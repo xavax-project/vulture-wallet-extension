@@ -1,0 +1,26 @@
+{
+    "name": "Vulture",
+    "version": "0.1.0",
+    "description": "Open-source, non-custodial DeFi wallet for Aleph Zero 'n' Substrate Friends ",
+    "manifest_version": 3,
+    "homepage_url": "https://vulture.network",
+    "background":{
+        "service_worker": "vulture_worker-bundle.js",
+        "type": "module"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Vulture"
+    },
+    "permissions": [
+        "clipboardWrite"
+      ],
+    "icons": {
+        "16": "icons/VultureIcon2.png",
+        "48": "icons/VultureIcon2.png",
+        "128": "icons/VultureIcon2.png"
+    }
+}
