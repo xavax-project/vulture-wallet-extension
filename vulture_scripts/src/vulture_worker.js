@@ -7,9 +7,9 @@ import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 import { KeyringPair } from "@polkadot/keyring/types";
 
-import { Codec } from '@polkadot/types-codec/types'
-import { hexToU8a } from '@polkadot/util/hex';
-import { TextDecoder } from "@polkadot/x-textdecoder";
+import { decodeAddress, encodeAddress } from "@polkadot/keyring";
+import { hexToU8a, isHex } from "@polkadot/util";
+
 
 
 //import {  } from '@polkadot/types-codec/utils';
@@ -148,6 +148,7 @@ self.addEventListener("message", (event) => {
                 includeUncontrolled: true,
                 type: 'window',
             }).then((clients) => {
+                /*
                 currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair).then((hash) => {
                     if(clients && clients.length) {
                         console.log(hash.toString());
@@ -157,6 +158,80 @@ self.addEventListener("message", (event) => {
                         }});
                     }
                 });
+                 */
+                currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair, ({events = [], status}) => {
+                    if(clients && clients.length) {
+                        if(status.isInBlock) {
+
+                            events.forEach(({event: {data,method,section}, phase}) => {
+                                if(method == 'ExtrinsicSuccess') {
+                                    clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                                        status: status.type,
+                                        blockHash: status.asInBlock.toHex(),
+                                        method: method,
+                                    }});
+                                }
+                            });
+                        }else if(status.isFinalized) {
+                            clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                                status: status.type,
+                                blockHash: status.asFinalized.toHex()
+                            }});
+                        }else {
+                            clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                                status: status.type,
+                            }});
+                        }
+                    }
+                });
+               
+            });
+        }
+    }
+    //Estimate tx fees
+    if(event.data && event.data.method === VultureMessage.ESTIMATE_TX_FEE) {
+        if(vault.seed != null && currentApi != null){
+            self.clients.matchAll({
+                includeUncontrolled: true,
+                type: 'window',
+            }).then((clients) => {
+                currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).paymentInfo(currentKeypair).then((info) => {
+                    if(clients && clients.length) {
+                        clients[0].postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
+                            success: true,
+                            result: info.toJSON(),
+                            fee: info.partialFee.toHuman()
+                        }});
+                    }
+                });
+            });
+        }
+    }
+    //Verify valid address
+    if(event.data && event.data.method === VultureMessage.IS_ADDRESS_VALID) {
+        if(vault.seed != null && currentApi != null){
+            self.clients.matchAll({
+                includeUncontrolled: true,
+                type: 'window',
+            }).then((clients) => {
+                if(clients && clients.length) {
+                    let result = false;
+    
+                    try {
+                        encodeAddress(
+                            isHex(event.data.params.address)
+                                ? hexToU8a(event.data.params.address)
+                                : decodeAddress(event.data.params.address)
+                        );
+                        result = true;
+                    }catch(error) {
+                        result = false;
+                    }
+                    clients[0].postMessage({method: VultureMessage.IS_ADDRESS_VALID, params: {
+                        success: true,
+                        isValid: result,
+                    }});
+                }
             });
         }
     }

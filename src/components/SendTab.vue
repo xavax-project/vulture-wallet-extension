@@ -1,7 +1,7 @@
 
 <template>
     <div class="flexBox box">
-        <div class="flexBox" style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 20px; padding-right: 20px; top: 20px; align-items: center;">
+        <div class="flexBox" style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 20px; padding-right: 20px; top: 20px; align-items: center;" :key="updateKey">
             <MinimalInput @on-enter="address($event)" inputPlaceholder="Address" inputWidth="315px" inputHeight="38px" fontSize="12px" inputName="Recipent Address"/>
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
               <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
@@ -9,22 +9,26 @@
                 <span v-if="vultureWallet.currentWallet">{{vultureWallet.currentWallet.accountData.network.networkAssetPrefix}}</span>
               </div>
             </div>
+            
             <span v-if="insufficientFunds" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Insufficient Funds!</span>
+            <span v-if="invalidAddress && currentAddress != ''" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Invalid Recipent Address!</span>
+            <span v-if="canSend()" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Estimated Fee: <span style="color: var(--accent_color">{{ estimatedFee.toFixed(7) }}</span></span>
 
         </div>
         <div style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 25px; padding-right: 25px; top: 285px;">
-            <DefaultButton :buttonDisabled="!canSend"
+            <DefaultButton :buttonDisabled="!canSend()"
             @button-click="sendButton()" buttonText="Send" buttonHeight="40px" buttonWidth="100%"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { PropType, ref } from 'vue';
+import { PropType, reactive, ref } from 'vue';
 import { VultureWallet } from '@/vulture_backend/wallets/IvultureWallet';
 
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import MinimalInput from "./building_parts/MinimalInput.vue";
+import { VultureMessage } from '@/vulture_backend/vultureMessage';
 export default {
   name: "SendTab",
   components: {
@@ -40,41 +44,64 @@ export default {
   },
   setup(props: any, context: any) {
 
-    let currentAmount = ref(0);
+    let updateKey = ref(0);
 
-    let insufficientFunds = ref(false);
-    let canSend = ref(false);
+    let currentAmount = ref(0);
 
     let currentAddress = ref('');
 
+    let estimatedFee = ref(0);
+
+    let insufficientFunds = ref(false);
+    let invalidAddress = ref(true);
+
     function address(address: string) {
-      this.currentAddress = address;
-      context.emit('address', this.currentAddress);
+      currentAddress.value = address;
+      (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid) => {
+          if(isValid) {
+            invalidAddress.value = false;
+          } else {
+            invalidAddress.value = true;
+          }
+      });
+      (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
     }
+    
     function amount(amount: number) {
       currentAmount.value = amount;
-      if(currentAmount.value > (props.vultureWallet as VultureWallet).currentWallet.accountData.freeAmountWhole) {
-        canSend.value = false;
-        insufficientFunds.value = true;
-      } else {
-        if(currentAmount.value > 0) {
-          canSend.value = true;
+      (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee) => {
+        estimatedFee.value = fee;
+        if((currentAmount.value + fee) < (props.vultureWallet as VultureWallet).currentWallet.accountData.freeAmountWhole) {
           insufficientFunds.value = false;
         }else {
-          canSend.value = false;
+          insufficientFunds.value = true;
         }
+      });
+      if(invalidAddress.value == false) {
+        (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
       }
-      context.emit('amount', this.currentAmount);
     }
     function sendButton() {
-        context.emit('send-button-click');
+      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value});
+      amount(0);
+      updateKey.value++;
+    }
+    function canSend() {
+      if(insufficientFunds.value == false && invalidAddress.value == false && currentAmount.value > 0) {
+        return true;
+      }
+      return false;
     }
     return {
-      canSend,
-      currentAmount,
-      currentAddress,
       insufficientFunds,
+      currentAddress,
+      invalidAddress,
+      currentAmount,
+      estimatedFee,
 
+      updateKey,
+
+      canSend: canSend,
       amount: amount,
       address: address,
       sendButton: sendButton,

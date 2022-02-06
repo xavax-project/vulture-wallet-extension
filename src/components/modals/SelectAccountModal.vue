@@ -3,13 +3,13 @@
         <div class="flexBox" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 5px; box-sizing: border-box; font-size: 24px;">
             
-            <div style="width: 100%; text-align: center; margin-bottom: 15px; margin-top: 20px;">
+            <div style="width: 100%; text-align: center; margin-bottom: 10px; margin-top: 20px;">
                 Select Account <br>
                 <span style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">You have <span style="color: var(--accent_color)">{{accountAmount}}</span> accounts.</span>
                 <hr>
             </div>
 
-            <div class="itemList" style="top: 5px; height: 355px;">
+            <div class="itemList" style="top: 0px; height: 370px;">
               <div class="flexBox" style="width: 100%; align-items: center;" >
               
                 <AccountModule style="margin-top: 10px;" v-for="(item, index) in vultureWallet.allAccounts" v-bind:key="item"

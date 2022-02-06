@@ -8,10 +8,7 @@
   <Navbar @switch-tab="setTab($event)"/>
 
   <SendTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'send' ? 'show' : 'hide'"
-  @send-button-click="transferAssets()"
-  @address="setTransferValues($event, true)"
-  @amount="setTransferValues($event, false)"
-
+  @send-button-click="transferAssets($event)"
   :vultureWallet="vultureWallet"/>
 
   <AccountsTab v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
@@ -57,6 +54,7 @@ import { doesWalletExist, VultureWallet, loadVault, Vault, loadAccounts,
          deleteWallet, VultureAccountStore, AccountData} from "./vulture_backend/wallets/IvultureWallet";
 import { Modals, WalletStates } from "./uiTypes";
 import { reactive, ref } from '@vue/reactivity';
+import { VultureMessage } from './vulture_backend/vultureMessage';
 
 //openWebApp();
 export default {
@@ -83,7 +81,7 @@ export default {
       /* --- Transfer Asset Variables & Functions --- */
 
       let recipentAddress = ref('');
-      let amountToSend = ref('');
+      let amountToSend = ref('')
 
       let selectedAccountIndex = ref(0);
 
@@ -91,11 +89,12 @@ export default {
         if(isAddress) {
           recipentAddress.value = value;
         }else {
-          amountToSend.value = value;
+          amountToSend.value = String(value);
         }
-        console.log("Sending: " + amountToSend.value + " To: " + recipentAddress.value);
       }
-      function transferAssets() {
+      function transferAssets(data: any) {
+        recipentAddress.value = data.recipent;
+        amountToSend.value = String(data.amount);
         setModal(modals.TRANSFER_ASSETS);
         //vultureWallet.currentWallet.transferAssets(recipentAddress.value, Number(amountToSend.value));
       }
@@ -159,6 +158,7 @@ export default {
         assetAmount,
         assetPrefix,
         address,
+        
 
         modals,
         state,
@@ -189,25 +189,6 @@ export default {
       setTab(tab: string) {
         this.currentTab = tab;
       },
-      sendButton() {
-        console.log("SEND!");
-      },
-
-      getAccountData() {
-        if(this.vultureWallet.currentWallet != null) {
-          return {
-            assetAmount: String(this.vultureWallet.currentWallet.accountData.freeAmountWhole),
-            assetPrefix: this.vultureWallet.currentWallet.accountData.network.networkAssetPrefix,
-            address: this.vultureWallet.currentWallet.accountData.address
-          }
-        } else {
-          return {
-            assetAmount: 'Loading',
-            assetPrefix: '...',
-            address: '~ v-v ~'
-          }
-        }
-      }
     },
     created() {
 

@@ -2,6 +2,7 @@ import localforage from "localforage";
 import { VultureMessage } from "../vultureMessage";
 import { encrypt } from "@metamask/browser-passworder";
 import { MnemonicSubstrateWallet } from "./mnemonicSubstrateWallet";
+import SafeEventEmitter from "@metamask/safe-event-emitter";
 
 /* --- Note # xavax # we are one @
     IvultureWallet.ts contains interfaces that are used by the Vulture wallet.
@@ -53,7 +54,7 @@ export interface AccountData {
     */
     accountIndex: number;
     freeAmountWhole: number;
-    freeAmountSmallestFraction: String;
+    freeAmountSmallestFraction: string;
     accountNonce: number;
     network: Network;
     walletType: WalletType;
@@ -98,6 +99,31 @@ export interface Network {
  */
 export interface VultureAccount {
 
+    /** ## accountEvents
+    * Due to the fact that a lot of computations happen in service & web workers, we use events
+    * to communicate the result of certain computations.
+    * 
+    * An example would be estimating a transaction fee, the flow of such a task would be something
+    * like this:
+    * 
+    * ### Example:
+    * 
+    * ```
+    * let account: VultureAccountImplementor;
+    * let currentFee: number = 0;
+    * 
+    * //Setup a once event callback for estimating a tx fee
+    * account.ccountEvents.once(vultureMessage.ESTIMATE_TX_FEE, (fee) => {
+    *       console.log("Fee in precise Whole units: " + fee);
+    *       currentFee = fee; 
+    * });
+    * 
+    * //Call the estimateTxFee(); Method that exists in VultureAccount implementors/
+    * account.estimateTxFee('Destination', '1.42');
+    * ```
+    */
+    accountEvents: SafeEventEmitter;
+
     /** ## accountData
     * The relevant Data each VultureAccount has, for example the address, derivation path, name, assetAmount, etc.
     */
@@ -107,9 +133,17 @@ export interface VultureAccount {
      * docs: Todo
      */
     transferAssets(destination: string, amountWhole: number): Promise<void>;
+    /** ## estimateTxFee();
+     * docs: Todo
+     */
+    estimateTxFee(destination: string, amountWhole: number): Promise<void>;
     /** ## updateAccountState();
-    * docs: Todo
-    */
+     * docs: Todo
+     */
+    /** ## updateAccountState();
+     * docs: Todo
+     */
+    isAddressValid(address: string): Promise<void>;
     updateAccountState(): Promise<void>;   
 }
 

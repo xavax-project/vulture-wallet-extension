@@ -3,7 +3,7 @@
     <div class="flexBox" style="width: 100%;">
       <div class="flexBox" style="width: 100%; flex-direction: row;">
         <div class="amountText">
-          {{ assetAmount }}<span class="azero">{{ assetPrefix }}</span>
+          {{ Number(assetAmount).toFixed(4) }}<span class="azero">{{ assetPrefix }}</span>
             <div class="underline"/>
         </div>
         <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 20px;" @click="selectAccount()">

@@ -2,7 +2,7 @@
 ### Easy-To-Use, multi-chain wallet made for [Aleph Zero](alephzero.org)
 
 
-Vulture is an easy-to-use multi-chain wallet made specifically for Aleph Zero. Vulture is completely open-source & non-custodial & made with love <3 By [Ira](https://twitter/diinkitheimp) and the [xavax.io](https://www.xavax.io) project.
+Vulture is an easy-to-use multi-chain wallet made specifically for Aleph Zero. Vulture is completely open-source & non-custodial, made with love <3 By [Ira](https://twitter/diinkitheimp) and the [xavax.io](https://www.xavax.io) project.
 
 #### Vulture is licensed under the permissive [MIT License](https://mit-license.org/).
 ___
@@ -10,7 +10,7 @@ ___
 * Vulture is early, you can see the roadmap at the [vulture website](https://vulturewallet.net).
 * Vulture aims to be multi-chain, with a focus on Aleph Zero. Multi-chain currently only works with
 other substrate-based networks.
-* Vulture aims to support the Ledger hard-ware wallet in the near-future, you will be able to use both non-hardware mnemonic accounts & Ledger accounts simultaneously.
+* Vulture aims to support the Ledger hardware wallet in the near future, you will be able to use both non-hardware mnemonic accounts & Ledger accounts simultaneously.
 
 ___
 
@@ -78,7 +78,7 @@ Follow [me](https://twitter/DiinkiTheImp) on twitter if you wanna!
 
 Feel free to help-out by: tipping, forking the code and creating pull requests, giving feedback, and also creating issues on Github if any issues arrise!
 
-**Tip address: AZERO**
+**AZERO Tipping address:**
 
 `some azero address in the future`
 
