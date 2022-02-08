@@ -11,6 +11,7 @@ import { VultureMessage } from "../vultureMessage";
 
 export class MnemonicSubstrateWallet implements VultureAccount {
 
+    public worker = new Worker('vulture_worker-bundle.js');
 
     public accountEvents = new SafeEventEmitter();
     public accountData: AccountData;
@@ -20,11 +21,13 @@ export class MnemonicSubstrateWallet implements VultureAccount {
         this.accountData = accountData;
 
 
-        navigator.serviceWorker.onmessage = (event) => {
+        this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.SET_CURRENT_WALLET) {
                 if(event.data.params.success == true) {
                     this.isWalletActive = true;
                     this.accountData.address = event.data.params.address;
+                    console.log("RECEIVED! " + event.data.params.address);
+                    
                     this.updateAccountState();     
                 }else {
                     console.error("Error: Vulture worker failed to setup Substrate wallet!");
@@ -32,12 +35,12 @@ export class MnemonicSubstrateWallet implements VultureAccount {
             }
 
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.SET_CURRENT_WALLET,
             params: {
                 keyring: {
                     type: 'sr25519',
-                    uri: seedPhrase + "//" + this.accountData.accountIndex + "/" +"0",
+                    uri: seedPhrase + "//" + this.accountData.accountIndex,
                 },
                 network: this.accountData.network.networkUri
             }
@@ -46,12 +49,12 @@ export class MnemonicSubstrateWallet implements VultureAccount {
 
 
     async transferAssets(destination: String, amountWhole: number) {
-        navigator.serviceWorker.onmessage = (event) => {
+        this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.TRANSFER_ASSETS) {
                 this.accountEvents.emit(VultureMessage.TRANSFER_ASSETS, event.data.params);
             }
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.TRANSFER_ASSETS,
             params: {
                 recipent: destination,
@@ -62,7 +65,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
     async estimateTxFee(destination: string, amountWhole: number) {
 
 
-        navigator.serviceWorker.onmessage = (event) => {
+        this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.ESTIMATE_TX_FEE) {
                 if(event.data.params.success == true) {
                     let fee = new BigNumber(event.data.params.result.partialFee)
@@ -73,7 +76,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
                 }
             }
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.ESTIMATE_TX_FEE,
             params: {
                 recipent: destination,
@@ -82,7 +85,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
         });
     }
     async isAddressValid(address: string) {
-        navigator.serviceWorker.onmessage = (event) => {
+        this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.IS_ADDRESS_VALID) {
                 if(event.data.params.success == true) {
                     this.accountEvents.emit(VultureMessage.IS_ADDRESS_VALID, event.data.params.isValid);
@@ -91,7 +94,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
                 }
             }
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.IS_ADDRESS_VALID,
             params: {
                 address: address,
@@ -100,7 +103,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
     }
     //Subscribe to account state
     async updateAccountState() {
-        navigator.serviceWorker.onmessage = (event) => {
+        this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.GET_ACCOUNT_STATE) {
                 if(event.data.params.success == true) {
                     let amount = new BigNumber(event.data.params.result.data.free);
@@ -125,16 +128,15 @@ export class MnemonicSubstrateWallet implements VultureAccount {
                     this.accountData.freeAmountWhole = wholeAmount.toNumber();
                     this.accountData.freeAmountSmallestFraction = amount.toString();
                     this.accountData.accountNonce = event.data.params.result.nonce;
-                    console.log(event.data.params.result);
                 }else {
                     console.error("Error: Vulture worker failed to get wallet state!");
                 }
             }
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.GET_ACCOUNT_STATE
         });
-        navigator.serviceWorker.controller?.postMessage({
+        this.worker.postMessage({
             method: VultureMessage.SUB_TO_ACCOUNT_STATE
         });
     }

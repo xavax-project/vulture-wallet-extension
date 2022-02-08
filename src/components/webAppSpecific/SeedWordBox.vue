@@ -1,19 +1,17 @@
 <template>
     <div style="display: flex; height: 100%; align-items: center;">
-        <div style="width: 28px; font-size: 18px; color: var(--accent_color)">
+        <div style="width: 28px; font-size: 16px; color: var(--accent_color)">
             {{wordIndex + 1}}
         </div>
-        <div>
-              <input class="inputCustom" v-model="currentWord" @input="onEnter()"
-               ref="word" min=0
-               placeholder="Word"/>
+        <div class="inputCustom">
+            {{word}}
         </div>
     </div>
 </template>
 
 <script>
 export default {
-  name: "SeedWordEdit",
+  name: "SeedWordBox",
   props: {
     word: String,
     wordIndex: Number
@@ -24,18 +22,8 @@ export default {
       }
   },
   methods: {
-    onEnter() {
-        this.$emit("update-word", {
-            newWord: this.currentWord,
-            index: this.wordIndex
-        });
-    }
+
   },
-  mounted() {
-      this.$nextTick(function() {
-            this.$refs["word"].value = this.word;
-      });
-  }
 };
 </script>
 
@@ -62,15 +50,6 @@ export default {
   margin: 5px;
   height: 24px;
   width: 90px;
-}
-.inputCustom:hover{
-    transition-duration: 120ms;
-    border-color: rgb(55, 190, 112);
-    
-}
-.inputCustom:focus{
-    transition-duration: 120ms;
-    border-color: rgb(55, 190, 112);
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

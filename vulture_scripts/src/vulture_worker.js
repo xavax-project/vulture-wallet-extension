@@ -2,11 +2,10 @@
 import { VultureMessage } from "../../src/vulture_backend/vultureMessage";
 import { VultureRequest } from "../../src/vulture_backend/vultureRPC";
 
+import { cryptoWaitReady } from '@polkadot/util-crypto';
+
 import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
 //
-import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { KeyringPair } from "@polkadot/keyring/types";
-
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from "@polkadot/util";
 
@@ -27,7 +26,7 @@ import { hexToU8a, isHex } from "@polkadot/util";
 var isCryptoReady = false;
 //Initialize WASM.
 cryptoWaitReady().then((ready) => {
-    isCryptoReady = ready;
+    isCryptoReady = true;
 });
 
 var vault = {
@@ -40,78 +39,58 @@ var currentWsProvider;
 var currentApi;
 
 self.addEventListener("message", (event) => {
-    if(event.data && event.data.method === VultureMessage.REQUEST_VAULT) {
-        self.clients.matchAll({
-            includeUncontrolled: true,
-            type: 'window',
-        }).then((clients) => {
-            if(clients && clients.length) {
-                clients[0].postMessage({method: VultureMessage.REQUEST_VAULT, params: {seed: vault.seed}});
-            }
-        });
-    }
     if(event.data && event.data.method === VultureMessage.SET_CURRENT_WALLET) {
-        self.clients.matchAll({
-            includeUncontrolled: true,
-            type: 'window',
-        }).then((clients) => {
+        if(currentWsProvider != null) {
+            currentWsProvider.disconnect();
+        }
+        if(isCryptoReady == false) {
+            cryptoWaitReady().then((ready) => {
+                isCryptoReady = true;
 
-            if(currentWsProvider != null) {
-                currentWsProvider.disconnect();
-            }
-
-            const keyring = new Keyring({type: event.data.params.keyring.type});
-            currentKeypair = keyring.addFromUri(event.data.params.keyring.uri);
-            currentWsProvider = new WsProvider(event.data.params.network);
-            currentWsProvider.isReady.then((ready) => {
-                ApiPromise.create({provider: currentWsProvider}).then((api) => {
-                    currentApi = api;
-                    console.log("Substrate Api has been generated succesfully!");
-                    if(clients && clients.length) {
-                        clients[0].postMessage({method: VultureMessage.SET_CURRENT_WALLET, params: {
+                const keyring = new Keyring({type: event.data.params.keyring.type});
+                currentKeypair = keyring.addFromUri(event.data.params.keyring.uri);
+                currentWsProvider = new WsProvider(event.data.params.network);
+                currentWsProvider.isReady.then((ready) => {
+                    ApiPromise.create({provider: currentWsProvider}).then((api) => {
+                        currentApi = api;
+                        console.log("Substrate Api has been generated succesfully!");
+                        postMessage({method: VultureMessage.SET_CURRENT_WALLET, params: {
                             success: true,
                             address: currentKeypair.address,
                         }});
                         console.log("Vulture Worker succesfully generated keypair");
-                    }
+                    });
                 });
             });
+        }
 
-            /* //NOTE : Due to webpack being a bitch to use with web-workers/webpack,
-            //          I'll create my own API for substrate & AZERO in the future, in native js(ts).
-            //          For now, you'll have to manually edit the generated bundle by webpack to fix a bug.
-            let socket = new WebSocket(event.data.params.network);
-            let r = ApiPromise;
-            socket.onopen = function(event) {
-                let req = new VultureRequest("state_getMetadata");
-                socket.send(req.getJson());
-                socket.onmessage = function(event) {
-                    let d = new TextDecoder().decode(hexToU8a(event.data.result));
-                    console.log(d);
-                }
+        /* //NOTE : Due to webpack being a bitch to use with web-workers/webpack,
+        //          I'll create my own API for substrate & AZERO in the future, in native js(ts).
+        //          For now, you'll have to manually edit the generated bundle by webpack to fix a bug.
+        let socket = new WebSocket(event.data.params.network);
+        let r = ApiPromise;
+        socket.onopen = function(event) {
+            let req = new VultureRequest("state_getMetadata");
+            socket.send(req.getJson());
+            socket.onmessage = function(event) {
+                let d = new TextDecoder().decode(hexToU8a(event.data.result));
+                console.log(d);
             }
-             */
-            //let response = req.postJsonRPC(event.data.params.network);
-            //console.log(response);
-        });
+        }
+         */
+        //let response = req.postJsonRPC(event.data.params.network);
+        //console.log(response);
     }
 
     if(event.data && event.data.method === VultureMessage.GET_ADDRESS_FROM_URI) {
-        self.clients.matchAll({
-            includeUncontrolled: true,
-            type: 'window',
-        }).then((clients) => {
-            const keyring = new Keyring({type: event.data.params.keyring.type});
-            currentKeypair = keyring.addFromUri(event.data.params.keyring.uri);
-            if(clients && clients.length) {
-                clients[0].postMessage({method: VultureMessage.GET_ADDRESS_FROM_URI, params: {
-                    success: true,
-                    address: currentKeypair.address,
-                    accountIndex: event.data.params.keyring.accountIndex,
-                }});
-                console.log("Vulture Worker succesfully generated keypair");
-            }
-        });
+        const keyring = new Keyring({type: event.data.params.keyring.type});
+        currentKeypair = keyring.addFromUri(event.data.params.keyring.uri);
+        postMessage({method: VultureMessage.GET_ADDRESS_FROM_URI, params: {
+            success: true,
+            address: currentKeypair.address,
+            accountIndex: event.data.params.keyring.accountIndex,
+        }});
+        console.log("Vulture Worker succesfully generated keypair");
     }
 
     //Set Network
@@ -125,145 +104,92 @@ self.addEventListener("message", (event) => {
         currentWsProvider.isReady.then((ready) => {
             ApiPromise.create({provider: currentWsProvider}).then((api) => {
                 currentApi = api;
-    
-                self.clients.matchAll({
-                    includeUncontrolled: true,
-                    type: 'window',
-                }).then((clients) => {
-                    if(clients && clients.length) {
-                        clients[0].postMessage({method: VultureMessage.SET_NETWORK, params: {
-                            success: true,
-                        }});
-                        console.log("Switched Substrate Network succesfully...");
-                    }
-                });
-    
+                postMessage({method: VultureMessage.SET_NETWORK, params: {
+                    success: true,
+                }});
+                console.log("Switched Substrate Network succesfully...");  
             });
         });
     }
     //Send assets
     if(event.data && event.data.method === VultureMessage.TRANSFER_ASSETS) {
         if(vault.seed != null && currentApi != null){
-            self.clients.matchAll({
-                includeUncontrolled: true,
-                type: 'window',
-            }).then((clients) => {
-                /*
-                currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair).then((hash) => {
-                    if(clients && clients.length) {
-                        console.log(hash.toString());
-                        clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                            success: true,
-                            result: hash.toString(),
-                        }});
-                    }
-                });
-                 */
-                currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair, ({events = [], status}) => {
-                    if(clients && clients.length) {
-                        if(status.isInBlock) {
+            currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair, ({events = [], status}) => {
+                if(status.isInBlock) {
 
-                            events.forEach(({event: {data,method,section}, phase}) => {
-                                if(method == 'ExtrinsicSuccess') {
-                                    clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                                        status: status.type,
-                                        blockHash: status.asInBlock.toHex(),
-                                        method: method,
-                                    }});
-                                }
-                            });
-                        }else if(status.isFinalized) {
-                            clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                    events.forEach(({event: {data,method,section}, phase}) => {
+                        if(method == 'ExtrinsicSuccess') {
+                            postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
                                 status: status.type,
-                                blockHash: status.asFinalized.toHex()
-                            }});
-                        }else {
-                            clients[0].postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                                status: status.type,
+                                blockHash: status.asInBlock.toHex(),
+                                method: method,
                             }});
                         }
-                    }
-                });
-               
+                    });
+                }else if(status.isFinalized) {
+                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                        status: status.type,
+                        blockHash: status.asFinalized.toHex()
+                    }});
+                }else {
+                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                        status: status.type,
+                    }});
+                }
             });
         }
     }
     //Estimate tx fees
     if(event.data && event.data.method === VultureMessage.ESTIMATE_TX_FEE) {
         if(vault.seed != null && currentApi != null){
-            self.clients.matchAll({
-                includeUncontrolled: true,
-                type: 'window',
-            }).then((clients) => {
-                currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).paymentInfo(currentKeypair).then((info) => {
-                    if(clients && clients.length) {
-                        clients[0].postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
-                            success: true,
-                            result: info.toJSON(),
-                            fee: info.partialFee.toHuman()
-                        }});
-                    }
-                });
+            currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).paymentInfo(currentKeypair).then((info) => {
+                postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
+                    success: true,
+                    result: info.toJSON(),
+                    fee: info.partialFee.toHuman()
+                }});
             });
         }
     }
     //Verify valid address
     if(event.data && event.data.method === VultureMessage.IS_ADDRESS_VALID) {
         if(vault.seed != null && currentApi != null){
-            self.clients.matchAll({
-                includeUncontrolled: true,
-                type: 'window',
-            }).then((clients) => {
-                if(clients && clients.length) {
-                    let result = false;
-    
-                    try {
-                        encodeAddress(
-                            isHex(event.data.params.address)
-                                ? hexToU8a(event.data.params.address)
-                                : decodeAddress(event.data.params.address)
-                        );
-                        result = true;
-                    }catch(error) {
-                        result = false;
-                    }
-                    clients[0].postMessage({method: VultureMessage.IS_ADDRESS_VALID, params: {
-                        success: true,
-                        isValid: result,
-                    }});
-                }
-            });
+            let result = false;
+            try {
+                encodeAddress(
+                    isHex(event.data.params.address)
+                        ? hexToU8a(event.data.params.address)
+                        : decodeAddress(event.data.params.address)
+                );
+                result = true;
+            }catch(error) {
+                result = false;
+            }
+            postMessage({method: VultureMessage.IS_ADDRESS_VALID, params: {
+                success: true,
+                isValid: result,
+            }});
         }
     }
     //Query the account state.
     if(event.data && event.data.method === VultureMessage.GET_ACCOUNT_STATE) {
         if(vault.seed != null && currentApi != null){
-            self.clients.matchAll({
-                includeUncontrolled: true,
-                type: 'window',
-            }).then((clients) => {
-                currentApi.query.system.account(currentKeypair.address).then((result) => {
-                    clients[0].postMessage({method: VultureMessage.GET_ACCOUNT_STATE, params: {
-                        success: true,
-                        result: result.toJSON(),
-                    }});
-                });
+            currentApi.query.system.account(currentKeypair.address).then((result) => {
+                postMessage({method: VultureMessage.GET_ACCOUNT_STATE, params: {
+                    success: true,
+                    result: result.toJSON(),
+                }});
             });
         }
     }
     //Subscribe to getting the account state.
     if(event.data && event.data.method === VultureMessage.SUB_TO_ACCOUNT_STATE) {
         if(vault.seed != null && currentApi != null){
-            self.clients.matchAll({
-                includeUncontrolled: true,
-                type: 'window',
-            }).then((clients) => {
-                currentApi.query.system.account(currentKeypair.address, (result) => {
-                    clients[0].postMessage({method: VultureMessage.SUB_TO_ACCOUNT_STATE, params: {
-                        success: true,
-                        result: result.toJSON(),
-                    }});
-                });
+            currentApi.query.system.account(currentKeypair.address, (result) => {
+                postMessage({method: VultureMessage.SUB_TO_ACCOUNT_STATE, params: {
+                    success: true,
+                    result: result.toJSON(),
+                }});
             });
         }
     }

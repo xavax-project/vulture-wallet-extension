@@ -98,8 +98,8 @@ export default {
     function send() {
         currentTxState.value = TxState.SENDING;
         let timer = setInterval(async () => {
-            txTimer.value += 0.05;
-        }, 50);
+            txTimer.value += 0.01;
+        }, 10);
         (props.vultureWallet as VultureWallet).currentWallet.accountEvents.removeAllListeners(VultureMessage.TRANSFER_ASSETS);
         (props.vultureWallet as VultureWallet).currentWallet.accountEvents.on(VultureMessage.TRANSFER_ASSETS, (params) => {
             if(params.status == 'InBlock') {

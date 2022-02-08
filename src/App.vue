@@ -18,13 +18,19 @@
   @create-new-account="setModal(modals.CREATE_NEW_ACCOUNT)"
   @modify-account="modifyAccount($event)"/>
 
+  <SettingsTab v-bind:class="currentTab == 'settings' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
+  :vultureWallet="vultureWallet"
+  @reset-wallet="resetWallet()"
+  />
+
   <Modal v-bind:class="currentModal == modals.NONE ? 'hide' : 'show'"
   :modalType="currentModal"
   :vultureWallet="vultureWallet"
   :selectedAccountIndex="selectedAccountIndex"
   :recipentAddress="recipentAddress"
   :amountToSend="amountToSend"
-  @quit-modal="quitModal()"/>
+  @quit-modal="quitModal()"
+  @on-wallet-reset="onWalletReset()"/>
 
 </div>
 
@@ -43,6 +49,7 @@ import OverviewModule from "./components/OverviewModule.vue";
 import DefaultButton from "./components/building_parts/DefaultButton.vue"
 import UnlockWallet from "./components/UnlockWallet.vue"
 import AccountsTab from "./components/AccountsTab.vue"
+import SettingsTab from "./components/SettingsTab.vue"
 import Onboarding from "./components/Onboarding.vue"
 import SendTab from "./components/SendTab.vue"
 import Navbar from "./components/Navbar.vue"
@@ -64,6 +71,7 @@ export default {
       DefaultButton,
       UnlockWallet,
       AccountsTab,
+      SettingsTab,
       Onboarding,
       SendTab,
       Navbar,
@@ -107,7 +115,7 @@ export default {
       doesWalletExist().then((value) => {
         if(value == true) {
           walletState.value = WalletStates.WALLET;
-          loadVault().then((value) => {
+          loadVault().then((value: any) => {
             vault.value = value as any;
               walletState.value = WalletStates.PASSWORD_LOCKED;
             //if(vault == null) {
@@ -150,6 +158,14 @@ export default {
         currentModal.value = Modals.NONE;
       }
 
+      function resetWallet() {
+        currentModal.value = modals.RESET_WALLET
+      }
+      function onWalletReset() {
+        currentModal.value = modals.NONE;
+        walletState.value = WalletStates.ONBOARDING;
+      }
+
       return {
         vultureWallet,
         walletState,
@@ -173,7 +189,9 @@ export default {
         setTransferValues: setTransferValues,
         setModal: setModal,
         quitModal: quitModal,
-        modifyAccount: modifyAccount
+        resetWallet: resetWallet,
+        modifyAccount: modifyAccount,
+        onWalletReset: onWalletReset,
       }
     },
     data(){

@@ -12,8 +12,8 @@
       </div>
 
       <div class="flexBox" style="width: 100%; justify-content: flex-end; align-items: center;">
-        <div style="margin: 6px; margin-left: 20px; align-self: flex-start;">
-        <div style="font-size 16px;">your address:</div>
+        <div style="margin: 6px; margin-left: 20px; align-self: flex-start; font-size 16px;">
+        <div class="workPlease" style="font-size 16px;">your address:</div>
         </div>
         <div class="addressText" style="">
           {{ address }}
@@ -44,7 +44,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.workPlease {
+  font-size: 16px;
+}
 .selectAccountButton {
   font-family: fonticonA;
   font-size: 22px;

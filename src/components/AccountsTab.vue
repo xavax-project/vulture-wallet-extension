@@ -36,7 +36,7 @@ import { PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
 
 export default {
-  name: "SendTab",
+  name: "AccountsTab",
   components: {
     DefaultButton,
     AccountModule,

@@ -55,12 +55,10 @@ Building everytime you make a change is slow, so if you want to develop I recomm
 
 This will launch a locally-hosted webserver where you can test the wallet in a web-page and make changes accordingally. You can enter inspect-mode and limit the resolution to imitate the extension-popup resolution.
 
-Note: You will need to uncomment the specified line in `main.ts` when you serve to a page, make sure to comment it again before running `yarn build` (not catastrophic if you forget).
-
 You will need to edit the `vulture_worker-bundle.js` file as well, but in the `public` folder instead. You will only have to edit the file once every time you run `yarn serve`.
 
 ### Scripts:
-Vulture has a Service-worker which handles important things in the *background*, and also has all the WASM functionality of the wallet since WASM isn't allowed in the extension environment. Everytime you edit the script or If you want to build the scripts manually, you can run:
+Vulture has a Web-Worker which handles important things in the *background*, and also has all the WASM functionality of the wallet since WASM isn't allowed in the extension environment. Everytime you edit the script or If you want to build the scripts manually, you can run:
 
 `yarn build-scripts`.
 
@@ -80,7 +78,7 @@ Feel free to help-out by: tipping, forking the code and creating pull requests, 
 
 **AZERO Tipping address:**
 
-`some azero address in the future`
+`some azero address in the future maybe`
 
 
 ### Hope you have a great time, all the time!~

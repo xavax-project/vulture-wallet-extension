@@ -12,8 +12,9 @@ module.exports = {
         "path": require.resolve('path-browserify'),
         "stream": require.resolve('stream-browserify'),
         "crypto": require.resolve('crypto-browserify'),
-    } 
-  }, 
+    },
+  },
+
   mode: 'production',
   //devtool: false,
   entry: {

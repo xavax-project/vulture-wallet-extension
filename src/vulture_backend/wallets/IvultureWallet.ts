@@ -99,6 +99,8 @@ export interface Network {
  */
 export interface VultureAccount {
 
+    worker: Worker;
+
     /** ## accountEvents
     * Due to the fact that a lot of computations happen in service & web workers, we use events
     * to communicate the result of certain computations.
@@ -202,6 +204,7 @@ export class DefaultNetworks {
 }
 
 export class VultureWallet {
+
     public currentWallet!: VultureAccount;
     public allAccounts: AccountData[] = [];
     public nextDerivIndex: number = 0;
@@ -246,7 +249,7 @@ export class VultureWallet {
                 localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(store))).catch((err) => {
                     console.error(err);
                 });
-
+                this.currentWallet.worker.terminate();
                 this.currentWallet = new MnemonicSubstrateWallet(this.vault.seed, this.allAccounts[index - 1]);    
  
             }else {
@@ -257,12 +260,12 @@ export class VultureWallet {
 
     }
     switchNetwork() {
-        navigator.serviceWorker.onmessage = (event) => {
+        this.currentWallet.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.SET_NETWORK) {
                 this.currentWallet.updateAccountState();
             }
         };
-        navigator.serviceWorker.controller?.postMessage({
+        this.currentWallet.worker.postMessage({
             method: VultureMessage.SET_NETWORK,
             params: {
                 network: JSON.parse(JSON.stringify(this.currentWallet.accountData.network)),
@@ -284,7 +287,7 @@ export class VultureWallet {
     }
     createAccount(network: Network, accountName: string, walletType: WalletType) {
         createNewAccount(network, accountName, walletType).then((account) => {
-            navigator.serviceWorker.onmessage = (event) => {
+            this.currentWallet.worker.onmessage = (event) => {
                 if(event.data.method == VultureMessage.GET_ADDRESS_FROM_URI && event.data.params.success == true) {
                     this.allAccounts[event.data.params.accountIndex - 1].address = event.data.params.address;
                     this.saveAccounts();
@@ -298,7 +301,7 @@ export class VultureWallet {
             this.allAccounts.push(account);
             this.nextDerivIndex = account.accountIndex + 1;
 
-            navigator.serviceWorker.controller?.postMessage({
+            this.currentWallet.worker.postMessage({
                 method: VultureMessage.GET_ADDRESS_FROM_URI,
                 params: {
                     keyring: {
@@ -351,15 +354,7 @@ export async function deleteWallet() {
     await localforage.removeItem("vultureAccounts");
 }
 
-/** # createVault()
- *  Creates a `Vault` and saves it to localstorage (encrypted) and also caches it
- *  in the service worker for 3 minutes (un-encrypted).
- * 
- * ## Note:
- * `createVault()` will not override the existing vault, if one already exists the function will
- * simply print an error.
- */
-export function createVault(vault: Vault, password: string) {
+export async function createVault(vault: any, password: string) {
     localforage.getItem("vault").then((value) => {
         if(value != null){
             console.error("Error: Tried creating a vault when a vault already exists!");
@@ -371,7 +366,7 @@ export function createVault(vault: Vault, password: string) {
                     return;
                 });
             });
-            navigator.serviceWorker.controller?.postMessage({
+            this.currentWallet.worker.postMessage({
                 method: VultureMessage.SET_VAULT,
                 vault: vault,
             });
@@ -386,10 +381,7 @@ export function createVault(vault: Vault, password: string) {
  * ## Note:
  * The value return is a `Vault` if found, and false if no Vault has been created (meaing no seed-phrase/hardware wallet).
  */
-export async function loadVault() {
-
-    let vault;
-
+export async function loadVault() {    let vault;
     vault = await localforage.getItem("vault").then((value) => {
         if(value != null) {
             return value as string;
@@ -398,21 +390,8 @@ export async function loadVault() {
             return null;
         }
     });
-    navigator.serviceWorker.onmessage = async (event) => {
-        if(event.data.method == VultureMessage.REQUEST_VAULT) {
-            if(event.data.params.vault != '') {
-                vault = event.data.params.vault as Vault;
-            }else {
-                console.log("Worker vault cache is freed, loading from storage...");
-            }
-        }
-    };
-    navigator.serviceWorker.controller?.postMessage({
-        method: VultureMessage.REQUEST_VAULT,
-    });
     return vault;
 }
-
 
 export async function loadAccounts() {
     let store;
@@ -454,6 +433,11 @@ export async function removeLatestAccount() {
     });
 }
 
+export function hardWalletReset() {
+    localforage.removeItem("vultureAccounts");
+    localforage.removeItem("vault");
+}
+
 /** # createNewAccount()
  * A function that creates and adds a new Vulture account to storage, this function is used to to
  * add/create new accounts, including the initial account, and also automatically save the account
@@ -466,7 +450,7 @@ export async function createNewAccount(network: Network, accountName: string, wa
             val.allAccounts.push({
                 accountName: accountName,
                 address: "",
-                derivationPath: "//" + val.nextAccountDerivIndex + "/0",
+                derivationPath: "//" + val.nextAccountDerivIndex,
                 accountIndex: val.nextAccountDerivIndex,
                 freeAmountWhole: 0,
                 accountNonce: 0,
@@ -484,7 +468,7 @@ export async function createNewAccount(network: Network, accountName: string, wa
                 allAccounts: [{
                     accountName: accountName,
                     address: "",
-                    derivationPath: "//0/0",
+                    derivationPath: "//0",
                     accountIndex: 0,
                     freeAmountWhole: 0,
                     accountNonce: 0,

@@ -1,7 +1,7 @@
 {
     "name": "Vulture",
     "version": "0.1.4",
-    "description": "Open-source, non-custodial DeFi wallet for Aleph Zero 'n' Substrate Friends ",
+    "description": "Sleek multi-chain crypto wallet, made for Aleph Zero.",
     "manifest_version": 2,
     "homepage_url": "https://vulture.network",
     "browser_action": {

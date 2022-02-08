@@ -20,11 +20,17 @@
         :vultureWallet="vultureWallet"
         :recipentAddress="recipentAddress"
         :amountToSend="amountToSend"/>
+
+        <ResetWalletModal v-if="modalType == modals.RESET_WALLET"
+        @quit-modal="quitModal"
+        @on-wallet-reset="hardWalletReset()"
+        :vultureWallet="vultureWallet"/>
     </div>
 </template>
 
 <script lang="ts">
 import DefaultButton from "../building_parts/DefaultButton.vue";
+import ResetWalletModal from './ResetWalletModal.vue';
 import CreateAccountModal from './CreateAccountModal.vue';
 import ModifyAccountModal from './ModifyAccountModal.vue';
 import SelectAccountModal from './SelectAccountModal.vue';
@@ -42,6 +48,7 @@ export default {
   name: "Modal",
   components: {
     DefaultButton,
+    ResetWalletModal,
     ModifyAccountModal,
     CreateAccountModal,
     SelectAccountModal,
@@ -67,10 +74,14 @@ export default {
     function quitModal() {
         context.emit("quit-modal");
     }
+    function hardWalletReset() {
+        context.emit("on-wallet-reset");
+    }
 
     return {
         modals,
         quitModal: quitModal,
+        hardWalletReset: hardWalletReset
     }
   }
 };
