@@ -6,8 +6,13 @@
           {{ Number(assetAmount).toFixed(4) }}<span class="azero">{{ assetPrefix }}</span>
             <div class="underline"/>
         </div>
-        <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 20px;" @click="selectAccount()">
-          &#xf0c9;
+        <div class="flexBox" style="">
+          <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 20px;" @click="selectAccount()">
+            &#xf0c9;
+          </div>
+          <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 8px;" @click="selectNetwork()">
+            &#xf0ac;
+          </div>
         </div>
       </div>
 
@@ -35,8 +40,12 @@ export default {
     function selectAccount() {
       context.emit("select-account");
     }
+    function selectNetwork() {
+      context.emit("select-network")
+    }
     return {
       selectAccount: selectAccount,
+      selectNetwork: selectNetwork
     }
   }
 };

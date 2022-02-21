@@ -10,6 +10,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@ledgerhq/hw-app-polkadot": "^6.24.1",
+    "@ledgerhq/hw-transport-webusb": "^6.24.1",
     "@metamask/browser-passworder": "^3.0.0",
     "@metamask/safe-event-emitter": "^2.0.0",
     "@open-wc/webpack-import-meta-loader": "^0.4.7",

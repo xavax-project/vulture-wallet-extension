@@ -2,21 +2,12 @@
     <div class="flexBox" style="height: 100%; width: 100%;">
         <div class="flexBox" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;">
-            <DefaultInput @on-enter="setName($event)" inputWidth="100%" inputHeight="40px" fontSize="18px" inputName="Account Name" inputPlaceholder="'NFT Acc'"/>
+            <DefaultInput @on-enter="setName($event)" inputWidth="100%" inputHeight="40px" fontSize="18px" inputName="Account Name" :inputPlaceholder='"\"" +getRandomAccountName() + "\""'/>
             
             <div style="width: 100%; text-align: left; margin-bottom: 18px; margin-top: 20px;">
                 Account Index: <span style="color: var(--accent_color)">{{nextAccountIndex}}</span> <br>
                 <i style="font-size: 13px;  color: var(--fg_color_2)">The account will always be the same at the given index.</i>
                 <hr>
-            </div>
-            <div style="width: 100%; text-align: left; margin-bottom: 18px;">
-                Network: <span style="color: var(--accent_color)">{{selectedNetwork.network.networkName}}</span> <br>
-                <i style="font-size: 13px;  color: var(--fg_color_2)">You can switch network at any time.</i>
-                <hr>
-            </div>
-            <div style="display: flex; align-items: center; flex-direction: column; width: 100%;margin: 15px;">
-                <DropdownSelection selectionText="Select Network" scrollHeight="120px" selectionWidth="70%" fontSize="18px" selectionHeight="35px" :dropDownContent="Array.from(networks.allNetworks.keys())"
-                @on-select="selectNetwork($event)"/>
             </div>
         </div>
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
@@ -31,6 +22,8 @@ import DefaultButton from "../building_parts/DefaultButton.vue";
 import DefaultInput from "../building_parts/DefaultInput.vue";
 import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/IvultureWallet";
+import { getRandomAccountName} from "../../randomNames";
+
 import { PropType, reactive, ref } from 'vue';
 
 export default {
@@ -52,7 +45,6 @@ export default {
     let accountName: string;
     const networks = new DefaultNetworks();
 
-    let selectedNetwork = reactive({network: networks.AlephZero});
 
     function quitModal() {
         context.emit("quit-modal");
@@ -60,25 +52,20 @@ export default {
     function setName(name: string) {
         accountName = name;
     }
-    function selectNetwork(network: string) {
-        let ntwrk = networks.allNetworks.get(network);
-        selectedNetwork.network = (ntwrk == undefined ? networks.AlephZero : ntwrk);
-    }
+
     function createAccount() {       /*Easiest way to get object from proxy...*/
-        props.vultureWallet.createAccount(JSON.parse(JSON.stringify(selectedNetwork.network)),
-        accountName,
+        props.vultureWallet.createAccount(accountName,
         WalletType.MnemonicPhrase);
         quitModal();
     }
 
     return {
         networks,
-        selectedNetwork,
 
         quitModal: quitModal,
         setName: setName,
         createAccount: createAccount,
-        selectNetwork: selectNetwork
+        getRandomAccountName: getRandomAccountName
     }
   }
 };

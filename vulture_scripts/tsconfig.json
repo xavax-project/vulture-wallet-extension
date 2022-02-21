@@ -1,0 +1,48 @@
+{
+    "compilerOptions": {
+      "target": "esnext",
+      "module": "esnext",
+      "strict": true,
+      "noImplicitThis": false,
+      "jsx": "preserve",
+      "importHelpers": true,
+      "moduleResolution": "node",
+      "experimentalDecorators": true,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "allowJs": true,
+      "sourceMap": true,
+      "baseUrl": ".",
+      "types": [
+        "webpack-env"
+      ],
+      "paths": {
+        "stream": [ "./node_modules/stream-browserify"],
+        "crypto": [ "./node_modules/crypto-browserify"],
+        "path": [ "./node_modules/path-browserify"],
+        "os": ["./node_modules/os-browserify"],
+        "buffer": ["./node_modules/buffer"],
+        "@/*": [
+          "src/*"
+        ]
+      },
+      "lib": [
+        "esnext",
+        "dom",
+        "dom.iterable",
+        "scripthost"
+      ]
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.vue",
+      "tests/**/*.ts",
+      "tests/**/*.tsx",
+      "src/**/*.js"
+  ],
+    "exclude": [
+      "node_modules"
+    ]
+  }

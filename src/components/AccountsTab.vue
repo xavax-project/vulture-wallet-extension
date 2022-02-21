@@ -11,7 +11,7 @@
             @module-click="modifyAccount($event)"/>
 
             <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 70%; flex-direction: row; align-self: center; justify-content: space-evenly;">
-              <DefaultButton :buttonDisabled="vultureWallet.allAccounts.length > 1 ? false : true " @button-click="removeAccount()" style="margin-top: 5px; margin-bottom: 15px;"
+              <DefaultButton :buttonDisabled="vultureWallet.accountStore.allAccounts.length > 1 ? false : true " @button-click="removeAccount()" style="margin-top: 5px; margin-bottom: 15px;"
                buttonWidth="100px" buttonHeight="30px" buttonText="Remove" fontSize="16px"/>
   
               <DefaultButton @button-click="createNewAccount()" style="margin-top: 5px; margin-bottom: 15px;"

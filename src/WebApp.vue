@@ -63,6 +63,15 @@ html {
   margin: 0px;
   padding: 0px;
 }
+a {
+  color: var(--accent_color);
+  transition-duration: 100ms;
+}
+a:hover {
+  transition-duration: 100ms;
+  text-shadow: 0px 0px 3px var(--accent_color);
+  text-decoration: none;
+}
 ::selection {
   background: var(--accent_color);
 }

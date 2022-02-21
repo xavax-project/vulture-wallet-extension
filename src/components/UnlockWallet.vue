@@ -29,11 +29,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import DefaultInput from "./building_parts/DefaultInput.vue";
 import { decrypt } from "@metamask/browser-passworder";
 import { Vault } from "../vulture_backend/wallets/IvultureWallet";
+import { PropType } from 'vue';
 export default {
   name: "UnlockWallet",
   components: {
@@ -48,10 +49,10 @@ export default {
       }
   },
   props: {
-      encryptedVault: Vault
+      encryptedVault: String,
   },
   methods: {
-    setPassword(password) {
+    setPassword(password: any) {
         this.password = password;
     },
     attemptUnlock() {

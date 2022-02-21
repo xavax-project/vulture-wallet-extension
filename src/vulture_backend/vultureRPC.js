@@ -10,18 +10,18 @@ export class VultureRequest {
     }
     
      /** # getJson()
-     * Returns the JSONRPC data ready to be sent, with headers and everythign (but doesn't send it...)
+     * Returns the JSONRPC data ready to be sent (but doesn't send it...)
      * ____
      */
-         getJson() {
-            return JSON.stringify({
-                method: this.method,
-                params: this.params,
-                id: 1,
-                jsonrpc: '2.0'
-            });
-            
-        }
+    getJson() {
+        return JSON.stringify({
+            method: this.method,
+            params: this.params,
+            id: 1,
+            jsonrpc: '2.0'
+        });
+        
+    }
 
     /** # postJsonRPC()
      * Returns a promise containing the RPC Response.

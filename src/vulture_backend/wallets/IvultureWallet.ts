@@ -1,7 +1,7 @@
 import localforage from "localforage";
 import { VultureMessage } from "../vultureMessage";
 import { encrypt } from "@metamask/browser-passworder";
-import { MnemonicSubstrateWallet } from "./mnemonicSubstrateWallet";
+import { MnemonicWallet } from "./mnemonicWallet";
 import SafeEventEmitter from "@metamask/safe-event-emitter";
 
 /* --- Note # xavax # we are one @
@@ -56,7 +56,6 @@ export interface AccountData {
     freeAmountWhole: number;
     freeAmountSmallestFraction: string;
     accountNonce: number;
-    network: Network;
     walletType: WalletType;
 }
 
@@ -68,12 +67,12 @@ export interface AccountData {
 export enum WalletType {
     MnemonicPhrase,
     Ledger,
-    Trezor
 }
 export enum NetworkType {
-    SolanaRuntime,
-    Avalanche,
     Substrate,
+    Solana,
+    AVM, //Avalanche virtual machine
+    PVM, //Platform virtual machine (also on avalanche)
     EVM,
 }
 
@@ -89,6 +88,7 @@ export interface Network {
     * A hex value of the color-theme of the network (mainly here for front-end visual purposes)...
     */
     networkColor: string;
+    networkLogoUri?: string;
     networkType: NetworkType;
 }
 
@@ -156,20 +156,14 @@ export interface VultureAccount {
 export interface VultureAccountStore {
     allAccounts: AccountData[],
     nextAccountDerivIndex: number,
-    currentlySelected: number
+    currentlySelectedNetwork: Network,
+    currentlySelectedAccount: number
 }
 
 /*@---------------------------------Wallet Classes-------------------------------@*/
 
 export class DefaultNetworks {
-    public AlephZeroTestNet: Network = {
-        networkUri: 'wss://ws.test.azero.dev',
-        networkAssetPrefix: 'TZERO',
-        networkName: 'Aleph Zero Testnet',
-        networkAssetDecimals: 12,
-        networkColor: '#4dff97',
-        networkType: NetworkType.Substrate,
-    }
+    /* -- Main Networks -- */
     public AlephZero: Network = {
         networkUri: 'wss://ws.azero.dev',
         networkAssetPrefix: 'AZERO',
@@ -178,12 +172,30 @@ export class DefaultNetworks {
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
     }
-    public Kusama: Network = {
-        networkUri: 'wss://kusama-rpc.polkadot.io',
-        networkAssetPrefix: 'KSM',
-        networkName: 'Kusama',
+    public AvalancheCChain: Network = {
+        networkUri: 'https://api.avax.network:443',
+        networkAssetPrefix: 'AVAX',
+        networkName: 'Avax C-Chain',
+        networkAssetDecimals: 18,
+        networkColor: '#ff004c',
+        networkType: NetworkType.EVM,
+    }
+
+    /* -- Test Networks -- */
+    public AlephZeroTestNet: Network = {
+        networkUri: 'wss://ws.test.azero.dev',
+        networkAssetPrefix: 'TZERO',
+        networkName: 'Aleph Zero Testnet',
         networkAssetDecimals: 12,
-        networkColor: '#cd0061',
+        networkColor: '#4dff97',
+        networkType: NetworkType.Substrate,
+    }
+    public AlephZeroSmartnet: Network = {
+        networkUri: 'wss://ws-smartnet.test.azero.dev',
+        networkAssetPrefix: 'SZERO',
+        networkName: 'Aleph Zero Smartnet',
+        networkAssetDecimals: 12,
+        networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
     }
     public allNetworks: Map<string, Network> = new Map([
@@ -192,12 +204,16 @@ export class DefaultNetworks {
             this.AlephZero
         ],
         [
+            this.AvalancheCChain.networkName,
+            this.AvalancheCChain
+        ],
+        [
             this.AlephZeroTestNet.networkName,
             this.AlephZeroTestNet
         ],
         [
-            this.Kusama.networkName,
-            this.Kusama
+            this.AlephZeroSmartnet.networkName,
+            this.AlephZeroSmartnet
         ],
     ]);
     constructor() {}
@@ -206,20 +222,21 @@ export class DefaultNetworks {
 export class VultureWallet {
 
     public currentWallet!: VultureAccount;
-    public allAccounts: AccountData[] = [];
     public nextDerivIndex: number = 0;
     public vault!: Vault;
     public selectedWalletIndex!: number;
 
+    public accountStore!: VultureAccountStore;
+
     constructor(vault?: Vault, accountStore?: VultureAccountStore) {
         if(vault && accountStore)
         {
-            this.selectedWalletIndex = accountStore.currentlySelected;
+            this.accountStore = accountStore;
+            this.selectedWalletIndex = accountStore.currentlySelectedAccount;
             this.vault = vault;
             this.nextDerivIndex = accountStore.nextAccountDerivIndex;
-            this.allAccounts = accountStore.allAccounts;
-            if(accountStore.allAccounts[accountStore.currentlySelected - 1].walletType == WalletType.MnemonicPhrase) {
-                this.currentWallet = new MnemonicSubstrateWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelected - 1]);
+            if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
+                this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
             }else {
                 console.error("Error: Ledger wallets not currently supported!");
             }
@@ -227,12 +244,12 @@ export class VultureWallet {
     }
 
     initWallet(vault: Vault, accountStore: VultureAccountStore) {
+        this.accountStore = accountStore;
         this.vault = vault;
         this.nextDerivIndex = accountStore.nextAccountDerivIndex;
-        this.selectedWalletIndex = accountStore.currentlySelected;
-        this.allAccounts = accountStore.allAccounts;
-        if(accountStore.allAccounts[accountStore.currentlySelected - 1].walletType == WalletType.MnemonicPhrase) {
-            this.currentWallet = new MnemonicSubstrateWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelected - 1]);
+        this.selectedWalletIndex = accountStore.currentlySelectedAccount;
+        if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
+            this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
         }else {
             console.error("Error: Ledger wallets not currently supported!");
         }
@@ -243,32 +260,54 @@ export class VultureWallet {
         localforage.getItem("vultureAccounts").then((value) => {
             if(value != null) {
                 let store = value as VultureAccountStore;
-                store.currentlySelected = index;
+                store.currentlySelectedAccount = index;
                 this.selectedWalletIndex = index;
 
                 localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(store))).catch((err) => {
                     console.error(err);
                 });
                 this.currentWallet.worker.terminate();
-                this.currentWallet = new MnemonicSubstrateWallet(this.vault.seed, this.allAccounts[index - 1]);    
+                this.currentWallet = new MnemonicWallet(this.vault.seed, this.accountStore.allAccounts[index - 1], this.accountStore.currentlySelectedNetwork);    
  
             }else {
                 console.error("Failed loading vultureAccounts!");
                 return false;
             }
         });
-
     }
-    switchNetwork() {
+    switchNetwork(networkName: string) {
+        const networks = new DefaultNetworks();
+
+        //Switch the network
+        if(networks.allNetworks.get(networkName)) {
+            this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
+        }else {
+            console.error("Network: " + networkName + " Doesn't exist!");
+            return;
+        }
+
+        //initialize the wallet again but with the new network.
+        if(this.accountStore.allAccounts[this.accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
+            this.initWallet(this.vault, this.accountStore);
+        }else {
+            console.error("Ledger wallets not currently supported!");
+        }
+    }
+    
+    updateAccountAddresses() {
         this.currentWallet.worker.onmessage = (event) => {
-            if(event.data.method == VultureMessage.SET_NETWORK) {
-                this.currentWallet.updateAccountState();
+            if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
+                if(event.data.params.success == true) {
+                    this.accountStore.allAccounts = event.data.params.updatedAccounts;
+                }else {
+                    event.data.params.error;
+                }
             }
         };
         this.currentWallet.worker.postMessage({
-            method: VultureMessage.SET_NETWORK,
+            method: VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK,
             params: {
-                network: JSON.parse(JSON.stringify(this.currentWallet.accountData.network)),
+                accounts: JSON.parse(JSON.stringify(this.accountStore.allAccounts)),
             },
         });
     }
@@ -276,7 +315,7 @@ export class VultureWallet {
         localforage.getItem("vultureAccounts").then((value) => {
             if(value != null) {
                 let val: VultureAccountStore = value as VultureAccountStore;
-                val.allAccounts = this.allAccounts;
+                val.allAccounts = this.accountStore.allAccounts;
                 localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(val))).catch((err) => {
                     console.error(err);
                 });
@@ -285,11 +324,11 @@ export class VultureWallet {
             }
         });
     }
-    createAccount(network: Network, accountName: string, walletType: WalletType) {
-        createNewAccount(network, accountName, walletType).then((account) => {
+    createAccount(accountName: string, walletType: WalletType) {
+        createNewAccount(accountName, walletType).then((account) => {
             this.currentWallet.worker.onmessage = (event) => {
                 if(event.data.method == VultureMessage.GET_ADDRESS_FROM_URI && event.data.params.success == true) {
-                    this.allAccounts[event.data.params.accountIndex - 1].address = event.data.params.address;
+                    this.accountStore.allAccounts[event.data.params.accountIndex - 1].address = event.data.params.address;
                     this.saveAccounts();
                 }
             };
@@ -298,16 +337,16 @@ export class VultureWallet {
             //complicated to read and more asynchronous in nature but it's either that or use a native
             //js sr25519 package (no audited ones exist...).
 
-            this.allAccounts.push(account);
+            this.accountStore.allAccounts.push(account);
             this.nextDerivIndex = account.accountIndex + 1;
 
             this.currentWallet.worker.postMessage({
                 method: VultureMessage.GET_ADDRESS_FROM_URI,
                 params: {
                     keyring: {
-                        type: 'sr25519',
-                        uri: this.vault.seed + account.derivationPath,
-                        accountIndex: this.allAccounts.length,
+                        accountIndex: this.accountStore.allAccounts.length,
+                        index: account.accountIndex,
+                        seed: this.vault.seed,
                     }
                 }
             });
@@ -317,11 +356,11 @@ export class VultureWallet {
         removeLatestAccount().then((success) => {
             if(success) {
                 //If the selected account is the one we are popping, select the previous account
-                if(this.selectedWalletIndex == this.allAccounts.length) {
+                if(this.selectedWalletIndex == this.accountStore.allAccounts.length) {
                     this.selectedWalletIndex--;
                     this.switchWallet(this.selectedWalletIndex);
                 }
-                this.allAccounts.pop();
+                this.accountStore.allAccounts.pop();
                 this.nextDerivIndex--;
             }
         })
@@ -381,7 +420,8 @@ export async function createVault(vault: any, password: string) {
  * ## Note:
  * The value return is a `Vault` if found, and false if no Vault has been created (meaing no seed-phrase/hardware wallet).
  */
-export async function loadVault() {    let vault;
+export async function loadVault() {
+    let vault;
     vault = await localforage.getItem("vault").then((value) => {
         if(value != null) {
             return value as string;
@@ -397,7 +437,12 @@ export async function loadAccounts() {
     let store;
     store = await localforage.getItem("vultureAccounts").then((value) => {
         if(value != null) {
-            return value as VultureAccountStore;
+            let store = value as VultureAccountStore;
+            //Making sure that we have a default network.
+            if(store.currentlySelectedNetwork == null) {
+                store.currentlySelectedNetwork = new DefaultNetworks().AlephZero;
+            }
+            return store;
         }else {
             return null;
         }
@@ -443,7 +488,7 @@ export function hardWalletReset() {
  * add/create new accounts, including the initial account, and also automatically save the account
  * in localstorage.
 */
-export async function createNewAccount(network: Network, accountName: string, walletType: WalletType): Promise<AccountData> {
+export async function createNewAccount(accountName: string, walletType: WalletType, network?: Network,): Promise<AccountData> {
     return localforage.getItem("vultureAccounts").then((value) => {
         if(value != null) {
             let val: VultureAccountStore = value as VultureAccountStore;
@@ -454,7 +499,6 @@ export async function createNewAccount(network: Network, accountName: string, wa
                 accountIndex: val.nextAccountDerivIndex,
                 freeAmountWhole: 0,
                 accountNonce: 0,
-                network: network,
                 freeAmountSmallestFraction: "0",
                 walletType: walletType
             });
@@ -464,6 +508,7 @@ export async function createNewAccount(network: Network, accountName: string, wa
             });
             return val.allAccounts[val.allAccounts.length - 1];
         }else {
+            let selectedNetwork = network != null ? network : new DefaultNetworks().AlephZero;
             let val: VultureAccountStore = {
                 allAccounts: [{
                     accountName: accountName,
@@ -472,12 +517,12 @@ export async function createNewAccount(network: Network, accountName: string, wa
                     accountIndex: 0,
                     freeAmountWhole: 0,
                     accountNonce: 0,
-                    network: network,
                     freeAmountSmallestFraction: "0",
                     walletType: walletType
                 }],
+                currentlySelectedNetwork: selectedNetwork,
                 nextAccountDerivIndex: 1,
-                currentlySelected: 1,
+                currentlySelectedAccount: 1,
             }
             localforage.setItem("vultureAccounts", val).catch((err) => {
                 console.error(err);

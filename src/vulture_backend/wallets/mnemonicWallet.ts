@@ -9,18 +9,18 @@ import { VultureMessage } from "../vultureMessage";
 
 
 
-export class MnemonicSubstrateWallet implements VultureAccount {
+export class MnemonicWallet implements VultureAccount {
 
     public worker = new Worker('vulture_worker-bundle.js');
 
     public accountEvents = new SafeEventEmitter();
     public accountData: AccountData;
+    public currentNetwork: Network;
     isWalletActive: boolean = false;
 
-    constructor(seedPhrase: string, accountData: AccountData) {
+    constructor(seedPhrase: string, accountData: AccountData, network: Network) {
         this.accountData = accountData;
-
-
+        this.currentNetwork = network;
         this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.SET_CURRENT_WALLET) {
                 if(event.data.params.success == true) {
@@ -41,8 +41,12 @@ export class MnemonicSubstrateWallet implements VultureAccount {
                 keyring: {
                     type: 'sr25519',
                     uri: seedPhrase + "//" + this.accountData.accountIndex,
+
+                    seed: seedPhrase,
+                    index: this.accountData.accountIndex
                 },
-                network: this.accountData.network.networkUri
+                networkURI: network.networkUri,
+                networkType: this.currentNetwork.networkType
             }
         });
     }
@@ -58,7 +62,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
             method: VultureMessage.TRANSFER_ASSETS,
             params: {
                 recipent: destination,
-                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.accountData.network.networkAssetDecimals)).toString()
+                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
             }
         });
     }
@@ -69,7 +73,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
             if(event.data.method == VultureMessage.ESTIMATE_TX_FEE) {
                 if(event.data.params.success == true) {
                     let fee = new BigNumber(event.data.params.result.partialFee)
-                    .div(new BigNumber(10).pow(this.accountData.network.networkAssetDecimals)).toNumber();
+                    .div(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toNumber();
                     this.accountEvents.emit(VultureMessage.ESTIMATE_TX_FEE, fee);
                 }else {
                     console.error("Error: Vulture worker failed to get wallet state!");
@@ -80,7 +84,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
             method: VultureMessage.ESTIMATE_TX_FEE,
             params: {
                 recipent: destination,
-                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.accountData.network.networkAssetDecimals)).toString()
+                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
             }
         });
     }
@@ -107,7 +111,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
             if(event.data.method == VultureMessage.GET_ACCOUNT_STATE) {
                 if(event.data.params.success == true) {
                     let amount = new BigNumber(event.data.params.result.data.free);
-                    let wholeAmount = amount.div(new BigNumber(10).pow(this.accountData.network.networkAssetDecimals));
+                    let wholeAmount = amount.div(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals));
                     
                     this.accountData.freeAmountWhole = wholeAmount.toNumber();
                     this.accountData.freeAmountSmallestFraction = amount.toString();
@@ -123,7 +127,7 @@ export class MnemonicSubstrateWallet implements VultureAccount {
                     //5 decimals is enuff (for this purpose of showing the amount)...
                     let amount = new BigNumber(event.data.params.result.data.free);
                     //Our Whole asset amount is the result divided by 10 to the power of the denomination/smallest fraction.
-                    let wholeAmount = amount.div(new BigNumber(10).pow(this.accountData.network.networkAssetDecimals));
+                    let wholeAmount = amount.div(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals));
 
                     this.accountData.freeAmountWhole = wholeAmount.toNumber();
                     this.accountData.freeAmountSmallestFraction = amount.toString();

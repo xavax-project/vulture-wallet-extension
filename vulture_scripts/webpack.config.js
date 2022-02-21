@@ -13,12 +13,13 @@ module.exports = {
         "stream": require.resolve('stream-browserify'),
         "crypto": require.resolve('crypto-browserify'),
     },
+    extensions: ['.ts', '.js'],
   },
 
   mode: 'production',
   //devtool: false,
   entry: {
-      vulture_worker: './src/vulture_worker.js',
+      vulture_worker: './src/vulture_worker.ts',
   },
   output: {
     filename: '[name]-bundle.js',
@@ -60,7 +61,8 @@ module.exports = {
         },
         { 
           test: /\.ts$/, 
-          use: 'ts-loader', exclude: /node_modules/ 
+          use: 'ts-loader',
+          exclude: /node_modules/ 
         }
     ],
  }

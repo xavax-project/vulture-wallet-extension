@@ -82,10 +82,10 @@ export default {
     const networks = new DefaultNetworks();
 
     let asset = ref('');
-    asset.value = (props.vultureWallet as VultureWallet).currentWallet.accountData.network.networkAssetPrefix;
+    asset.value = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetPrefix;
 
     let accountAmount = ref(0);
-    accountAmount.value = (props.vultureWallet as VultureWallet).allAccounts.length;
+    accountAmount.value = (props.vultureWallet as VultureWallet).accountStore.allAccounts.length;
     let selectedNetwork = reactive({network: networks.AlephZero});
 
     let txFee = ref(0);

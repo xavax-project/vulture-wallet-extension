@@ -6,7 +6,7 @@
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
               <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
               <div class="assetNameBox">
-                <span v-if="vultureWallet.currentWallet">{{vultureWallet.currentWallet.accountData.network.networkAssetPrefix}}</span>
+                <span v-if="vultureWallet.currentWallet">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
               </div>
             </div>
             

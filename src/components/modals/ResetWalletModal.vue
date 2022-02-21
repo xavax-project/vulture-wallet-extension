@@ -15,8 +15,8 @@
                     Which you've hopefully written down somewhere safe and not shared with anyone.
                 </div>
                 <div style="font-size: 16px; color: var(--fg_color_2); margin-bottom: 15px;">
-                    Resetting will log you out of the wallet, and the only way to recover would
-                    be through your seed-phrase.
+                    Resetting will delete all data and log you out of the wallet. The only way to recover would
+                    be through your seed-phrase or hardware wallet.
                 </div>
                 <div style="display: flex; margin-top: 70px; margin-bottom: 0px;">
                     <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Reset" @button-click="resetWallet()"/>

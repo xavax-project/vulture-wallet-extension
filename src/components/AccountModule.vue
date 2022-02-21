@@ -54,6 +54,7 @@ export default {
 .left {
   margin: 5px;
   font-size: 17px;
+  text-align: left;
 }
 .underline {
   background-color: var(--fg_color);

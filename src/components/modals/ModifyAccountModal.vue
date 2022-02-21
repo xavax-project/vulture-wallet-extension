@@ -6,21 +6,13 @@
 
             <DefaultInput :startValue="accountName" @on-enter="setName($event)" inputWidth="100%" inputHeight="40px" fontSize="18px" inputName="Account Name" inputPlaceholder="Name"/>
             <div style="width: 100%; text-align: left; margin-top: 15px;">
-                Account Index: <span style="color: var(--accent_color)">{{vultureWallet.allAccounts[selectedAccount - 1].accountIndex}}</span>
+                Account Index: <span style="color: var(--accent_color)">{{vultureWallet.accountStore.allAccounts[selectedAccount - 1].accountIndex}}</span>
             <hr>
             </div>
             <div style="width: 100%; text-align: left; margin-top: 20px;">
-                Address: <span style="color: var(--accent_color); font-size: 15px;">{{vultureWallet.allAccounts[selectedAccount - 1].address}}</span> <br>
+                Address: <span style="color: var(--accent_color); font-size: 15px;">{{vultureWallet.accountStore.allAccounts[selectedAccount - 1].address}}</span> <br>
                 <i style="font-size: 13px;  color: var(--fg_color_2)">Address may vary depending on the selected network.</i>
                 <hr>
-            </div>
-
-            <div style="width: 100%; text-align: left; margin-top: 20px;">
-                Network: <span style="color: var(--accent_color)">{{selectedNetwork.network.networkName}}</span> <br>
-            </div>
-            <div style="display: flex; align-items: center; margin-top: 20px; flex-direction: column; width: 425px; margin: 15px;">
-                <DropdownSelection selectionText="Change Network" scrollHeight="80px" selectionWidth="70%" fontSize="18px" selectionHeight="35px" :dropDownContent="Array.from(networks.allNetworks.keys())"
-                @on-select="selectNetwork($event)"/>
             </div>
         </div>
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
@@ -54,43 +46,32 @@ export default {
   setup(props: any, context: any) {
 
 
-    let accountName: string = (props.vultureWallet as VultureWallet).allAccounts[props.selectedAccount - 1].accountName;
+    let accountName: string = (props.vultureWallet as VultureWallet).accountStore.allAccounts[props.selectedAccount - 1].accountName;
     const networks = new DefaultNetworks();
-    let initialNetwork = (props.vultureWallet as VultureWallet).allAccounts[props.selectedAccount - 1].network;
-    let selectedNetwork = reactive({network: (props.vultureWallet as VultureWallet).allAccounts[props.selectedAccount - 1].network});
+    let initialNetwork = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork;
 
     function quitModal() {
         context.emit("quit-modal");
     }
     function setName(name: string) {
         accountName = name;
-        (props.vultureWallet as VultureWallet).allAccounts[props.selectedAccount - 1].accountName = accountName;
+        (props.vultureWallet as VultureWallet).accountStore.allAccounts[props.selectedAccount - 1].accountName = accountName;
     }
     function saveAccount() {
-
-        if(selectedNetwork.network.networkUri != initialNetwork.networkUri) {
-            (props.vultureWallet as VultureWallet).allAccounts[props.selectedAccount - 1].network = selectedNetwork.network;
-            (props.vultureWallet as VultureWallet).switchNetwork();
-        }
 
         (props.vultureWallet as VultureWallet).saveAccounts();
         quitModal();
     }
-    function selectNetwork(network: string) {
-        let ntwrk = networks.allNetworks.get(network);
-        selectedNetwork.network = (ntwrk == undefined ? networks.AlephZero : ntwrk);
-    }
+
     
 
     return {
         accountName,
-        selectedNetwork,
         networks,
 
         quitModal: quitModal,
         setName: setName,
         saveAccount: saveAccount,
-        selectNetwork: selectNetwork,
     }
   }
 };

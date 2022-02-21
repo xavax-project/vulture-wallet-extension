@@ -4,6 +4,7 @@
     :assetPrefix="assetPrefix"
     :assetAmount="assetAmount"
     @select-account="setModal(modals.SELECT_NEW_ACCOUNT)"
+    @select-network="setModal(modals.SELECT_NEW_NETWORK)"
   />
   <Navbar @switch-tab="setTab($event)"/>
 
@@ -11,8 +12,8 @@
   @send-button-click="transferAssets($event)"
   :vultureWallet="vultureWallet"/>
 
-  <AccountsTab v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
-  :allAccounts="vultureWallet.allAccounts"
+  <AccountsTab v-if="vultureWallet.accountStore != null" v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
+  :allAccounts="vultureWallet.accountStore.allAccounts"
   :vultureWallet="vultureWallet"
   
   @create-new-account="setModal(modals.CREATE_NEW_ACCOUNT)"
@@ -139,7 +140,7 @@ export default {
           setInterval(()=> {
           if(vultureWallet.currentWallet != null) {
             assetAmount.value = String(vultureWallet.currentWallet.accountData.freeAmountWhole);
-            assetPrefix.value = vultureWallet.currentWallet.accountData.network.networkAssetPrefix;
+            assetPrefix.value = vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
             address.value = vultureWallet.currentWallet.accountData.address;
           }
         }, 1000);

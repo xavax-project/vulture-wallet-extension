@@ -15,6 +15,11 @@
         :vultureWallet="vultureWallet"
         :nextAccountIndex="vultureWallet.nextDerivIndex"/>
 
+        <SelectNetworkModal v-if="modalType == modals.SELECT_NEW_NETWORK"
+        @quit-modal="quitModal" 
+        :vultureWallet="vultureWallet"
+        :nextAccountIndex="vultureWallet.nextDerivIndex"/>
+
         <TransferAssetsModal v-if="modalType == modals.TRANSFER_ASSETS"
         @quit-modal="quitModal" 
         :vultureWallet="vultureWallet"
@@ -34,6 +39,7 @@ import ResetWalletModal from './ResetWalletModal.vue';
 import CreateAccountModal from './CreateAccountModal.vue';
 import ModifyAccountModal from './ModifyAccountModal.vue';
 import SelectAccountModal from './SelectAccountModal.vue';
+import SelectNetworkModal from './SelectNetworkModal.vue';
 import TransferAssetsModal from './TransferAssetsModal.vue';
 
 
@@ -52,6 +58,7 @@ export default {
     ModifyAccountModal,
     CreateAccountModal,
     SelectAccountModal,
+    SelectNetworkModal,
     TransferAssetsModal,
   },
   props: {
