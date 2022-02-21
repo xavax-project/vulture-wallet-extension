@@ -1,5 +1,5 @@
 <template>
-<span :style="getTheme()">
+<span  :style="'--accent_color: ' + currentAccentColor">
   <div v-if="walletState == state.WALLET">
   <OverviewModule :address="address"
     :assetPrefix="assetPrefix"
@@ -98,6 +98,8 @@ export default {
       let recipentAddress = ref('');
       let amountToSend = ref('')
 
+      let currentAccentColor = ref('#4dff97');
+
       let selectedAccountIndex = ref(0);
 
       function setTransferValues(value: string, isAddress: boolean) {
@@ -140,6 +142,7 @@ export default {
           //vultureWallet = new VultureWallet(vault, accounts as VultureAccountStore);
           vultureWallet.initWallet(vaultE, accounts as VultureAccountStore);
           walletState.value = WalletStates.WALLET;
+          currentAccentColor.value = vultureWallet.accountStore.currentlySelectedNetwork.networkColor;
           
           //Not extremely happy that I'm doing this, but vue seems to really like being a bitch about updating these set of values manually,
           //just a temporary work-around until I improve the state management & reactivity (the values should be reactive, kinda weird...)
@@ -173,12 +176,6 @@ export default {
         walletState.value = WalletStates.ONBOARDING;
       }
 
-      function getTheme() {
-
-        return {
-          '--accent_color': '#4dff97'
-        }
-      }
       return {
         vultureWallet,
         walletState,
@@ -197,6 +194,8 @@ export default {
 
         selectedAccountIndex,
 
+        currentAccentColor,
+
         initWallet: initWallet,
         transferAssets: transferAssets,
         setTransferValues: setTransferValues,
@@ -205,7 +204,6 @@ export default {
         resetWallet: resetWallet,
         modifyAccount: modifyAccount,
         onWalletReset: onWalletReset,
-        getTheme: getTheme,
       }
     },
     data(){

@@ -49,7 +49,6 @@ export class SubstrateNetwork implements VultureNetwork {
             this.wsProvider = new WsProvider(this.networkURI);
             this.wsProvider.isReady.then((ready: any) => {
                 ApiPromise.create({provider: this.wsProvider}).then((api) => {
-                    console.log("Websocket connection to: " + websocketNetworkURI + " | " +ready);
                     this.networkAPI = api;
 
                     postMessage(new MethodResponse(

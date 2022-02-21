@@ -26,7 +26,6 @@ export class MnemonicWallet implements VultureAccount {
                 if(event.data.params.success == true) {
                     this.isWalletActive = true;
                     this.accountData.address = event.data.params.address;
-                    console.log("RECEIVED! " + event.data.params.address);
                     
                     this.updateAccountState();     
                 }else {

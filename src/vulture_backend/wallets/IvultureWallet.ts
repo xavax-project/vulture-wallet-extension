@@ -172,15 +172,16 @@ export class DefaultNetworks {
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
     }
+    /* 
     public AvalancheCChain: Network = {
         networkUri: 'https://api.avax.network:443',
         networkAssetPrefix: 'AVAX',
         networkName: 'Avax C-Chain',
         networkAssetDecimals: 18,
-        networkColor: '#ff004c',
+        networkColor: '#ff0043',
         networkType: NetworkType.EVM,
     }
-
+     */
     /* -- Test Networks -- */
     public AlephZeroTestNet: Network = {
         networkUri: 'wss://ws.test.azero.dev',
@@ -203,10 +204,12 @@ export class DefaultNetworks {
             this.AlephZero.networkName,
             this.AlephZero
         ],
+        /*
         [
             this.AvalancheCChain.networkName,
             this.AvalancheCChain
         ],
+         */
         [
             this.AlephZeroTestNet.networkName,
             this.AlephZeroTestNet
