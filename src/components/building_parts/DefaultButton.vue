@@ -64,10 +64,9 @@ export default {
 }
 .button:active {
     transition-duration: 100ms;
-    border-color: rgb(55, 190, 112);
     box-shadow: 0px 0px 3px 0px rgb(5, 5, 5);
-    color: rgb(55, 190, 112);
     background-color: var(--bg_color);
+    filter: brightness(70%);
 }
 .disabledButton {
 

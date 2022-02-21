@@ -75,12 +75,11 @@ export default {
 }
 .inputCustom:hover{
     transition-duration: 120ms;
-    border-color: rgb(55, 190, 112);
-    
+    filter: brightness(90%);    
 }
 .inputCustom:focus{
     transition-duration: 120ms;
-    border-color: rgb(55, 190, 112);
+    filter: brightness(90%);
 }
 
 input::-webkit-outer-spin-button,

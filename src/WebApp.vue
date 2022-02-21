@@ -52,6 +52,8 @@ html {
   --fg_color: rgb(255,255,255);
   --fg_color_2: rgb(150, 150, 150);
 
+/*
+ */
   --accent_color: rgb(77, 255, 151);
 
   font-family: GardensC;

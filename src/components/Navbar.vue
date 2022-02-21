@@ -74,8 +74,7 @@ export default {
     transition-duration: 190ms;
 }
 .iconFont:active {
-    color: rgb(55, 190, 112);
-    text-shadow: 0px 0px 4px rgb(55, 190, 112);
+    filter: brightness(75%);
 }
 .selected {
     text-shadow: 0px 0px 5px var(--accent_color);

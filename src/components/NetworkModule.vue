@@ -20,13 +20,14 @@
         {{networkName}}
       </div>
       <div class="right">
-        <span v-if="networkType == 0">Substrate</span>
-        <span v-if="networkType == 1">EVM</span>
+        <span v-if="networkType == NetworkType.Substrate">Substrate</span>
+        <span v-if="networkType == NetworkType.EVM">EVM</span>
       </div>
   </div>
 </template>
 
 <script lang="ts">
+import { NetworkType } from "../vulture_backend/wallets/IvultureWallet";
 export default {
   name: "NetworkModule",
   props: {
@@ -37,6 +38,11 @@ export default {
   methods: {
     moduleClick(){
        this.$emit('module-click', this.networkName);
+    }
+  },
+  setup() {
+    return {
+      NetworkType
     }
   }
 };
@@ -52,10 +58,6 @@ export default {
   margin-left: 15px;
 }
 
-.selectedNetwork {
-  color: var(--accent_color);
-  fill: var(--accent_color);
-}
 
 
 .right {
@@ -114,5 +116,11 @@ export default {
   transition-duration: 160ms;
   box-shadow: 0px 0px 8px rgb(6,6,6);
   filter: brightness(75%);
+}
+
+.selectedNetwork {
+  color: var(--accent_color);
+  fill: var(--accent_color);
+  border-color: var(--accent_color);
 }
 </style>

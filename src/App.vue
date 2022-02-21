@@ -1,5 +1,6 @@
 <template>
-<div v-if="walletState == state.WALLET">
+<span :style="getTheme()">
+  <div v-if="walletState == state.WALLET">
   <OverviewModule :address="address"
     :assetPrefix="assetPrefix"
     :assetAmount="assetAmount"
@@ -42,6 +43,7 @@
 <div v-if="walletState == state.ONBOARDING">
   <Onboarding style="position: absolute; width: 360px;"/>
 </div>
+</span>
 
 </template>
 
@@ -57,6 +59,7 @@ import Navbar from "./components/Navbar.vue"
 import Modal from "./components/modals/Modal.vue";
 
 
+import { provide } from 'vue';
 
 import { doesWalletExist, VultureWallet, loadVault, Vault, loadAccounts,
          deleteWallet, VultureAccountStore, AccountData} from "./vulture_backend/wallets/IvultureWallet";
@@ -79,6 +82,7 @@ export default {
       Modal
     },
     setup() {
+
       let vultureWallet = reactive(new VultureWallet());
       let walletState = ref(WalletStates.LOADING);
       let currentModal  = ref(Modals.NONE);
@@ -86,6 +90,8 @@ export default {
 
       let modals = Modals;
       let state = WalletStates;
+
+      
 
       /* --- Transfer Asset Variables & Functions --- */
 
@@ -167,6 +173,12 @@ export default {
         walletState.value = WalletStates.ONBOARDING;
       }
 
+      function getTheme() {
+
+        return {
+          '--accent_color': '#4dff97'
+        }
+      }
       return {
         vultureWallet,
         walletState,
@@ -193,6 +205,7 @@ export default {
         resetWallet: resetWallet,
         modifyAccount: modifyAccount,
         onWalletReset: onWalletReset,
+        getTheme: getTheme,
       }
     },
     data(){
@@ -208,9 +221,6 @@ export default {
       setTab(tab: string) {
         this.currentTab = tab;
       },
-    },
-    created() {
-
     },
 }
 </script>
@@ -246,7 +256,9 @@ html {
   --fg_color: rgb(255,255,255);
   --fg_color_2: rgb(150, 150, 150);
 
-  --accent_color: rgb(77, 255, 151);
+/*
+  --accent_color: #4dff97;
+ */
 
   font-family: GardensC;
   -webkit-font-smoothing: antialiased;

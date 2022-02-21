@@ -292,6 +292,7 @@ export class VultureWallet {
         }else {
             console.error("Ledger wallets not currently supported!");
         }
+        this.saveAccounts();
     }
     
     updateAccountAddresses() {
@@ -312,17 +313,17 @@ export class VultureWallet {
         });
     }
     saveAccounts() {
+        localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(this.accountStore))).catch((err) => {
+            console.error(err);
+        });
+        /*
         localforage.getItem("vultureAccounts").then((value) => {
             if(value != null) {
-                let val: VultureAccountStore = value as VultureAccountStore;
-                val.allAccounts = this.accountStore.allAccounts;
-                localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(val))).catch((err) => {
-                    console.error(err);
-                });
             }else {
                 console.error("Can't save accounts if you don't have one...");
             }
         });
+         */
     }
     createAccount(accountName: string, walletType: WalletType) {
         createNewAccount(accountName, walletType).then((account) => {
