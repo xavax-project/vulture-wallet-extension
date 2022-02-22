@@ -102,7 +102,11 @@ export default {
         }, 10);
         (props.vultureWallet as VultureWallet).currentWallet.accountEvents.removeAllListeners(VultureMessage.TRANSFER_ASSETS);
         (props.vultureWallet as VultureWallet).currentWallet.accountEvents.on(VultureMessage.TRANSFER_ASSETS, (params) => {
-            if(params.status == 'InBlock') {
+            if(params.status == false) {
+                (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
+                currentTxState.value = TxState.FAILED;
+                clearInterval(timer);
+            } else if(params.status == 'InBlock') {
                 if(params.method == 'ExtrinsicSuccess') {
                     (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
                     currentTxState.value = TxState.SUCCESS;
