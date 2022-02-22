@@ -51,7 +51,7 @@ To build Vulture you run:
 This will build the wallet into the `dist` folder, but there's a slight catch every time you build:
 
 You need to manually
-open & edit the `vulture_worker-bundle.js` file located in the `dist` and `public` folder, search for the `document.baseURI ||` line, and delete it.
+open & edit the `vulture_worker-bundle.js` file located in the `dist` and `public` folder, search for the `document.baseURI||` line, and delete it.
 
 This error is due to a bug with how Webpack 5 loads WASM, this will likely be fixed soon by either a workaround or by the Webpack developers.
 
@@ -72,7 +72,7 @@ Vulture has a Web-Worker which handles important things in the *background*, and
 
 This will pack, build, and place the scripts in the `public` folder. Everytime you customize the script, you'll need to run `yarn build-scripts` again, even if you ran `yarn serve`.
 
-Make sure to edit the built `vulture_worker-bundle.js` file and manually remove the `document.baseURI ||` line.
+Make sure to edit the built `vulture_worker-bundle.js` file and manually remove the `document.baseURI||` line.
 
 It's really sucky, I know; But *WASM + Webpack + Web-Workers + Extension environment* isn't a thing that can easily be glued together. For more technical details, read the initial blog-post about the wallet.
 ___

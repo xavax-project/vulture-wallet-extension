@@ -27,8 +27,8 @@
                 State:
                 <span v-if="currentTxState == txStates.SENDING" style="color: var(--accent_color)">Sending <br></span>
                 <span v-if="currentTxState == txStates.PENDING" style="color: var(--accent_color)">Pending <br></span>
-                <span v-if="currentTxState == txStates.SUCCESS" style="color: var(--accent_color)">Success <br></span>
-                <span v-if="currentTxState == txStates.FAILED" style="color: var(--accent_color)">Failed <br></span>
+                <span v-if="currentTxState == txStates.SUCCESS" style="color: #4dff97">Success <br></span>
+                <span v-if="currentTxState == txStates.FAILED" style="color: #ff0061">Failed <br></span>
                 Completed In: <span style="color: var(--accent_color)">{{txTimer.toFixed(2)}}s <br></span>
                 <hr>
                 <div v-bind:class="currentTxState == txStates.SUCCESS ? 'show' : 'hide' " style="font-size: 16px;">

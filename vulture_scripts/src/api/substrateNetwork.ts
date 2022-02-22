@@ -121,25 +121,42 @@ export class SubstrateNetwork implements VultureNetwork {
                     events.forEach(({event: {data, method, section}, phase}) => {
                         if(method == 'ExtrinsicSuccess') {
                             postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                                success: true,
+                                status: status.type,
+                                blockHash: status.asInBlock.toHex(),
+                                method: method,
+                            }});
+                        } else if(method == 'ExtrinsicFailed') {                            
+                            postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                                success: false,
                                 status: status.type,
                                 blockHash: status.asInBlock.toHex(),
                                 method: method,
                             }});
                         }
                     });
-                }else if(status.isFinalized) {
+                }else if(status.isDropped) {
                     postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                        success: false,
                         status: status.type,
-                        blockHash: status.asFinalized.toHex()
                     }});
-                }else {
+                }else if(status.isFinalityTimeout) {
                     postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                        success: false,
+                        status: status.type,
+                    }});
+                }else if(status.isInvalid) {
+                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                        success: false,
                         status: status.type,
                     }});
                 }
             });
             
         }else {
+            postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                success: false,
+            }});
             throw new Error("Cryptography WASM hasn't been initialized yet!");
         }
     }
