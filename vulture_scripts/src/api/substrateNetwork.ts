@@ -79,6 +79,8 @@ export class SubstrateNetwork implements VultureNetwork {
             for(let i = 0; i < accounts.length; i++) {
                 if(network.addressFormat != undefined) {
                     this.keyring!.setSS58Format(Number(network.addressFormat));
+                }else {
+                    this.keyring!.setSS58Format(42);
                 }
                 let kp = this.keyring!.addFromUri(this.seed + "//" + updatedAccounts[i].accountIndex);
                 updatedAccounts[i].address = kp.address;

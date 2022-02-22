@@ -1,9 +1,10 @@
 <template>
-<span  :style="'--accent_color: ' + currentAccentColor">
+<span :style="'--accent_color: ' +  currentAccentColor">
   <div v-if="walletState == state.WALLET">
-  <OverviewModule :address="address"
+  <OverviewModule v-if="vultureWallet.accountStore != null" :address="address"
     :assetPrefix="assetPrefix"
     :assetAmount="assetAmount"
+    :accountName="vultureWallet.currentWallet.accountData.accountName"
     @select-account="setModal(modals.SELECT_NEW_ACCOUNT)"
     @select-network="setModal(modals.SELECT_NEW_NETWORK)"
   />
@@ -166,6 +167,7 @@ export default {
       }
       function quitModal() {
         currentModal.value = Modals.NONE;
+        currentAccentColor.value = vultureWallet.accountStore.currentlySelectedNetwork.networkColor;
       }
 
       function resetWallet() {

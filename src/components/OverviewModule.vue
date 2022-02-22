@@ -18,7 +18,7 @@
 
       <div class="flexBox" style="width: 100%; justify-content: flex-end; align-items: center;">
         <div style="margin: 6px; margin-left: 20px; align-self: flex-start; font-size 16px;">
-        <div class="workPlease" style="font-size 16px;">your address:</div>
+        <div class="workPlease" style="font-size 16px;">Account: "{{accountName}}"</div>
         </div>
         <div class="addressText" style="">
           {{ address }}
@@ -33,6 +33,7 @@ export default {
   name: "OverviewModule",
   props: {
     address: String,
+    accountName: String,
     assetPrefix: String,
     assetAmount: String
   },

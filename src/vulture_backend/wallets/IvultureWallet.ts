@@ -191,7 +191,7 @@ export class DefaultNetworks {
         networkAssetPrefix: 'KSM',
         networkName: 'Kusama',
         networkAssetDecimals: 12,
-        networkColor: '#e6007a',
+        networkColor: '#e8026d',
         networkType: NetworkType.Substrate,
         addressFormat: '2',
         isTestnet: false,
@@ -328,24 +328,9 @@ export class VultureWallet {
     }
 
     async switchWallet(index: number) {
-        //this is kinda fked, I'll update it to something more elegant later...
-        localforage.getItem("vultureAccounts").then((value) => {
-            if(value != null) {
-                let store = value as VultureAccountStore;
-                store.currentlySelectedAccount = index;
-                this.selectedWalletIndex = index;
-
-                localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(store))).catch((err) => {
-                    console.error(err);
-                });
-                this.currentWallet.worker.terminate();
-                this.currentWallet = new MnemonicWallet(this.vault.seed, this.accountStore.allAccounts[index - 1], this.accountStore.currentlySelectedNetwork);    
- 
-            }else {
-                console.error("Failed loading vultureAccounts!");
-                return false;
-            }
-        });
+        this.accountStore.currentlySelectedAccount = index;
+        this.saveAccounts();
+        this.initWallet(this.vault, this.accountStore);
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();
@@ -353,6 +338,7 @@ export class VultureWallet {
         //Switch the network
         if(networks.allNetworks.get(networkName)) {
             this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
+            this.saveAccounts();
             this.updateAccountAddresses();
         }else {
             console.error("Network: " + networkName + " Doesn't exist!");
@@ -360,11 +346,7 @@ export class VultureWallet {
         }
 
         //initialize the wallet again but with the new network.
-        if(this.accountStore.allAccounts[this.accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
-            this.initWallet(this.vault, this.accountStore);
-        }else {
-            console.error("Ledger wallets not currently supported!");
-        }
+        this.initWallet(this.vault, this.accountStore);
     }
     
     updateAccountAddresses() {
@@ -390,20 +372,14 @@ export class VultureWallet {
         localforage.setItem("vultureAccounts", JSON.parse(JSON.stringify(this.accountStore))).catch((err) => {
             console.error(err);
         });
-        /*
-        localforage.getItem("vultureAccounts").then((value) => {
-            if(value != null) {
-            }else {
-                console.error("Can't save accounts if you don't have one...");
-            }
-        });
-         */
     }
     createAccount(accountName: string, walletType: WalletType) {
         createNewAccount(accountName, walletType).then((account) => {
             this.currentWallet.worker.onmessage = (event) => {
                 if(event.data.method == VultureMessage.GET_ADDRESS_FROM_URI && event.data.params.success == true) {
                     this.accountStore.allAccounts[event.data.params.accountIndex - 1].address = event.data.params.address;
+                    this.accountStore.nextAccountDerivIndex++;
+                    this.nextDerivIndex = this.accountStore.nextAccountDerivIndex;
                     this.saveAccounts();
                 }
             };
@@ -413,7 +389,6 @@ export class VultureWallet {
             //js sr25519 package (no audited ones exist...).
 
             this.accountStore.allAccounts.push(account);
-            this.nextDerivIndex = account.accountIndex + 1;
 
             this.currentWallet.worker.postMessage({
                 method: VultureMessage.GET_ADDRESS_FROM_URI,
@@ -435,8 +410,10 @@ export class VultureWallet {
                     this.selectedWalletIndex--;
                     this.switchWallet(this.selectedWalletIndex);
                 }
-                this.accountStore.allAccounts.pop();
                 this.nextDerivIndex--;
+                this.accountStore.allAccounts.pop();
+                this.accountStore.nextAccountDerivIndex--;
+                this.saveAccounts();
             }
         })
     }
