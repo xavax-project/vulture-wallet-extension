@@ -12,6 +12,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 
 import { VultureNetwork, MethodResponse } from './networkApi';
 import { VultureMessage } from '../../../src/vulture_backend/vultureMessage';
+import { AccountData, Network } from '../../../src/vulture_backend/wallets/IvultureWallet';
 
 
 export class SubstrateNetwork implements VultureNetwork {
@@ -71,7 +72,26 @@ export class SubstrateNetwork implements VultureNetwork {
         });
         
     }
-
+    updateAccountsToNetwork(accounts: AccountData[], network: Network): void {
+        if(this.isCryptoReady) {
+            let updatedAccounts: AccountData[];
+            updatedAccounts = accounts;
+            for(let i = 0; i < accounts.length; i++) {
+                if(network.addressFormat != undefined) {
+                    this.keyring!.setSS58Format(Number(network.addressFormat));
+                }
+                let kp = this.keyring!.addFromUri(this.seed + "//" + updatedAccounts[i].accountIndex);
+                updatedAccounts[i].address = kp.address;
+            }
+            postMessage(new MethodResponse(
+                VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK,
+                {
+                    success: true,
+                    updatedAccounts: updatedAccounts,
+                }
+            ));
+        }
+    }
     getAddress(): MethodResponse {
         throw new Error('Method not implemented.');
     }

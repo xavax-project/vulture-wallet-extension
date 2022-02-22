@@ -353,6 +353,7 @@ export class VultureWallet {
         //Switch the network
         if(networks.allNetworks.get(networkName)) {
             this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
+            this.updateAccountAddresses();
         }else {
             console.error("Network: " + networkName + " Doesn't exist!");
             return;
@@ -364,7 +365,6 @@ export class VultureWallet {
         }else {
             console.error("Ledger wallets not currently supported!");
         }
-        this.saveAccounts();
     }
     
     updateAccountAddresses() {
@@ -372,8 +372,9 @@ export class VultureWallet {
             if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
                 if(event.data.params.success == true) {
                     this.accountStore.allAccounts = event.data.params.updatedAccounts;
+                    this.saveAccounts();
                 }else {
-                    event.data.params.error;
+                    console.log("Failed updating accounts to use new network format!");
                 }
             }
         };
@@ -381,6 +382,7 @@ export class VultureWallet {
             method: VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK,
             params: {
                 accounts: JSON.parse(JSON.stringify(this.accountStore.allAccounts)),
+                network: JSON.parse(JSON.stringify(this.accountStore.currentlySelectedNetwork)),
             },
         });
     }

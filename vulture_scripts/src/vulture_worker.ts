@@ -54,16 +54,13 @@ self.addEventListener("message", (event) => {
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
-        /*
-        const keyring = new Keyring({type: 'sr25519'});
-        let kp = keyring.addFromUri(event.data.params.keyring.seed + "//" + event.data.params.keyring.index);
-        postMessage({method: VultureMessage.GET_ADDRESS_FROM_URI, params: {
-            success: true,
-            address: kp.address,
-            accountIndex: event.data.params.keyring.accountIndex,
-        }});
-        console.log("Vulture Worker succesfully generated keypair");
-         */
+    }
+    if(event.data && event.data.method === VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
+        if(currentWallet != null) {
+            currentWallet.updateAccountsToNetwork(event.data.params.accounts, event.data.params.network);
+        }else {
+            console.error("Wallet hasn't been setup in vulture_worker yet!");
+        }
     }
 
     //Send assets
@@ -71,31 +68,6 @@ self.addEventListener("message", (event) => {
         if(currentWallet != null){
             currentWallet.transferAssets(event.data.params.recipent, event.data.params.amount);
 
-            /*
-            currentApi.tx.balances.transferKeepAlive(event.data.params.recipent, event.data.params.amount).signAndSend(currentKeypair, ({events = [], status}) => {
-                if(status.isInBlock) {
-
-                    events.forEach(({event: {data, method, section}, phase}) => {
-                        if(method == 'ExtrinsicSuccess') {
-                            postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                                status: status.type,
-                                blockHash: status.asInBlock.toHex(),
-                                method: method,
-                            }});
-                        }
-                    });
-                }else if(status.isFinalized) {
-                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                        status: status.type,
-                        blockHash: status.asFinalized.toHex()
-                    }});
-                }else {
-                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                        status: status.type,
-                    }});
-                }
-            });
-             */
         } else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
@@ -115,25 +87,6 @@ self.addEventListener("message", (event) => {
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
-        /*
-        if(vault.seed != null && currentApi != null){
-            let result = false;
-            try {
-                encodeAddress(
-                    isHex(event.data.params.address)
-                        ? hexToU8a(event.data.params.address)
-                        : decodeAddress(event.data.params.address)
-                );
-                result = true;
-            }catch(error) {
-                result = false;
-            }
-            postMessage({method: VultureMessage.IS_ADDRESS_VALID, params: {
-                success: true,
-                isValid: result,
-            }});
-        }
-         */
     }
     //Query the account state.
     if(event.data && event.data.method === VultureMessage.GET_ACCOUNT_STATE) {
@@ -142,16 +95,6 @@ self.addEventListener("message", (event) => {
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
-        /*
-        if(vault.seed != null && currentApi != null){
-            currentApi.query.system.account(currentKeypair.address).then((result) => {
-                postMessage({method: VultureMessage.GET_ACCOUNT_STATE, params: {
-                    success: true,
-                    result: result.toJSON(),
-                }});
-            });
-        }
-         */
     }
     //Subscribe to getting the account state.
     if(event.data && event.data.method === VultureMessage.SUB_TO_ACCOUNT_STATE) {
@@ -161,17 +104,6 @@ self.addEventListener("message", (event) => {
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
-
-        /*
-        if(vault.seed != null && currentApi != null){
-            currentApi.query.system.account(currentKeypair.address, (result) => {
-                postMessage({method: VultureMessage.SUB_TO_ACCOUNT_STATE, params: {
-                    success: true,
-                    result: result.toJSON(),
-                }});
-            });
-        }
-        */
     }
 
     //Not used anywhere right now, this is simply exploring seed-phrase caching.
