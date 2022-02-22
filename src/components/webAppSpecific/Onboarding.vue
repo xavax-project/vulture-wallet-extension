@@ -10,11 +10,16 @@
                     </div>
                     <DefaultButton @click="createWallet()" style="margin-bottom: 25px; align-self: center" buttonWidth="270px" buttonHeight="50px" buttonText="Create New" />
                     <DefaultButton @click="importSeed()" style="margin-bottom: 25px; align-self: center" buttonWidth="270px" buttonHeight="50px" buttonText="Import Seed Phrase" />
-                    <DefaultButton @click="hardwareWallet()" style="margin-bottom: 25px; align-self: center" buttonWidth="270px" buttonHeight="50px" buttonText="Hardware Wallet" />
+                    <DefaultButton :buttonDisabled="true" @click="hardwareWallet()" style="margin-bottom: 25px; align-self: center" buttonWidth="270px" buttonHeight="50px" buttonText="Hardware Wallet" />
+                    <div style="margin-bottom: 25px; font-size: 13px; color: var(--fg_color_2)">
+                        Hardware wallets are <b>heavily</b> recommended. <br>Vulture will support <a href="https://www.ledger.com/" target="_blank">Ledger</a> very soon.
+                    </div>
+                    <!--
 
                     <div style="margin-bottom: 25px; font-size: 13px; color: var(--fg_color_2)">
                         Hardware wallets are <b>heavily</b> recommended. <br>Vulture currently supports <a href="https://www.ledger.com/" target="_blank">Ledger</a>.
                     </div>
+                    -->
                 </div>
             </div>
 
