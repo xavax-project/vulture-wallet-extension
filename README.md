@@ -24,7 +24,6 @@ Vulture has three main branches:
 
 Other branches that add very feature-specific things may arrise.
 
-___
 
 <h1 align="center"> ~ For The Devs ~ </h1>
 
