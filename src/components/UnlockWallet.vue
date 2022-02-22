@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 25px; padding-right: 25px; top: 510px; font-size: 16px">
-                <span class="styled">vulture.network</span>
+                <span class="styled">vulturewallet.net</span>
             </div>
         </div>
 

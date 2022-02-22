@@ -45,7 +45,8 @@ export class MnemonicWallet implements VultureAccount {
                     index: this.accountData.accountIndex
                 },
                 networkURI: network.networkUri,
-                networkType: this.currentNetwork.networkType
+                networkType: this.currentNetwork.networkType,
+                addressFormat: this.currentNetwork.addressFormat ? this.currentNetwork.addressFormat : null,
             }
         });
     }

@@ -27,6 +27,7 @@ export class SubstrateNetwork implements VultureNetwork {
     networkURI: string;
 
     isCryptoReady: boolean = false;
+    addressFormat: string | null = null;
 
     /** ## SubstrateNetwork()
      * Derivation path format is:
@@ -35,14 +36,18 @@ export class SubstrateNetwork implements VultureNetwork {
      * 
      * For Vulture, please only use Hardened keys.
      */
-    constructor(seed: string, derivationPath: string, websocketNetworkURI: string) {
+    constructor(seed: string, derivationPath: string, websocketNetworkURI: string, addressFormat?: string) {
         this.seed = seed;
         this.networkURI = websocketNetworkURI;
+        this.addressFormat = addressFormat ? addressFormat : null;
         cryptoWaitReady().then((ready) => {
             console.log("Crypto WASM: " + ready);
             this.isCryptoReady = true;
 
-            this.keyring = new Keyring({type: 'sr25519'});
+            this.keyring = new Keyring({
+                type: 'sr25519',
+                ss58Format: this.addressFormat != null ? Number(this.addressFormat) : undefined
+            });
             this.keypair = this.keyring.addFromUri(this.seed + derivationPath);
             this.currentAddress = this.keypair.address;
             

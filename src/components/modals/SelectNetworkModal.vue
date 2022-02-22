@@ -5,20 +5,32 @@
             
             <div style="width: 100%; text-align: center; margin-bottom: 10px; margin-top: 20px;">
                 Select Network <br>
-                <div style="font-size: 14px; color: var(--fg_color_2); margin-bottom: 5px; margin-top: 10px;">Your addresses may change depending on selected network.</div>
+                <div style="font-size: 14px; color: var(--fg_color_2); margin-bottom: 5px; margin-top: 10px;">Addresses may vary depending on selected network.</div>
                 <hr>
             </div>
 
-            <div class="itemList" style="top: 0px; height: 355px;">
+            <div class="itemList" style="top: 0px; height: 370px;">
               <div class="flexBox" style="width: 100%; align-items: center;" >
               
-                <NetworkModule style="margin-top: 10px;" v-for="item in networks.allNetworks.values()" v-bind:key="item"
+                <NetworkModule style="margin-top: 10px;" v-for="item in networks.mainNets.values()" v-bind:key="item"
+                :networkType="item.networkType"
+                :networkName="item.networkName"
+                :selected="vultureWallet.accountStore.currentlySelectedNetwork.networkName == item.networkName ? true : false"
+                @module-click="selectNetwork($event)"/>
+                <div style="width: 80%; background-color: var(--fg_color_2); height: 1px; margin-top: 10px; margin-bottom: 0px;">
+
+                </div>
+                <div style="font-size: 14px; color: var(--fg_color_2); margin-bottom: 5px; margin-top: 10px;">Networks below are Test-Networks!</div>
+
+                <NetworkModule style="margin-top: 10px;" v-for="item in networks.testNets.values()" v-bind:key="item"
                 :networkType="item.networkType"
                 :networkName="item.networkName"
                 :selected="vultureWallet.accountStore.currentlySelectedNetwork.networkName == item.networkName ? true : false"
                 @module-click="selectNetwork($event)"/>
 
+              <!--
                 <span style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">You can add custom networks in the<br> settings tab.</span>
+              -->
 
               </div>
 

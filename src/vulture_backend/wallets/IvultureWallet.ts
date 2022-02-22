@@ -90,6 +90,19 @@ export interface Network {
     networkColor: string;
     networkLogoUri?: string;
     networkType: NetworkType;
+    /** # addressFormat
+     * Some networks which are multi-chain, or use certain SDKs such as Substrate may
+     * have multiple address encoding/formats to differentiate between the different
+     * chains. In the case of Substrate, this is true with the `ss58` format.
+     * 
+     * ## Substrate:
+     * If the networkType is substrate, the address format should be the `ss58` prefix
+     * number, if left undefined, this will default to the default substrate address format.
+     * A list of ss58 prefixes can be found in the [ss58 registry](https://github.com/paritytech/ss58-registry/blob/main/ss58-registry.json)
+     * 
+     */
+    addressFormat?: string
+    isTestnet: boolean,
 }
 
 /** ## VultureAccount
@@ -171,6 +184,27 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
+        isTestnet: false,
+    }
+    public Kusama: Network = {
+        networkUri: 'wss://kusama-rpc.polkadot.io',
+        networkAssetPrefix: 'KSM',
+        networkName: 'Kusama',
+        networkAssetDecimals: 12,
+        networkColor: '#e6007a',
+        networkType: NetworkType.Substrate,
+        addressFormat: '2',
+        isTestnet: false,
+    }
+    public Polkadot: Network = {
+        networkUri: 'wss://kusama-rpc.polkadot.io',
+        networkAssetPrefix: 'DOT',
+        networkName: 'Polkadot',
+        networkAssetDecimals: 10,
+        networkColor: '#e6007a',
+        networkType: NetworkType.Substrate,
+        addressFormat: '0',
+        isTestnet: false,
     }
     /* 
     public AvalancheCChain: Network = {
@@ -180,6 +214,7 @@ export class DefaultNetworks {
         networkAssetDecimals: 18,
         networkColor: '#ff0043',
         networkType: NetworkType.EVM,
+        isTestnet: false,
     }
      */
     /* -- Test Networks -- */
@@ -190,6 +225,7 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
+        isTestnet: true,
     }
     public AlephZeroSmartnet: Network = {
         networkUri: 'wss://ws-smartnet.test.azero.dev',
@@ -198,11 +234,20 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
+        isTestnet: true,
     }
     public allNetworks: Map<string, Network> = new Map([
         [
             this.AlephZero.networkName,
             this.AlephZero
+        ],
+        [
+            this.Kusama.networkName,
+            this.Kusama
+        ],
+        [
+            this.Polkadot.networkName,
+            this.Polkadot
         ],
         /*
         [
@@ -210,6 +255,30 @@ export class DefaultNetworks {
             this.AvalancheCChain
         ],
          */
+        [
+            this.AlephZeroTestNet.networkName,
+            this.AlephZeroTestNet
+        ],
+        [
+            this.AlephZeroSmartnet.networkName,
+            this.AlephZeroSmartnet
+        ],
+    ]);
+    public mainNets: Map<string, Network> = new Map([
+        [
+            this.AlephZero.networkName,
+            this.AlephZero
+        ],
+        [
+            this.Kusama.networkName,
+            this.Kusama
+        ],
+        [
+            this.Polkadot.networkName,
+            this.Polkadot
+        ],
+    ]);
+    public testNets: Map<string, Network> = new Map([
         [
             this.AlephZeroTestNet.networkName,
             this.AlephZeroTestNet

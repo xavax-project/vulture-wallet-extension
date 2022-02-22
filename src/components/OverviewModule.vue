@@ -3,7 +3,7 @@
     <div class="flexBox" style="width: 100%;">
       <div class="flexBox" style="width: 100%; flex-direction: row;">
         <div class="amountText">
-          {{ Number(assetAmount).toFixed(4) }}<span class="azero">{{ assetPrefix }}</span>
+          {{ Number(assetAmount).toFixed(4) }}<span class="assetName">{{ assetPrefix }}</span>
             <div class="underline"/>
         </div>
         <div class="flexBox" style="">
@@ -89,8 +89,8 @@ export default {
   padding: 7px;
   border-radius: 7px;
 }
-.azero {
-  font-size: 14px;
+.assetName {
+  font-size: 15px;
   color: var(--accent_color);
   font-weight: bold;
 }

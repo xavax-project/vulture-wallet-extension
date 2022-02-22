@@ -21,6 +21,7 @@ self.addEventListener("message", (event) => {
                     event.data.params.keyring.seed, //seed
                     "//" + event.data.params.keyring.index, //derivation path
                     event.data.params.networkURI, //network websocket URI
+                    event.data.params.addressFormat != null ? event.data.params.addressFormat : undefined
                 );
                 break;
             }

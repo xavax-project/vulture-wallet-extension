@@ -3,17 +3,15 @@
 
 const accountNameExamples: string[] = [
     "DeFi Account",       "NFT Account",
-    "Public Account",     "Public Account",
+    "Public Account",     "Private Account",
     "Charity Account",    "Savings Account",
-    "Spendings Account",  "Income Account",
-    "Taxes Account",      "GPU Money",
-    "For DAOs",           "Experiment Money",
-    "uwu money",          "Vulture by xavax.io",
-    "Tx Fee Savings",     "Rocketry Money",
-    "Revolution Savings", "Mars Trip",
+    "Spending Account",   "Income Account",
+    "DAO Account",        "Experiment Account",
+    "uwu Account",        "Vulture by xavax.io",
+    "Rocketry Account",
+    "Revolution Savings", "Mars Account",
     "Inssurance Money",   "HODL Account",
-    "Ape money",          "Ape money",
-    "owo money",
+    "Ape money",          
 ]
 
 export function getRandomAccountName(): string {
