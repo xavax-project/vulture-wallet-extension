@@ -86,7 +86,7 @@ Vulture is licensed under the permissive [MIT License](https://mit-license.org/)
 
 You can find more info at [vulturewallet.net](https://vulturewallet.net) and [xavax.io](https://www.xavax.io).
 
-Follow [me](https://twitter/DiinkiTheImp) on twitter if you wanna!
+Follow [me](https://twitter.com/DiinkiTheImp) on twitter if you wanna!
 
 Feel free to help-out by: tipping, forking the code and creating pull requests, giving feedback, and also creating issues on Github if any issues arrise!
 
