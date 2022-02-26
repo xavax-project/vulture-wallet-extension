@@ -320,10 +320,23 @@ export class VultureWallet {
         this.vault = vault;
         this.nextDerivIndex = accountStore.nextAccountDerivIndex;
         this.selectedWalletIndex = accountStore.currentlySelectedAccount;
-        if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
-            this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
+
+        //If the currently selected account is available, if it isn't we fallback to using the first account.
+        //The reason this check is necessary is due to updates possibly resetting the currentlySelectedAccount value. 
+        if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1]) {
+            if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
+                this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
+            }else {
+                console.error("Error: Ledger wallets not currently supported!");
+            }
         }else {
-            console.error("Error: Ledger wallets not currently supported!");
+            if(accountStore.allAccounts[0].walletType == WalletType.MnemonicPhrase) {
+                this.accountStore.currentlySelectedAccount = 0;
+                this.saveAccounts();
+                this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[0], accountStore.currentlySelectedNetwork);
+            }else {
+                console.error("Error: Ledger wallets not currently supported!");
+            }
         }
     }
 
@@ -494,6 +507,7 @@ export async function loadAccounts() {
             if(store.currentlySelectedNetwork == null) {
                 store.currentlySelectedNetwork = new DefaultNetworks().AlephZero;
             }
+            if(store.allAccounts[0].walletType)
             return store;
         }else {
             return null;

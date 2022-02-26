@@ -8,9 +8,6 @@
         "default_popup": "index.html",
         "default_title": "Vulture"
     },
-    "permissions": [
-        "clipboardWrite"
-      ],
     "icons": {
         "16": "icons/VultureIcon2.png",
         "48": "icons/VultureIcon2.png",
