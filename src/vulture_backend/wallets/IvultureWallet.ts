@@ -503,11 +503,17 @@ export async function loadAccounts() {
     store = await localforage.getItem("vultureAccounts").then((value) => {
         if(value != null) {
             let store = value as VultureAccountStore;
+
+            /*--- Due to updating serialization, need to make sure the store contains this data! ---*/
             //Making sure that we have a default network.
             if(store.currentlySelectedNetwork == null) {
                 store.currentlySelectedNetwork = new DefaultNetworks().AlephZero;
             }
-            if(store.allAccounts[0].walletType)
+            //Making sure that we have a nextAccountDerivIndex.
+            if(store.nextAccountDerivIndex == null) {
+                store.nextAccountDerivIndex = 1;
+            }
+            localforage.setItem("vultureAccounts", store);
             return store;
         }else {
             return null;
