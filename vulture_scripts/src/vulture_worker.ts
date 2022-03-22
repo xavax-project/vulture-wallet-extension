@@ -48,6 +48,8 @@ self.addEventListener("message", (event) => {
         }
     }
 
+    //Generate an address from a URI (URI in this case is the derivation path index & the account index (which account in the back-end the address
+    //corresponds to))
     if(event.data && event.data.method === VultureMessage.GET_ADDRESS_FROM_URI) {
         if(currentWallet != null) {
             currentWallet.generateAddress("//" + event.data.params.keyring.index, event.data.params.keyring.accountIndex);
@@ -55,6 +57,8 @@ self.addEventListener("message", (event) => {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
     }
+
+    //Update the given accounts (the address encoding format) to a new network, and send the new addresses to the wallet backend.
     if(event.data && event.data.method === VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
         if(currentWallet != null) {
             currentWallet.updateAccountsToNetwork(event.data.params.accounts, event.data.params.network);
@@ -106,9 +110,17 @@ self.addEventListener("message", (event) => {
         }
     }
 
+    if(event.data && event.data.method === "TEST") {
+        if(currentWallet != null) {
+            currentWallet.test();
+        }else {
+            console.error("Wallet hasn't been setup in vulture_worker yet!");
+        }
+    }
+
     //Not used anywhere right now, this is simply exploring seed-phrase caching.
     //The raw seed-phrase will never be cached without any encryption when the user
-    //isn't using the wallet however.
+    //isn't using the wallet.
     if(event.data && event.data.method === VultureMessage.SET_VAULT) {
         vault.seed = event.data.vault.seed;
     }

@@ -4,11 +4,9 @@
            <div @click="onTabSwitch('send')" class="iconFont" :class="currentTab == 'send' ? 'selected' : ''">
                &#xf1d8;
            </div>
-           
             <div @click="onTabSwitch('wallet')" class="iconFont" :class="currentTab == 'wallet' ? 'selected' : ''">
                &#xf555;
            </div>
-           
             <div @click="onTabSwitch('accounts')" class="iconFont" :class="currentTab == 'accounts' ? 'selected' : ''">
                &#xf2b9;
            </div>

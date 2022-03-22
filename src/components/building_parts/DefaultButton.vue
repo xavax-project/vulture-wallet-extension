@@ -39,7 +39,7 @@ export default {
     border-color: var(--bg_color_2);
     border-width: 2px;
     border-style: solid;
-    box-shadow: 0px 0px 6px rgb(5, 5, 5);
+    box-shadow: 0px 0px 3px rgb(5, 5, 5);
     transition-duration: 100ms;
     cursor: pointer;
 
@@ -70,7 +70,7 @@ export default {
 }
 .disabledButton {
 
-      display: flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     width: auto;
@@ -79,7 +79,7 @@ export default {
     border-color: var(--bg_color_2);
     border-width: 2px;
     border-style: solid;
-    box-shadow: 0px 0px 6px rgb(5, 5, 5);
+    box-shadow: 0px 0px 3px rgb(5, 5, 5);
     transition-duration: 100ms;
     cursor:not-allowed;
 

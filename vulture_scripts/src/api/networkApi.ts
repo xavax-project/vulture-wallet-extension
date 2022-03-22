@@ -22,4 +22,5 @@ export interface VultureNetwork {
     validateAddress(address: string): void;
     getAddressState(): void;
     subscribeToAddressUpdates(): void;
+    test(): void;
 }

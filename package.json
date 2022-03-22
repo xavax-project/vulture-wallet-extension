@@ -16,6 +16,7 @@
     "@metamask/safe-event-emitter": "^2.0.0",
     "@open-wc/webpack-import-meta-loader": "^0.4.7",
     "@polkadot/api": "^7.5.1",
+    "@polkadot/api-contract": "^7.11.1",
     "@polkadot/x-textdecoder": "^8.3.3",
     "bignumber.js": "^9.0.2",
     "bip39": "^3.0.4",

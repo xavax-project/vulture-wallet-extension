@@ -3,6 +3,7 @@ import { VultureMessage } from "../vultureMessage";
 import { encrypt } from "@metamask/browser-passworder";
 import { MnemonicWallet } from "./mnemonicWallet";
 import SafeEventEmitter from "@metamask/safe-event-emitter";
+import { AbstractToken } from "../types/abstractToken";
 
 /* --- Note # xavax # we are one @
     IvultureWallet.ts contains interfaces that are used by the Vulture wallet.
@@ -57,6 +58,17 @@ export interface AccountData {
     freeAmountSmallestFraction: string;
     accountNonce: number;
     walletType: WalletType;
+
+    /** ## tokens
+     * Optional token/asset store.
+     * 
+     * It is important to note that the AbstractToken interface
+     * is an abstract interface which also contains the network-information (tokens
+     * are on a per-network basis). The AbstractToken interface may represent ERC20 tokens,
+     * and also native assets that reside within blockchains. The Vulture back-end will handle
+     * tokens differently depending on the currently selected network.
+     */
+    tokens?: AbstractToken[];
 }
 
 
@@ -68,6 +80,14 @@ export enum WalletType {
     MnemonicPhrase,
     Ledger,
 }
+/** ## NetworkType
+ * The network type of a network, the value in this enum represents how the wallet handles the data/accounts/cryptography
+ * of the network. If the user adds a custom network (with a custom RPC), it is important that they select a network type
+ * that's corret.
+ * 
+ * There may also be additional specific network types, such as `SubstrateNetworks`; this is due to the fact that substrate
+ * networks may have different properties which are unique, and cannot be general.
+ */
 export enum NetworkType {
     Substrate,
     Solana,
@@ -103,6 +123,12 @@ export interface Network {
      */
     addressFormat?: string
     isTestnet: boolean,
+
+    /** ## smartContractCapable
+     * If the network is smart-contract capable or not. This boolean is quite temporary as I'd like to abstract
+     * network features further later on. 
+     */
+    smartContractCapable: boolean,
 }
 
 /** ## VultureAccount
@@ -185,6 +211,7 @@ export class DefaultNetworks {
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
         isTestnet: false,
+        smartContractCapable: false
     }
     public Kusama: Network = {
         networkUri: 'wss://kusama-rpc.polkadot.io',
@@ -195,6 +222,7 @@ export class DefaultNetworks {
         networkType: NetworkType.Substrate,
         addressFormat: '2',
         isTestnet: false,
+        smartContractCapable: false,
     }
     public Polkadot: Network = {
         networkUri: 'wss://kusama-rpc.polkadot.io',
@@ -205,6 +233,7 @@ export class DefaultNetworks {
         networkType: NetworkType.Substrate,
         addressFormat: '0',
         isTestnet: false,
+        smartContractCapable: false,
     }
     /* 
     public AvalancheCChain: Network = {
@@ -226,6 +255,7 @@ export class DefaultNetworks {
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
         isTestnet: true,
+        smartContractCapable: false,
     }
     public AlephZeroSmartnet: Network = {
         networkUri: 'wss://ws-smartnet.test.azero.dev',
@@ -235,6 +265,7 @@ export class DefaultNetworks {
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
         isTestnet: true,
+        smartContractCapable: true
     }
     public allNetworks: Map<string, Network> = new Map([
         [
@@ -344,6 +375,14 @@ export class VultureWallet {
         this.accountStore.currentlySelectedAccount = index;
         this.saveAccounts();
         this.initWallet(this.vault, this.accountStore);
+    }
+    test() {
+        this.currentWallet.worker.postMessage({
+            method: "TEST",
+            params: {
+
+            }
+        })
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();

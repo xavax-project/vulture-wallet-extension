@@ -14,6 +14,9 @@
   @send-button-click="transferAssets($event)"
   :vultureWallet="vultureWallet"/>
 
+  <WalletTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'wallet' ? 'show' : 'hide'"
+  :vultureWallet="vultureWallet"/>
+
   <AccountsTab v-if="vultureWallet.accountStore != null" v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
   :allAccounts="vultureWallet.accountStore.allAccounts"
   :vultureWallet="vultureWallet"
@@ -50,13 +53,14 @@
 
 <script lang="ts">
 import OverviewModule from "./components/OverviewModule.vue";
-import DefaultButton from "./components/building_parts/DefaultButton.vue"
-import UnlockWallet from "./components/UnlockWallet.vue"
-import AccountsTab from "./components/AccountsTab.vue"
-import SettingsTab from "./components/SettingsTab.vue"
-import Onboarding from "./components/Onboarding.vue"
-import SendTab from "./components/SendTab.vue"
-import Navbar from "./components/Navbar.vue"
+import DefaultButton from "./components/building_parts/DefaultButton.vue";
+import UnlockWallet from "./components/UnlockWallet.vue";
+import AccountsTab from "./components/AccountsTab.vue";
+import SettingsTab from "./components/SettingsTab.vue";
+import Onboarding from "./components/Onboarding.vue";
+import WalletTab from "./components/WalletTab.vue";
+import SendTab from "./components/SendTab.vue";
+import Navbar from "./components/Navbar.vue";
 import Modal from "./components/modals/Modal.vue";
 
 
@@ -78,6 +82,7 @@ export default {
       AccountsTab,
       SettingsTab,
       Onboarding,
+      WalletTab,
       SendTab,
       Navbar,
       Modal

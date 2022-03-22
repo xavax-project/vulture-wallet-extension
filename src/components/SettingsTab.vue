@@ -13,7 +13,7 @@
                 <hr>
                 <div style="font-size: 16px; color: var(--fg_color_2)">
                     Vulture is an open-source, non-custodial wallet developed by the xavax.io project.<br> <br>
-                    <span style="color: var(--accent_color)">v0.1.5-beta</span>
+                    <span style="color: var(--accent_color)">v0.1.6-beta</span>
                 </div> 
             </div>
         </div>

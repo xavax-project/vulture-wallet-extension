@@ -4,7 +4,9 @@
 
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
-import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
+import { WsProvider, Keyring, ApiPromise} from '@polkadot/api';
+
+const { ContractPromise } = require('@polkadot/api-contract');
 
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from "@polkadot/util";
@@ -173,6 +175,21 @@ export class SubstrateNetwork implements VultureNetwork {
             throw new Error("Cryptography WASM hasn't been initialized yet!");
         }
     }
+    test() {
+        if(this.isCryptoReady) {
+            let contract = new ContractPromise(this.networkAPI!, erc20Abi, "5D3qCr9DJQz6U7P8zpMSzTqHuozBibA6HyixKBAB8A9fArM2");
+            console.log("kee");
+            contract.query.name(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
+                if(data.result.isOk) {
+                    console.log(data.output.toHuman());
+                }else {
+                    console.error(data.asErr);
+                }
+            });
+        }else {
+            throw new Error("Cryptography WASM hasn't been initialized yet!");
+        }
+    }
     validateAddress(address: string) {
         if(this.isCryptoReady) {
             let result = false;
@@ -219,4 +236,3 @@ export class SubstrateNetwork implements VultureNetwork {
         }
     }
 }
-
