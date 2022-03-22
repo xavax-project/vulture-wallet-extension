@@ -1,4 +1,4 @@
-var erc20Abi = {
+export var erc20Abi = {
     "source": {
       "hash": "0xa5a9796d4237cdfd5f7af429ae5101ef264f1c6a516eccb45d41b6c60ef8fece",
       "language": "ink! 3.0.0-rc9",

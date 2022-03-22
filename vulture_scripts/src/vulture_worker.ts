@@ -1,4 +1,5 @@
 
+import { AbstractToken } from "../../src/vulture_backend/types/abstractToken";
 import { VultureMessage } from "../../src/vulture_backend/vultureMessage";
 import { VultureRequest } from "../../src/vulture_backend/vultureRPC";
 import { NetworkType } from "../../src/vulture_backend/wallets/IvultureWallet";
@@ -112,7 +113,15 @@ self.addEventListener("message", (event) => {
 
     if(event.data && event.data.method === "TEST") {
         if(currentWallet != null) {
-            currentWallet.test();
+            let testingToken: AbstractToken = {
+                network: event.data.params.network,
+                address: "5D3qCr9DJQz6U7P8zpMSzTqHuozBibA6HyixKBAB8A9fArM2",
+                decimals: 0,
+                name: "OogaDoogoo",
+                symbol: "OOGA",
+                logoURI: ""
+            }
+            currentWallet.transferAssets("5EBzqfLvB5eacCEtub6UXgGjoJYBtDtnDw4ANQeSsHbgLtC6", "1000", testingToken);
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }

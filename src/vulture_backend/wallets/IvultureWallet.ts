@@ -380,7 +380,7 @@ export class VultureWallet {
         this.currentWallet.worker.postMessage({
             method: "TEST",
             params: {
-
+                network: JSON.parse(JSON.stringify(this.accountStore.currentlySelectedNetwork))
             }
         })
     }

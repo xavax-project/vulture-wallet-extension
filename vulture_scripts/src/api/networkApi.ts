@@ -1,3 +1,4 @@
+import { AbstractToken } from "../../../src/vulture_backend/types/abstractToken";
 import { AccountData, Network } from "../../../src/vulture_backend/wallets/IvultureWallet";
 
 export class MethodResponse {
@@ -17,10 +18,9 @@ export interface VultureNetwork {
     getAddress(): void;
     generateAddress(derivationPath: string, accountIndex: number): void,
     updateAccountsToNetwork(accounts: AccountData[], network: Network): void,
-    transferAssets(recipent: string, amount: string): void;
+    transferAssets(recipent: string, amount: string, token?: AbstractToken): void;
     estimateTxFee(recipent: string, amount: string): void;
     validateAddress(address: string): void;
     getAddressState(): void;
     subscribeToAddressUpdates(): void;
-    test(): void;
 }

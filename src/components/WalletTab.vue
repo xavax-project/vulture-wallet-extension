@@ -3,7 +3,7 @@
     <div class="flexBox box">
         <div style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 25px; padding-right: 25px; top: 285px;">
             <DefaultButton
-            @button-click="test()" buttonText="Test" buttonHeight="40px" buttonWidth="100%"/>
+            @button-click="test()" buttonText="Test (look in console)" buttonHeight="40px" buttonWidth="100%"/>
         </div>
     </div>
 </template>
