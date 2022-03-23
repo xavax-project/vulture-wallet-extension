@@ -124,19 +124,38 @@ export class SubstrateNetwork implements VultureNetwork {
             //This only works on substrate networks with the Ink! smart contract pallete.
 
             let contract = new ContractPromise(this.networkAPI!, erc20Abi, token.address);
-            console.log("===== \n Attempting to transfer: '" + token.name + "' Token");
+            console.log("_________________________________ \nAttempting to transfer: '" + token.name + "' Token");
             
             let fee: any;
             contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
               console.log("Estimated Fee: " + info.partialFee.toHuman());
               contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).signAndSend(this.keypair!, ({events = [], status = {}}) => {
                 if((status as any).isInBlock) {
-                    console.log((status as any).asInBlock.toHex());
+
                     events.forEach(({event: {data, method, section}, phase}) => {
+                        if(method == 'ExtrinsicSuccess') {
+
                         console.log("==== EVENT START ===");
                         console.log(method);
+                        console.log("Block Hash Of Tx: " + (status as any).asInBlock.toHex());
                         console.log("==== EVENT END ===");
+                          postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                              success: true,
+                              status: (status as any).type,
+                              blockHash: (status as any).asInBlock.toHex(),
+                              method: method,
+                          }});
+                        } else if(method == 'ExtrinsicFailed') {                            
+                          postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                              success: false,
+                              status: (status as any).type,
+                              blockHash: (status as any).asInBlock.toHex(),
+                              method: method,
+                          }});
+                        }
                     });
+                    console.log("_________________________________");
+
                 }else if((status as any).isDropped) {
                     postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
                         success: false,
@@ -155,8 +174,6 @@ export class SubstrateNetwork implements VultureNetwork {
                   }
 
               });
-
-              console.log("=====");
             });
 
 
