@@ -13,12 +13,14 @@ export interface AbstractToken {
     chainId?: number
     chainName?: string
     network: Network
-
+    
     address: string,
     decimals: number,
     name: string,
     symbol: string,
     logoURI: string,
+    
+    amount?: string,
 }
 
 /** ## TokenStore
@@ -35,6 +37,6 @@ export interface AbstractToken {
  * 
  */
 export interface TokenStore {
-    userAddedFungibleTokenList: AbstractToken[];
-    userAddedNFTList: AbstractToken[];
+    tokenList: Map<string, AbstractToken[]>;
+    NFTList: Map<string, AbstractToken[]>;
 }

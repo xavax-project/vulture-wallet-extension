@@ -2,7 +2,7 @@
 import { AbstractToken } from "../../src/vulture_backend/types/abstractToken";
 import { VultureMessage } from "../../src/vulture_backend/vultureMessage";
 import { VultureRequest } from "../../src/vulture_backend/vultureRPC";
-import { NetworkType } from "../../src/vulture_backend/wallets/IvultureWallet";
+import { NetworkType } from "../../src/vulture_backend/wallets/vultureWallet";
 
 import { VultureNetwork } from './api/networkApi';
 import { SubstrateNetwork } from './api/substrateNetwork';
@@ -53,7 +53,7 @@ self.addEventListener("message", (event) => {
     //corresponds to))
     if(event.data && event.data.method === VultureMessage.GET_ADDRESS_FROM_URI) {
         if(currentWallet != null) {
-            currentWallet.generateAddress("//" + event.data.params.keyring.index, event.data.params.keyring.accountIndex);
+            currentWallet.generateAddress(event.data.params.keyring.addressURI, event.data.params.keyring.accountIndex);
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }

@@ -143,10 +143,10 @@ export default {
 
       });
       
-      function initWallet(vaultE: Vault) {
-        loadAccounts().then((accounts)=> {
+      async function initWallet(vaultE: Vault) {
+        loadAccounts().then(async (accounts)=> {
           //vultureWallet = new VultureWallet(vault, accounts as VultureAccountStore);
-          vultureWallet.initWallet(vaultE, accounts as VultureAccountStore);
+          await vultureWallet.initWallet(vaultE, accounts as VultureAccountStore);
           walletState.value = WalletStates.WALLET;
           currentAccentColor.value = vultureWallet.accountStore.currentlySelectedNetwork.networkColor;
           

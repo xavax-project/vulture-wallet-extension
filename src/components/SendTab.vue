@@ -5,15 +5,18 @@
             <MinimalInput @on-enter="address($event)" inputPlaceholder="Address" inputWidth="315px" inputHeight="38px" fontSize="12px" inputName="Recipent Address"/>
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
               <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
+            <div>
+              <div class="inputName">Asset</div>
               <div class="assetBox">
                 <span v-if="vultureWallet.currentWallet">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
-                <span style="font-family: fonticonA; font-size: 18px;"> &#xf142;</span>
+                <span style="font-family: fonticonA; font-size: 18px;"> &#xf044;</span>
               </div>
             </div>
+          </div>
             
-            <span v-if="insufficientFunds" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Insufficient Funds!</span>
-            <span v-if="invalidAddress && currentAddress != ''" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Invalid Recipent Address!</span>
-            <span v-if="canSend()" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Estimated Fee: <span style="color: var(--accent_color">{{ estimatedFee.toFixed(7) }}</span></span>
+          <span v-if="insufficientFunds" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Insufficient Funds!</span>
+          <span v-if="invalidAddress && currentAddress != ''" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Invalid Recipent Address!</span>
+          <span v-if="canSend()" style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">Estimated Fee: <span style="color: var(--accent_color">{{ estimatedFee.toFixed(7) }}</span></span>
 
         </div>
         <div style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 25px; padding-right: 25px; top: 285px;">
@@ -132,6 +135,12 @@ export default {
   cursor: pointer;
 
   transition-duration: 125ms;
+}
+.inputName {
+  text-align: left;
+  font-size: 14px;
+  margin: 5px;
+  color: var(--fg_color_2);
 }
 .assetBox:hover {
   text-shadow: 0px 0px 5px var(--accent_color);

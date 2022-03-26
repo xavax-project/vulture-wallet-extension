@@ -8,7 +8,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 
 import { VultureNetwork, MethodResponse } from './networkApi';
 import { VultureMessage } from '../../../src/vulture_backend/vultureMessage';
-import { AccountData, Network } from '../../../src/vulture_backend/wallets/IvultureWallet';
+import { AccountData, Network } from '../../../src/vulture_backend/wallets/vultureWallet';
 import { AbstractToken } from '../../../src/vulture_backend/types/abstractToken';
 import { erc20Abi } from '../ink_contract_abis/erc20Abi';
 

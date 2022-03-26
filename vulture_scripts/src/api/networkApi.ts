@@ -1,5 +1,5 @@
 import { AbstractToken } from "../../../src/vulture_backend/types/abstractToken";
-import { AccountData, Network } from "../../../src/vulture_backend/wallets/IvultureWallet";
+import { AccountData, Network } from "../../../src/vulture_backend/wallets/vultureWallet";
 
 export class MethodResponse {
     method: string;
