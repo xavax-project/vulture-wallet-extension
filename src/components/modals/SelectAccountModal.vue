@@ -20,13 +20,11 @@
                 @module-click="selectAccount($event)"/>
 
                 <span style="font-size: 14px;  color: var(--fg_color_2); margin-bottom: 5px;">You can create new accounts in the<br> accounts tab.</span>
-
               </div>
-
-          <!--
-            <AccountModule accountIndex="2" accountType="Mnemonic" accountName="DeFi"/>
-          -->
-        </div>
+            <!--
+              <AccountModule accountIndex="2" accountType="Mnemonic" accountName="DeFi"/>
+            -->
+            </div>
 
         </div>
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
@@ -41,7 +39,7 @@ import DefaultInput from "../building_parts/DefaultInput.vue";
 import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import AccountModule from "../AccountModule.vue"
 
-import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/IvultureWallet";
+import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/vultureWallet";
 import { PropType, reactive, ref } from 'vue';
 
 export default {

@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { Network } from "../../vulture_backend/wallets/IvultureWallet";
+import { Network } from "../../vulture_backend/wallets/vultureWallet";
 import { PropType, ref } from 'vue';
 
 export default {

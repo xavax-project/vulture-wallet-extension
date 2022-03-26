@@ -1,4 +1,4 @@
-import { WalletType, VultureAccount, Network, AccountData } from "./IvultureWallet";
+import { WalletType, VultureAccount, Network, AccountData } from "./vultureWallet";
 import SafeEventEmitter from "@metamask/safe-event-emitter";
 
 //import { KeyringPair } from "@polkadot/keyring/types";

@@ -46,7 +46,7 @@ import TransferAssetsModal from './TransferAssetsModal.vue';
 
 import { Modals } from "../../uiTypes";
 import { PropType } from "@vue/runtime-core";
-import { VultureWallet } from "../../vulture_backend/wallets/IvultureWallet";
+import { VultureWallet } from "../../vulture_backend/wallets/vultureWallet";
 
 
 

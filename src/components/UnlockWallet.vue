@@ -33,7 +33,7 @@
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import DefaultInput from "./building_parts/DefaultInput.vue";
 import { decrypt } from "@metamask/browser-passworder";
-import { Vault } from "../vulture_backend/wallets/IvultureWallet";
+import { Vault } from "../vulture_backend/wallets/vultureWallet";
 import { PropType } from 'vue';
 export default {
   name: "UnlockWallet",

@@ -71,8 +71,8 @@ self.addEventListener("message", (event) => {
     //Send assets
     if(event.data && event.data.method === VultureMessage.TRANSFER_ASSETS) {
         if(currentWallet != null){
-            currentWallet.transferAssets(event.data.params.recipent, event.data.params.amount);
-
+            
+            currentWallet.transferAssets(event.data.params.recipent, event.data.params.amount, event.data.params.token == null ? null : event.data.params.token);
         } else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }

@@ -25,7 +25,7 @@ import DefaultButton from "./building_parts/DefaultButton.vue";
 import DefaultInput from "./building_parts/DefaultInput.vue";
 import AccountModule from "../components/AccountModule.vue"
 
-import { AccountData, VultureWallet } from '../vulture_backend/wallets/IvultureWallet'
+import { AccountData, VultureWallet } from '../vulture_backend/wallets/vultureWallet'
 import { PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
 

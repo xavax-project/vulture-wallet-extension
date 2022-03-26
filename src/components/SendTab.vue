@@ -5,8 +5,9 @@
             <MinimalInput @on-enter="address($event)" inputPlaceholder="Address" inputWidth="315px" inputHeight="38px" fontSize="12px" inputName="Recipent Address"/>
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
               <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
-              <div class="assetNameBox">
+              <div class="assetBox">
                 <span v-if="vultureWallet.currentWallet">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
+                <span style="font-family: fonticonA; font-size: 18px;"> &#xf142;</span>
               </div>
             </div>
             
@@ -24,7 +25,7 @@
 
 <script lang="ts">
 import { PropType, reactive, ref } from 'vue';
-import { VultureWallet } from '@/vulture_backend/wallets/IvultureWallet';
+import { VultureWallet } from '@/vulture_backend/wallets/vultureWallet';
 
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import MinimalInput from "./building_parts/MinimalInput.vue";
@@ -112,7 +113,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.assetNameBox {
+.assetBox {
   font-size: 20px;
   padding: 8px;
 
@@ -126,6 +127,20 @@ export default {
   border-bottom-style: solid;
   border-width: 2px;
   border-color: var(--accent_color);
+  user-select: none;
+
+  cursor: pointer;
+
+  transition-duration: 125ms;
+}
+.assetBox:hover {
+  text-shadow: 0px 0px 5px var(--accent_color);
+  color: var(--accent_color);
+
+  transition-duration: 125ms;
+}
+.assetBox:active {
+  filter: brightness(70%);
 }
 .box {
     height: 320px;

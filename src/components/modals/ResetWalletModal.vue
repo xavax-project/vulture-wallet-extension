@@ -36,7 +36,7 @@ import DefaultInput from "../building_parts/DefaultInput.vue";
 import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import AccountModule from "../AccountModule.vue"
 
-import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType, hardWalletReset} from "../../vulture_backend/wallets/IvultureWallet";
+import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType, hardWalletReset} from "../../vulture_backend/wallets/vultureWallet";
 import { PropType, reactive, ref } from 'vue';
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
 import { TxState } from '@/uiTypes';

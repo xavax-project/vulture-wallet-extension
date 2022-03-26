@@ -67,7 +67,7 @@ import Modal from "./components/modals/Modal.vue";
 import { provide } from 'vue';
 
 import { doesWalletExist, VultureWallet, loadVault, Vault, loadAccounts,
-         deleteWallet, VultureAccountStore, AccountData} from "./vulture_backend/wallets/IvultureWallet";
+         deleteWallet, VultureAccountStore, AccountData} from "./vulture_backend/wallets/vultureWallet";
 import { Modals, WalletStates } from "./uiTypes";
 import { reactive, ref } from '@vue/reactivity';
 import { VultureMessage } from './vulture_backend/vultureMessage';

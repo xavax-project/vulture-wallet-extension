@@ -1,12 +1,6 @@
-
-//import { VultureMessage } from "../../src/vulture_backend/vultureMessage";
-//import { VultureRequest } from "../../src/vulture_backend/vultureRPC";
-
 import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 import { WsProvider, Keyring, ApiPromise} from '@polkadot/api';
-
-const { ContractPromise } = require('@polkadot/api-contract');
 
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from "@polkadot/util";
@@ -18,6 +12,7 @@ import { AccountData, Network } from '../../../src/vulture_backend/wallets/Ivult
 import { AbstractToken } from '../../../src/vulture_backend/types/abstractToken';
 import { erc20Abi } from '../ink_contract_abis/erc20Abi';
 
+const { ContractPromise } = require('@polkadot/api-contract');
 
 export class SubstrateNetwork implements VultureNetwork {
     currentAddress: string = "";
@@ -124,68 +119,54 @@ export class SubstrateNetwork implements VultureNetwork {
             //This only works on substrate networks with the Ink! smart contract pallete.
 
             let contract = new ContractPromise(this.networkAPI!, erc20Abi, token.address);
-            console.log("_________________________________ \nAttempting to transfer: '" + token.name + "' Token");
+            console.log("_________________________________ \nAttempting to transfer: '" + token.name + "' Token to: " + recipent);
             
-            let fee: any;
-            contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
-              console.log("Estimated Fee: " + info.partialFee.toHuman());
-              contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).signAndSend(this.keypair!, ({events = [], status = {}}) => {
-                if((status as any).isInBlock) {
+            contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).signAndSend(this.keypair!, ({events = [], status = {}}) => {
+              if((status as any).isInBlock) {
 
-                    events.forEach(({event: {data, method, section}, phase}) => {
-                        if(method == 'ExtrinsicSuccess') {
+                  events.forEach(({event: {data, method, section}, phase}) => {
+                      if(method == 'ExtrinsicSuccess') {
 
-                        console.log("==== EVENT START ===");
-                        console.log(method);
-                        console.log("Block Hash Of Tx: " + (status as any).asInBlock.toHex());
-                        console.log("==== EVENT END ===");
-                          postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                              success: true,
-                              status: (status as any).type,
-                              blockHash: (status as any).asInBlock.toHex(),
-                              method: method,
-                          }});
-                        } else if(method == 'ExtrinsicFailed') {                            
-                          postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                              success: false,
-                              status: (status as any).type,
-                              blockHash: (status as any).asInBlock.toHex(),
-                              method: method,
-                          }});
-                        }
-                    });
-                    console.log("_________________________________");
+                      console.log("==== EVENT START ===");
+                      console.log(method);
+                      console.log("Block Hash Of Tx: " + (status as any).asInBlock.toHex());
+                      console.log("==== EVENT END ===");
+                        postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                            success: true,
+                            status: (status as any).type,
+                            blockHash: (status as any).asInBlock.toHex(),
+                            method: method,
+                        }});
+                      } else if(method == 'ExtrinsicFailed') {                            
+                        postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                            success: false,
+                            status: (status as any).type,
+                            blockHash: (status as any).asInBlock.toHex(),
+                            method: method,
+                        }});
+                      }
+                  });
+                  console.log("_________________________________");
 
-                }else if((status as any).isDropped) {
-                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                        success: false,
-                        status: (status as any).type,
-                    }});
-                  }else if((status as any).isFinalityTimeout) {
-                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                        success: false,
-                        status: (status as any).type,
-                    }});
-                  }else if((status as any).isInvalid) {
-                    postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
-                        success: false,
-                        status: (status as any).type,
-                    }});
-                  }
-
-              });
-            });
-
-
-            /*
-            contract.query.name(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
-                if(data.result.isOk) {
-                  console.log(data.output.toHuman());
-                }else {
-                  console.error(data.asErr);
+              }else if((status as any).isDropped) {
+                  postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                      success: false,
+                      status: (status as any).type,
+                  }});
+                }else if((status as any).isFinalityTimeout) {
+                  postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                      success: false,
+                      status: (status as any).type,
+                  }});
+                }else if((status as any).isInvalid) {
+                  postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
+                      success: false,
+                      status: (status as any).type,
+                  }});
                 }
+
             });
-             */
+
           }else {
             //If the method caller hasn't specified a token, we are sending the native asset of the current network.
             this.networkAPI!.tx.balances.transferKeepAlive(recipent, amount).signAndSend(this.keypair!, ({events = [], status}) => {
@@ -233,15 +214,28 @@ export class SubstrateNetwork implements VultureNetwork {
             throw new Error("Cryptography WASM hasn't been initialized yet!");
         }
     }
-    estimateTxFee(recipent: string, amount: string) {
+    estimateTxFee(recipent: string, amount: string, token?: AbstractToken) {
         if(this.isCryptoReady) {
-            this.networkAPI!.tx.balances.transferKeepAlive(recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
-                postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
-                    success: true,
-                    result: info.toJSON(),
-                    fee: info.partialFee.toHuman()
-                }});
-            });
+            
+            if(token != null) {
+                let contract = new ContractPromise(this.networkAPI!, erc20Abi, token.address);
+                contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
+                    postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
+                        success: true,
+                        result: info.toJSON(),
+                        fee: info.partialFee.toHuman()
+                    }});
+                });
+            }else {
+                this.networkAPI!.tx.balances.transferKeepAlive(recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
+                    postMessage({method: VultureMessage.ESTIMATE_TX_FEE, params: {
+                        success: true,
+                        result: info.toJSON(),
+                        fee: info.partialFee.toHuman()
+                    }});
+                });
+            }
+
         }else {
             throw new Error("Cryptography WASM hasn't been initialized yet!");
         }

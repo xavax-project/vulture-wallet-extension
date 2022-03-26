@@ -19,7 +19,7 @@ export interface VultureNetwork {
     generateAddress(derivationPath: string, accountIndex: number): void,
     updateAccountsToNetwork(accounts: AccountData[], network: Network): void,
     transferAssets(recipent: string, amount: string, token?: AbstractToken): void;
-    estimateTxFee(recipent: string, amount: string): void;
+    estimateTxFee(recipent: string, amount: string, token?: AbstractToken): void;
     validateAddress(address: string): void;
     getAddressState(): void;
     subscribeToAddressUpdates(): void;
