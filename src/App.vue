@@ -15,7 +15,8 @@
   :vultureWallet="vultureWallet"/>
 
   <WalletTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'wallet' ? 'show' : 'hide'"
-  :vultureWallet="vultureWallet"/>
+  :vultureWallet="vultureWallet"
+  @add-custom-token="setModal(modals.ADD_CUSTOM_TOKEN)"/>
 
   <AccountsTab v-if="vultureWallet.accountStore != null" v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
   :allAccounts="vultureWallet.accountStore.allAccounts"

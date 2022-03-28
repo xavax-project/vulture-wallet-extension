@@ -18,7 +18,7 @@ other substrate-based networks.
 
 Vulture has three main branches:
 
-* `Dev` - The dev branch has frequent rolling updates, this version likely has new features that are buggy.
+* `Dev` - The dev branch has frequent rolling updates, this version likely has new features that are buggy and unfinished, crazy branch dis branch!
 * `Nightly` - The nightly branch contains a release candidate version of the next Vulture update, it might be buggy.
 * `Master` - The master branch contains the version of Vulture as you can find in the Chrome Web Store or any web extension store.
 

@@ -30,6 +30,12 @@
         @quit-modal="quitModal"
         @on-wallet-reset="hardWalletReset()"
         :vultureWallet="vultureWallet"/>
+
+
+        <AddTokenModal v-if="modalType == modals.ADD_CUSTOM_TOKEN"
+        @quit-modal="quitModal" 
+        :vultureWallet="vultureWallet"/>
+        
     </div>
 </template>
 
@@ -41,6 +47,7 @@ import ModifyAccountModal from './ModifyAccountModal.vue';
 import SelectAccountModal from './SelectAccountModal.vue';
 import SelectNetworkModal from './SelectNetworkModal.vue';
 import TransferAssetsModal from './TransferAssetsModal.vue';
+import AddTokenModal from "./AddTokenModal.vue"
 
 
 
@@ -60,6 +67,7 @@ export default {
     SelectAccountModal,
     SelectNetworkModal,
     TransferAssetsModal,
+    AddTokenModal,
   },
   props: {
       modalType: {
