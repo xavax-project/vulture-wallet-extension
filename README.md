@@ -3,7 +3,7 @@
 <img src="./public/icons/VultureIcon2.png" alt="Example 1" width="8%"> 
 </p>
 
-### Sleek, open-source, non-custodial multi-chain crypto wallet made for [Aleph Zero](alephzero.org).
+### Sleek, open-source & non-custodial multi-chain crypto wallet made for Substrate and [Aleph Zero](https://alephzero.org).
 
 *made with love <3 By [Ira](https://twitter/diinkitheimp) and the [xavax.io](https://www.xavax.io) project.*
 
