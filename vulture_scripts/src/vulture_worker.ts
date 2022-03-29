@@ -93,6 +93,14 @@ self.addEventListener("message", (event) => {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
     }
+    //Get information about a token and return the data.
+    if(event.data && event.data.method === VultureMessage.GET_TOKEN_DATA) {
+        if(currentWallet != null) {
+            currentWallet.getTokenData(event.data.params.tokenAddress, event.data.params.tokenType);
+        }else {
+            console.error("Wallet hasn't been setup in vulture_worker yet!");
+        }
+    }
     //Query the account state.
     if(event.data && event.data.method === VultureMessage.GET_ACCOUNT_STATE) {
         if(currentWallet != null) {

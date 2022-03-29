@@ -21,6 +21,7 @@ export interface VultureNetwork {
     transferAssets(recipent: string, amount: string, token?: AbstractToken): void;
     estimateTxFee(recipent: string, amount: string, token?: AbstractToken): void;
     validateAddress(address: string): void;
+    getTokenData(tokenAddress: string, tokenType: string): void;
     getAddressState(): void;
     subscribeToAddressUpdates(): void;
 }

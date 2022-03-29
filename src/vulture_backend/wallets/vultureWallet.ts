@@ -185,6 +185,19 @@ export interface VultureAccount {
      * docs: Todo
      */
     isAddressValid(address: string): Promise<void>;
+    /** ## getTokenInformation();
+     * Returns information about a token, the tokenAddress could point to an ERC20 or ERC721 token, or
+     * a native token depending on the currently selected network.
+     * 
+     * 
+     * tokenType refers to the type of the token, as stated above, this could be "ERC20", "ERC721", "NATIVE",
+     * or more. The currently available tokenTypes are written below:
+     * 
+     * * "ERC20"
+     * * "ERC721"
+     * * "NATIVE"
+     */
+    getTokenInformation(tokenAddress: string, tokenType: string): Promise<void>;
     updateAccountState(): Promise<void>;   
 }
 

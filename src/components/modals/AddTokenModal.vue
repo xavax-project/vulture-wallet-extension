@@ -77,8 +77,16 @@ export default {
             return;
         }
         (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid) => {
-            tokenDiscoveryStatus.value = isValid == true ? "Loading" : "InvalidAddress";
-            if(tokenDiscoveryStatus.value == "Loading") { showLoader.value = true; } else { showLoader.value = false; }
+            if(isValid == true) {
+                tokenDiscoveryStatus.value = "Loading";
+                showLoader.value = true;
+                
+                //Get the token information and display it if the address matches a token.
+                
+            }else {
+                tokenDiscoveryStatus.value = "InvalidAddress";
+                showLoader.value = false;
+            }
         });
         (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
     }

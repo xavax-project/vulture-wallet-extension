@@ -66,6 +66,25 @@ export class MnemonicWallet implements VultureAccount {
             }
         });
     }
+    async getTokenInformation(tokenAddress: string, tokenType: string) {
+        this.worker.onmessage = (event) => {
+            if(event.data.method == VultureMessage.GET_TOKEN_DATA) {
+                if(event.data.params.success == true) {
+                    this.accountEvents.emit(VultureMessage.GET_TOKEN_DATA, event.data.params.tokenData);
+                }else {
+                    console.error("Error: Vulture failed to get information about token with address:\n '" + tokenAddress + "'.");
+                }
+            }
+        }
+
+        this.worker.postMessage({
+            method: VultureMessage.GET_TOKEN_DATA,
+            params: {
+                tokenAddress: tokenAddress,
+                tokenType: tokenType,
+            } 
+        });
+    }
     async estimateTxFee(destination: string, amountWhole: number) {
 
         this.worker.onmessage = (event) => {

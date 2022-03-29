@@ -16,5 +16,7 @@ export const VultureMessage = {
 
     /* Utilities */
     "IS_ADDRESS_VALID": "IS_ADDRESS_VALID",
-    "ESTIMATE_TX_FEE": "ESTIMATE_TX_FEE"
+    "ESTIMATE_TX_FEE": "ESTIMATE_TX_FEE",
+    //Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
+    "GET_TOKEN_DATA": "GET_TOKEN_DATA",
 }

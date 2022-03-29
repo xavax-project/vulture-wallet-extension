@@ -330,7 +330,7 @@ html {
 
   border-color: var(--accent_color) var(--bg_color_2) var(--accent_color) var(--bg_color_2);
   
-  animation: vultureLoaderFrames 0.9s  infinite;
+  animation: vultureLoaderFrames 0.87s infinite;
   box-shadow: 0px 0px 8px black inset;
 }
 @keyframes vultureLoaderFrames {
