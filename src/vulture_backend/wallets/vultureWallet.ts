@@ -154,7 +154,7 @@ export interface VultureAccount {
     * let currentFee: number = 0;
     * 
     * //Setup a once event callback for estimating a tx fee
-    * account.ccountEvents.once(vultureMessage.ESTIMATE_TX_FEE, (fee) => {
+    * account.accountEvents.once(vultureMessage.ESTIMATE_TX_FEE, (fee) => {
     *       console.log("Fee in precise Whole units: " + fee);
     *       currentFee = fee; 
     * });

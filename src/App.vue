@@ -303,6 +303,49 @@ html {
   filter: opacity(0);
 }
 
+.showLoader {
+  visibility: visible;
+  transition-duration: 180ms;
+  filter: opacity(1);
+}
+.hideLoader {
+  visibility: hidden;
+  transition-duration: 140ms;
+  filter: opacity(0);
+}
+
+.vultureLoader {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.vultureLoader:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 3px solid;
+
+  border-color: var(--accent_color) var(--bg_color_2) var(--accent_color) var(--bg_color_2);
+  
+  animation: vultureLoaderFrames 0.9s  infinite;
+  box-shadow: 0px 0px 8px black inset;
+}
+@keyframes vultureLoaderFrames {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
 * {
   scrollbar-width: 5px;
   scrollbar-color: var(--bg_color_2);

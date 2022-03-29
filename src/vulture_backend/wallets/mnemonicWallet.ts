@@ -68,7 +68,6 @@ export class MnemonicWallet implements VultureAccount {
     }
     async estimateTxFee(destination: string, amountWhole: number) {
 
-
         this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.ESTIMATE_TX_FEE) {
                 if(event.data.params.success == true) {
