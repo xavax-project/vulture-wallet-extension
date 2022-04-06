@@ -424,8 +424,10 @@ export class VultureWallet {
 
         //initialize the wallet again but with the new network.
         this.initWallet(this.vault, this.accountStore);
+    }    
+    addTokenToList(token: AbstractToken) {
+        
     }
-    
     updateAccountAddresses() {
         this.currentWallet.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {

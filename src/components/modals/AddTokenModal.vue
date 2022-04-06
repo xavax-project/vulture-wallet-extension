@@ -7,7 +7,11 @@
             
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
                 <div v-if="tokenDiscoveryStatus == 'EnterAddress'">    
-                    Please enter a Token Address to add a token Manually.
+                    Please enter a Token Address to add a token Manually. <br> <br>
+                    Only add tokens you 
+                    <span style="color: var(--accent_color); text-shadow: 0px 0px 5px var(--accent_color); ">
+                    trust.
+                    </span>
                 </div>
 
                 <div v-if="tokenDiscoveryStatus == 'InvalidAddress'">    
@@ -44,6 +48,7 @@ import DefaultButton from "../building_parts/DefaultButton.vue";
 import DefaultInput from "../building_parts/DefaultInput.vue"
 import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks} from "../../vulture_backend/wallets/vultureWallet";
+import { AbstractToken } from "../../vulture_backend/types/abstractToken";
 import { VultureMessage } from "../../vulture_backend/vultureMessage";
 import { PropType, reactive, ref, Ref } from 'vue';
 
@@ -66,6 +71,9 @@ export default {
     
     let showLoader = ref(false);
 
+    let token: AbstractToken | null = null;
+    let currentToken = ref({token: token})
+
     function quitModal() {
         context.emit("quit-modal");
     }
@@ -82,6 +90,14 @@ export default {
                 showLoader.value = true;
                 
                 //Get the token information and display it if the address matches a token.
+                (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (tokenData) => {
+                    if(tokenData.success == true) {
+                        tokenDiscoveryStatus.value = "TokenFound";
+                        showLoader.value = false;
+                        // set currentToken.token to the token, 
+                    }
+                });
+                (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, "ERC20");
                 
             }else {
                 tokenDiscoveryStatus.value = "InvalidAddress";
@@ -91,7 +107,7 @@ export default {
         (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
     }
     function addToken() {
-        quitModal();
+        
     }
     return {
         tokenDiscoveryStatus,

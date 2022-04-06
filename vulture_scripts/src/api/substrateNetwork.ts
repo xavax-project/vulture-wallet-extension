@@ -71,6 +71,9 @@ export class SubstrateNetwork implements VultureNetwork {
         });
         
     }
+    getTokenData(tokenAddress: string, tokenType: string): void {
+        throw new Error('Method not implemented.');
+    }
     updateAccountsToNetwork(accounts: AccountData[], network: Network): void {
         if(this.isCryptoReady) {
             let updatedAccounts: AccountData[];

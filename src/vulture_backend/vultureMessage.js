@@ -13,10 +13,10 @@ export const VultureMessage = {
     //Will update the passed in key-pairs to be encoded in the correct cryptography & address format,
     //This method is used primarily when the user switches network (all accounts will need to be updated accordingally).
     "UPDATE_ACCOUNTS_TO_NETWORK": "UPDATE_ACCOUNTS_TO_NETWORK",
+    //Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
+    "GET_TOKEN_DATA": "GET_TOKEN_DATA",
 
     /* Utilities */
     "IS_ADDRESS_VALID": "IS_ADDRESS_VALID",
     "ESTIMATE_TX_FEE": "ESTIMATE_TX_FEE",
-    //Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
-    "GET_TOKEN_DATA": "GET_TOKEN_DATA",
 }
