@@ -3,7 +3,7 @@
         <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
         overflow-wrap: break-word;">
-            <DefaultInput @on-enter="setAddress($event)" inputWidth="100%" inputHeight="40px" fontSize="18px" inputName="Token Address" inputPlaceholder="Address"/>
+            <DefaultInput @on-enter="setAddress($event)" inputWidth="315px" inputHeight="40px" fontSize="15px" inputName="Token Address" inputPlaceholder="Enter Token Address"/>
             
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
                 <div v-if="tokenDiscoveryStatus == 'EnterAddress'">    
@@ -21,11 +21,37 @@
                     </span>
                 </div>
 
+                <div v-if="tokenDiscoveryStatus == 'InvalidToken'">    
+                    The address entered belongs to a faulty token! <br>
+                    <span style="color: rgb(255, 0, 65); font-size: 16px; text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
+                    Please fix (╬ Ò﹏Ó)
+                    </span>
+                </div>
+
+                <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Name: <span style="color: var(--accent_color)">{{currentToken.name}}</span>
+                        <hr>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Symbol: <span style="color: var(--accent_color)">{{currentToken.symbol}}</span> 
+                        <hr>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Supply: <span style="color: var(--accent_color)">{{currentToken.totalSupply}}</span> <br>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Total supply of the Token.</i>
+                        <hr>
+                    </div>
+                    <div  style="width: 100%; text-align: left; margin-top: 20px;">
+                        Address: <span style="color: var(--accent_color); font-size: 15px;">{{currentToken.address}}</span> <br>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Address hash of the Token.</i>
+                        <hr>
+                    </div>
+                </div>
+
                 <div class="vultureLoader" v-if="showLoader == true"></div>
 
-                <div v-if="tokenDiscoveryStatus == 'AddToken'" style="display: flex; margin-top: 70px; margin-bottom: 0px;">
-                    <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Reset" @button-click="resetWallet()"/>
-                </div>
+
             </div>
 
         </div>
@@ -35,9 +61,12 @@
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
             <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Return" @button-click="quitModal()"/>
             <!--
-
             <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Add" @button-click="addToken()"/>
+
             -->
+            <span v-if="tokenDiscoveryStatus == 'TokenFound'">
+                <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Add" @button-click="addToken()"/>
+           </span>
         </div>
             
     </div>
@@ -71,8 +100,15 @@ export default {
     
     let showLoader = ref(false);
 
-    let token: AbstractToken | null = null;
-    let currentToken = ref({token: token})
+    let token: AbstractToken = {
+      network: new DefaultNetworks().AlephZero,
+      address: '',
+      decimals: 0,
+      name: '',
+      symbol: '',
+      logoURI: ''
+    };
+    let currentToken = ref(token);
 
     function quitModal() {
         context.emit("quit-modal");
@@ -90,11 +126,25 @@ export default {
                 showLoader.value = true;
                 
                 //Get the token information and display it if the address matches a token.
-                (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (tokenData) => {
-                    if(tokenData.success == true) {
+                (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (data) => {
+                    console.log(data.params);
+                    if(data.params.success == true) {
                         tokenDiscoveryStatus.value = "TokenFound";
                         showLoader.value = false;
+
+                        let selectedToken: AbstractToken = {
+                          network: (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork,
+                          address: address,
+                          decimals: (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetDecimals, //this is temporary for now...
+                          name: data.params.tokenData.name,
+                          totalSupply: data.params.tokenData.totalSupply,
+                          symbol: data.params.tokenData.symbol,
+                          logoURI: data.params.tokenData.logoURI,
+                        }
+                        currentToken.value = selectedToken;
                         // set currentToken.token to the token, 
+                    }else {
+                        tokenDiscoveryStatus.value = "InvalidToken";
                     }
                 });
                 (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, "ERC20");
@@ -112,6 +162,7 @@ export default {
     return {
         tokenDiscoveryStatus,
         showLoader,
+        currentToken,
 
         quitModal: quitModal,
         setAddress: setAddress,
@@ -142,6 +193,8 @@ hr {
     padding: 12px;
     margin: 10px;
     margin-top: 0px;
+
+    flex-wrap: wrap;
     
     overflow: hidden;
 }

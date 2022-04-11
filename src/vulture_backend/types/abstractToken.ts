@@ -12,7 +12,7 @@ import { Network } from "../wallets/vultureWallet";
 export interface AbstractToken {
     chainId?: number
     chainName?: string
-    network: Network
+    network?: Network
     
     address: string,
     decimals: number,
@@ -21,6 +21,7 @@ export interface AbstractToken {
     logoURI: string,
     
     amount?: string,
+    totalSupply?: string,
 }
 
 /** ## TokenStore

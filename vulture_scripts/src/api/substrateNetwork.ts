@@ -71,8 +71,66 @@ export class SubstrateNetwork implements VultureNetwork {
         });
         
     }
-    getTokenData(tokenAddress: string, tokenType: string): void {
-        throw new Error('Method not implemented.');
+    async getTokenData(tokenAddress: string, tokenType: string): Promise<void> {
+
+        
+        if(this.isCryptoReady) {
+            let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+
+            let token: AbstractToken = {
+                address: tokenAddress,
+                decimals: -1,
+                name: '',
+                symbol: '',
+                logoURI: ''
+            }
+
+            let nameData = await contract.query.name(this.currentAddress, {value: 0, gasLimit: -1});
+            if(nameData.result.isOk) {
+                token.name = nameData.output.toHuman();
+            }else {
+                console.log("Error: Failed getting token name \n" + nameData.result.asErr);
+            }
+
+            //contract.query.name(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
+            //});
+
+            let symbolData = await contract.query.symbol(this.currentAddress, {value: 0, gasLimit: -1});
+            if(symbolData.result.isOk) {
+                token.symbol = symbolData.output.toHuman();
+            }else {
+                console.log("Error: Failed getting token name \n" + symbolData.result.asErr);
+            }
+            //contract.query.symbol(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
+            //});
+
+            let totalSupplyData = await contract.query.totalSupply(this.currentAddress, {value: 0, gasLimit: -1});
+            if(totalSupplyData.result.isOk) {
+                token.totalSupply = totalSupplyData.output.toHuman();
+            }else {
+                console.log("Error: Failed getting token name \n" + totalSupplyData.result.asErr);
+            }
+            //contract.query.totalSupply(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
+            //});
+
+            /*
+            contract.query.decimals(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
+                if(data.result.isOk) {
+                    token.decimals = data.output.toHuman();
+                }else {
+                    console.log("Error: Failed getting token denomination, tell devs to fix their shit \n" + data.result.asErr);
+                }
+            });
+             */
+
+            postMessage(new MethodResponse(
+                VultureMessage.GET_TOKEN_DATA,
+                {
+                    tokenData: token,
+                    success: true,
+                }
+            ));
+        }
     }
     updateAccountsToNetwork(accounts: AccountData[], network: Network): void {
         if(this.isCryptoReady) {

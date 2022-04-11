@@ -70,7 +70,7 @@ export class MnemonicWallet implements VultureAccount {
         this.worker.onmessage = (event) => {
             if(event.data.method == VultureMessage.GET_TOKEN_DATA) {
                 if(event.data.params.success == true) {
-                    this.accountEvents.emit(VultureMessage.GET_TOKEN_DATA, event.data.params.tokenData);
+                    this.accountEvents.emit(VultureMessage.GET_TOKEN_DATA, event.data);
                 }else {
                     console.error("Error: Vulture failed to get information about token with address:\n '" + tokenAddress + "'.");
                 }
