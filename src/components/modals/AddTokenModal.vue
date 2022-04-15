@@ -2,7 +2,7 @@
     <div class="flexBox" style="height: 100%; width: 100%;">
         <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
-        overflow-wrap: break-word;">
+        overflow-wrap: break-word">
             <DefaultInput @on-enter="setAddress($event)" inputWidth="315px" inputHeight="40px" fontSize="15px" inputName="Token Address" inputPlaceholder="Enter Token Address"/>
             
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
@@ -22,10 +22,11 @@
                 </div>
 
                 <div v-if="tokenDiscoveryStatus == 'InvalidToken'">    
-                    The address entered belongs to a faulty token! <br>
-                    <span style="color: rgb(255, 0, 65); font-size: 16px; text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
-                    Please fix (╬ Ò﹏Ó)
+                    The token address entered is faulty! <br><br>
+                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
+                    Error:
                     </span>
+                    {{error}}
                 </div>
 
                 <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
@@ -38,13 +39,17 @@
                         <hr>
                     </div>
                     <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Your Balance: <span style="color: var(--accent_color)">{{currentToken.balance}}</span> 
+                        <hr>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
                         Supply: <span style="color: var(--accent_color)">{{currentToken.totalSupply}}</span> <br>
                         <i style="font-size: 13px;  color: var(--fg_color_2)">Total supply of the Token.</i>
                         <hr>
                     </div>
                     <div  style="width: 100%; text-align: left; margin-top: 20px;">
                         Address: <span style="color: var(--accent_color); font-size: 15px;">{{currentToken.address}}</span> <br>
-                        <i style="font-size: 13px;  color: var(--fg_color_2)">Address hash of the Token.</i>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Unique Address of the Token.</i>
                         <hr>
                     </div>
                 </div>
@@ -108,6 +113,7 @@ export default {
       symbol: '',
       logoURI: ''
     };
+    let error = ref("");
     let currentToken = ref(token);
 
     function quitModal() {
@@ -127,7 +133,6 @@ export default {
                 
                 //Get the token information and display it if the address matches a token.
                 (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (data) => {
-                    console.log(data.params);
                     if(data.params.success == true) {
                         tokenDiscoveryStatus.value = "TokenFound";
                         showLoader.value = false;
@@ -140,11 +145,14 @@ export default {
                           totalSupply: data.params.tokenData.totalSupply,
                           symbol: data.params.tokenData.symbol,
                           logoURI: data.params.tokenData.logoURI,
+                          balance: data.params.tokenData.balance,
                         }
                         currentToken.value = selectedToken;
                         // set currentToken.token to the token, 
                     }else {
+                        showLoader.value = false;
                         tokenDiscoveryStatus.value = "InvalidToken";
+                        error.value = data.params.error;
                     }
                 });
                 (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, "ERC20");
@@ -163,6 +171,7 @@ export default {
         tokenDiscoveryStatus,
         showLoader,
         currentToken,
+        error,
 
         quitModal: quitModal,
         setAddress: setAddress,
@@ -191,12 +200,17 @@ hr {
     border-style: solid;
     border-color: var(--bg_color_2);
     padding: 12px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     margin: 10px;
     margin-top: 0px;
 
     flex-wrap: wrap;
+
+    max-height: 346px;
     
     overflow: hidden;
+    overflow-y: auto;
 }
 
 .vultureLogo {

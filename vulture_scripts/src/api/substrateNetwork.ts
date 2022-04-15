@@ -11,6 +11,7 @@ import { VultureMessage } from '../../../src/vulture_backend/vultureMessage';
 import { AccountData, Network } from '../../../src/vulture_backend/wallets/vultureWallet';
 import { AbstractToken } from '../../../src/vulture_backend/types/abstractToken';
 import { erc20Abi } from '../ink_contract_abis/erc20Abi';
+import BigNumber from 'bignumber.js';
 
 const { ContractPromise } = require('@polkadot/api-contract');
 
@@ -76,60 +77,114 @@ export class SubstrateNetwork implements VultureNetwork {
         
         if(this.isCryptoReady) {
             let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
-
+            let success: boolean = true;
+            let error: string = "";
             let token: AbstractToken = {
                 address: tokenAddress,
                 decimals: -1,
                 name: '',
                 symbol: '',
-                logoURI: ''
+                logoURI: '',
+                balance: '0',
             }
 
-            let nameData = await contract.query.name(this.currentAddress, {value: 0, gasLimit: -1});
-            if(nameData.result.isOk) {
-                token.name = nameData.output.toHuman();
-            }else {
-                console.log("Error: Failed getting token name \n" + nameData.result.asErr);
-            }
-
-            //contract.query.name(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
-            //});
-
-            let symbolData = await contract.query.symbol(this.currentAddress, {value: 0, gasLimit: -1});
-            if(symbolData.result.isOk) {
-                token.symbol = symbolData.output.toHuman();
-            }else {
-                console.log("Error: Failed getting token name \n" + symbolData.result.asErr);
-            }
-            //contract.query.symbol(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
-            //});
-
-            let totalSupplyData = await contract.query.totalSupply(this.currentAddress, {value: 0, gasLimit: -1});
-            if(totalSupplyData.result.isOk) {
-                token.totalSupply = totalSupplyData.output.toHuman();
-            }else {
-                console.log("Error: Failed getting token name \n" + totalSupplyData.result.asErr);
-            }
-            //contract.query.totalSupply(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
-            //});
-
-            /*
-            contract.query.decimals(this.currentAddress, {value: 0, gasLimit: -1}).then((data: any) => {
-                if(data.result.isOk) {
-                    token.decimals = data.output.toHuman();
+            try{
+                let decimals = await contract.query.decimals(this.currentAddress, {value: 0, gasLimit: -1});
+                if(decimals.result.isOk) {
+                    token.decimals = decimals.output.toHuman();
                 }else {
-                    console.log("Error: Failed getting token denomination, tell devs to fix their shit \n" + data.result.asErr);
+                    console.log("Error: Failed getting token total decimals (the amount of fractions the token is divided into) \n");
                 }
-            });
-             */
+            }catch {
+                token.decimals = -1;
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have decimals()");
+            }
+            
+            try{
+                let balance = await contract.query.balanceOf(this.currentAddress, {value: 0, gasLimit: -1}, this.currentAddress);
+                if(balance.result.isOk) {
+                    if(token.decimals != -1) {
+                        token.balance = new BigNumber((balance.output.toHuman() as string).replaceAll(',', ''))
+                        .div(new BigNumber(10).pow(token.decimals)).toString();
+                    }else {
+                        token.balance = balance.output.toHuman();
+                    }
+                }else {
+                    console.log("Error: Failed getting balance!");
+                    if(balance.result.asErr.toHuman().Module.error == 5) {
+                        success = false;
+                        error = "Contract Not Found";
+                    }
+                }
+                
+            }catch {
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC20");
+            }
 
-            postMessage(new MethodResponse(
-                VultureMessage.GET_TOKEN_DATA,
-                {
-                    tokenData: token,
-                    success: true,
+            try {
+                let nameData = await contract.query.name(this.currentAddress, {value: 0, gasLimit: -1});
+                if(nameData.result.isOk) {
+                    token.name = nameData.output.toHuman();
+                }else {
+                    console.log("Error: Failed getting token name");
+                    if(nameData.result.asErr.toHuman().Module.error == 5) {
+                        success = false;
+                        error = "Contract Not Found";
+                    }
                 }
-            ));
+            }catch {
+                token.name = "Token Has None";
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have name()");
+            }
+
+            try {
+                let symbolData = await contract.query.symbol(this.currentAddress, {value: 0, gasLimit: -1});
+                if(symbolData.result.isOk) {
+                    token.symbol = symbolData.output.toHuman();
+                }else {
+                    console.log("Error: Failed getting token symbol \n");
+                }
+            }catch {
+                token.symbol = "Token Has None";
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have symbol()");
+            }
+             
+            try {
+                let totalSupplyData = await contract.query.totalSupply(this.currentAddress, {value: 0, gasLimit: -1});
+                if(totalSupplyData.result.isOk) {
+                    if(token.decimals != -1) {
+                        token.totalSupply = new BigNumber((totalSupplyData.output.toHuman() as string).replaceAll(',', ''))
+                        .div(new BigNumber(10).pow(token.decimals)).toString()
+                    }else {
+                        token.totalSupply = totalSupplyData.output.toHuman();
+                    }
+                }else {
+                    console.log("Error: Failed getting token total supply! \n");
+                }
+            }catch {
+                token.totalSupply = undefined;
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have totalSupply()");
+            }
+             
+
+            if(success) {
+                postMessage(new MethodResponse(
+                    VultureMessage.GET_TOKEN_DATA,
+                    {
+                        tokenData: token,
+                        success: true,
+                    }
+                ));
+            }else {
+                postMessage(new MethodResponse(
+                    VultureMessage.GET_TOKEN_DATA,
+                    {
+                        tokenData: token,
+                        error: error,
+                        success: false,
+                    }
+                ));
+            }
         }
     }
     updateAccountsToNetwork(accounts: AccountData[], network: Network): void {
