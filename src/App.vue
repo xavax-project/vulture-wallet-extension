@@ -16,7 +16,7 @@
 
   <WalletTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'wallet' ? 'show' : 'hide'"
   :vultureWallet="vultureWallet"
-  @add-custom-token="setModal(modals.ADD_CUSTOM_TOKEN)"/>
+  @add-custom-token="addToken($event)"/>
 
   <AccountsTab v-if="vultureWallet.accountStore != null" v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
   :allAccounts="vultureWallet.accountStore.allAccounts"
@@ -36,6 +36,7 @@
   :selectedAccountIndex="selectedAccountIndex"
   :recipentAddress="recipentAddress"
   :amountToSend="amountToSend"
+  :tokenTypeToAdd="tokenTypeToAdd"
   @quit-modal="quitModal()"
   @on-wallet-reset="onWalletReset()"/>
 
@@ -98,6 +99,8 @@ export default {
       let modals = Modals;
       let state = WalletStates;
 
+
+      let tokenTypeToAdd = ref('');
       
 
       /* --- Transfer Asset Variables & Functions --- */
@@ -184,6 +187,11 @@ export default {
         walletState.value = WalletStates.ONBOARDING;
       }
 
+      function addToken(tokenType: string) {
+        setModal(Modals.ADD_CUSTOM_TOKEN);
+        tokenTypeToAdd.value = tokenType;
+      }
+
       return {
         vultureWallet,
         walletState,
@@ -196,6 +204,8 @@ export default {
 
         modals,
         state,
+
+        tokenTypeToAdd,
 
         recipentAddress,
         amountToSend,
@@ -212,6 +222,7 @@ export default {
         resetWallet: resetWallet,
         modifyAccount: modifyAccount,
         onWalletReset: onWalletReset,
+        addToken: addToken,
       }
     },
     data(){

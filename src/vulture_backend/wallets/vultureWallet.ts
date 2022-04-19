@@ -425,8 +425,21 @@ export class VultureWallet {
         //initialize the wallet again but with the new network.
         this.initWallet(this.vault, this.accountStore);
     }    
-    addTokenToList(token: AbstractToken) {
-        
+    addTokenToList(token: AbstractToken, tokenType: string) {
+        switch(tokenType) {
+            case 'ERC20': {
+                addTokenToStore(this.accountStore.currentlySelectedNetwork, false, token);
+                break;
+            }
+            case 'ERC721': {
+                addTokenToStore(this.accountStore.currentlySelectedNetwork, true, token);
+                break;
+            }
+        }
+        loadTokenStore(this.accountStore?.currentlySelectedNetwork).then((store) => {
+            this.tokenStore = store;
+            console.log(this.tokenStore.tokenList);
+        });
     }
     updateAccountAddresses() {
         this.currentWallet.worker.onmessage = (event) => {
@@ -557,9 +570,21 @@ export async function addTokenToStore(network: Network, isNFT: boolean, token: A
         if(value != null) {
             let store = value as TokenStore;
             if(isNFT) {
-                store.NFTList.get(network.networkUri)?.push(token);
+                if(store.NFTList.get(network.networkUri)) {
+                    store.NFTList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    
+                }else {
+                    store.NFTList.set(network.networkUri, []);
+                    store.NFTList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                }
             }else {
-                store.tokenList.get(network.networkUri)?.push(token);
+                if(store.tokenList.get(network.networkUri)) {
+                    store.tokenList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    
+                }else {
+                    store.tokenList.set(network.networkUri, []);
+                    store.tokenList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                }
             }
             localforage.setItem("tokenStore", store);
         }else {

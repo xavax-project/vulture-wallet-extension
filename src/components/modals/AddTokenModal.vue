@@ -98,6 +98,7 @@ export default {
         type: Object as PropType<VultureWallet>,
         required: true,
     },
+    tokenTypeToAdd: String,
   },
   setup(props: any, context: any) {
     let currentAddress = ref("");
@@ -155,7 +156,8 @@ export default {
                         error.value = data.params.error;
                     }
                 });
-                (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, "ERC20");
+                console.log(props.tokenTypeToAdd);
+                (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, props.tokenTypeToAdd);
                 
             }else {
                 tokenDiscoveryStatus.value = "InvalidAddress";
@@ -165,7 +167,11 @@ export default {
         (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
     }
     function addToken() {
-        
+        if(tokenDiscoveryStatus.value == "TokenFound") {
+            (props.vultureWallet as VultureWallet).addTokenToList(currentToken.value, props.tokenTypeToAdd);
+            console.log("Added token: " + currentToken.value);
+        }
+        quitModal();
     }
     return {
         tokenDiscoveryStatus,
@@ -175,7 +181,7 @@ export default {
 
         quitModal: quitModal,
         setAddress: setAddress,
-        addToken: addToken
+        addToken: addToken,
     }
   }
 };

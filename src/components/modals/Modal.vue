@@ -34,7 +34,8 @@
 
         <AddTokenModal v-if="modalType == modals.ADD_CUSTOM_TOKEN"
         @quit-modal="quitModal" 
-        :vultureWallet="vultureWallet"/>
+        :vultureWallet="vultureWallet"
+        :tokenTypeToAdd="tokenTypeToAdd"/>
         
     </div>
 </template>
@@ -82,6 +83,8 @@ export default {
 
       recipentAddress: String,
       amountToSend: String,
+
+      tokenTypeToAdd: String,
   },
   setup(props: any, context: any) {
     let modals = Modals;
