@@ -1,13 +1,13 @@
 <template>
-  <div @click="moduleClick()" class="module" v-bind:class="selected == true ? 'selectedAccount' : ''">
+  <div @click="moduleClick()" class="module">
     <div class="icon">
       &#xf51e;
     </div>
       <div class="left">
-        "{{token.symbol}}"
+        "{{token.name}}"
       </div>
       <div class="right">
-        <span>1231</span>
+        {{token.balance}}<span style="font-size: 13px; color: var(--accent_color); ">{{token.symbol}}</span>
       </div>
   </div>
 </template>
@@ -40,9 +40,6 @@ export default {
   font-size: 18px;
   margin: 5px;
   margin-left: 15px;
-}
-.selectedAccount {
-  color: var(--accent_color);
 }
 
 
@@ -79,12 +76,12 @@ export default {
 
   box-shadow: 0px 0px 3px rgb(6,6,6);
 
-  width: 250px;
+  width: 270px;
   height: auto;
-  min-height: 50px;
+  min-height: 52px;
 
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 6px;
+  margin-top: 6px;
 
   cursor: pointer;
 }

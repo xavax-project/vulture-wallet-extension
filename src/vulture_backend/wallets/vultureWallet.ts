@@ -428,18 +428,27 @@ export class VultureWallet {
     addTokenToList(token: AbstractToken, tokenType: string) {
         switch(tokenType) {
             case 'ERC20': {
-                addTokenToStore(this.accountStore.currentlySelectedNetwork, false, token);
+                addTokenToStore(this.accountStore.currentlySelectedNetwork, false, token).then((store) => {
+                    if(store != null) {
+                        this.tokenStore = store;
+                    }else {
+                        console.error("Failed adding token, store not found!");
+                    }
+                });
                 break;
             }
             case 'ERC721': {
-                addTokenToStore(this.accountStore.currentlySelectedNetwork, true, token);
+                addTokenToStore(this.accountStore.currentlySelectedNetwork, true, token).then((store) => {
+                    if(store != null) {
+                        this.tokenStore = store;
+                    }else {
+                        console.error("Failed adding token, store not found!");
+                    }
+                });
                 break;
             }
         }
-        loadTokenStore(this.accountStore?.currentlySelectedNetwork).then((store) => {
-            this.tokenStore = store;
-            console.log(this.tokenStore.tokenList);
-        });
+
     }
     updateAccountAddresses() {
         this.currentWallet.worker.onmessage = (event) => {
@@ -566,7 +575,8 @@ export async function loadTokenStore(network: Network) {
  *  on the front-end GUI.
  */
 export async function addTokenToStore(network: Network, isNFT: boolean, token: AbstractToken){
-    localforage.getItem("tokenStore").then((value) => {
+
+    let res = await localforage.getItem("tokenStore").then((value) => {
         if(value != null) {
             let store = value as TokenStore;
             if(isNFT) {
@@ -587,11 +597,13 @@ export async function addTokenToStore(network: Network, isNFT: boolean, token: A
                 }
             }
             localforage.setItem("tokenStore", store);
+            return store;
         }else {
             console.error("Current network does not have a token-store! Please create one with the `loadTokenStore();` function!");
             return null;
         }
     });
+    return res;
 }
 
 export async function createVault(vault: any, password: string) {
@@ -627,7 +639,6 @@ export async function loadVault() {
         if(value != null) {
             return value as string;
         }else {
-            console.log(value);
             return null;
         }
     });

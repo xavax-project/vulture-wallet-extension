@@ -156,7 +156,6 @@ export default {
                         error.value = data.params.error;
                     }
                 });
-                console.log(props.tokenTypeToAdd);
                 (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, props.tokenTypeToAdd);
                 
             }else {
@@ -169,7 +168,6 @@ export default {
     function addToken() {
         if(tokenDiscoveryStatus.value == "TokenFound") {
             (props.vultureWallet as VultureWallet).addTokenToList(currentToken.value, props.tokenTypeToAdd);
-            console.log("Added token: " + currentToken.value);
         }
         quitModal();
     }
