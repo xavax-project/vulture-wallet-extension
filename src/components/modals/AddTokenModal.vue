@@ -32,10 +32,7 @@
                 <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
                     <div style="width: 100%; text-align: left; margin-top: 15px;">
                         Name: <span style="color: var(--accent_color)">{{currentToken.name}}</span>
-                        <hr>
-                    </div>
-                    <div style="width: 100%; text-align: left; margin-top: 15px;">
-                        Symbol: <span style="color: var(--accent_color)">{{currentToken.symbol}}</span> 
+                        [<span style="font-size: 14px; color: var(--accent_color);"> ${{currentToken.symbol}}</span> ]
                         <hr>
                     </div>
                     <div style="width: 100%; text-align: left; margin-top: 15px;">
@@ -65,10 +62,6 @@
 
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
             <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Return" @button-click="quitModal()"/>
-            <!--
-            <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Add" @button-click="addToken()"/>
-
-            -->
             <span v-if="tokenDiscoveryStatus == 'TokenFound'">
                 <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Add" @button-click="addToken()"/>
            </span>

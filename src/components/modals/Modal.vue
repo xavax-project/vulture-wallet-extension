@@ -36,26 +36,31 @@
         @quit-modal="quitModal" 
         :vultureWallet="vultureWallet"
         :tokenTypeToAdd="tokenTypeToAdd"/>
+
+        <TokenViewModal v-if="modalType == modals.TOKEN_VIEW"
+        @quit-modal="quitModal" 
+        :vultureWallet="vultureWallet"
+        :tokenType="tokenTypeToAdd"
+        :arrayIndexOfToken="arrayIndexOfSelectedToken"/>
         
     </div>
 </template>
 
 <script lang="ts">
 import DefaultButton from "../building_parts/DefaultButton.vue";
+import TokenViewModal from './TokenViewModal.vue';
 import ResetWalletModal from './ResetWalletModal.vue';
 import CreateAccountModal from './CreateAccountModal.vue';
 import ModifyAccountModal from './ModifyAccountModal.vue';
 import SelectAccountModal from './SelectAccountModal.vue';
 import SelectNetworkModal from './SelectNetworkModal.vue';
 import TransferAssetsModal from './TransferAssetsModal.vue';
+
 import AddTokenModal from "./AddTokenModal.vue"
-
-
 
 import { Modals } from "../../uiTypes";
 import { PropType } from "@vue/runtime-core";
 import { VultureWallet } from "../../vulture_backend/wallets/vultureWallet";
-
 
 
 export default {
@@ -68,6 +73,7 @@ export default {
     SelectAccountModal,
     SelectNetworkModal,
     TransferAssetsModal,
+    TokenViewModal,
     AddTokenModal,
   },
   props: {
@@ -85,6 +91,7 @@ export default {
       amountToSend: String,
 
       tokenTypeToAdd: String,
+      arrayIndexOfSelectedToken: Number,
   },
   setup(props: any, context: any) {
     let modals = Modals;

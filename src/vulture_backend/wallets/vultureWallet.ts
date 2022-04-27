@@ -448,7 +448,30 @@ export class VultureWallet {
                 break;
             }
         }
-
+    }
+    removeTokenFromList(arrayIndexOfToken: number, tokenType: string) {
+        switch(tokenType) {
+            case 'ERC20': {
+                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, false, arrayIndexOfToken).then((store) => {
+                    if(store != null) {
+                        this.tokenStore = store;
+                    }else {
+                        console.error("Failed removing token, store not found!");
+                    }
+                });
+                break;
+            }
+            case 'ERC721': {
+                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, true, arrayIndexOfToken).then((store) => {
+                    if(store != null) {
+                        this.tokenStore = store;
+                    }else {
+                        console.error("Failed removing token, store not found!");
+                    }
+                });
+                break;
+            }
+        }
     }
     updateAccountAddresses() {
         this.currentWallet.worker.onmessage = (event) => {
@@ -594,6 +617,41 @@ export async function addTokenToStore(network: Network, isNFT: boolean, token: A
                 }else {
                     store.tokenList.set(network.networkUri, []);
                     store.tokenList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                }
+            }
+            localforage.setItem("tokenStore", store);
+            return store;
+        }else {
+            console.error("Current network does not have a token-store! Please create one with the `loadTokenStore();` function!");
+            return null;
+        }
+    });
+    return res;
+}
+/** # addTokenToStore()
+ *  Adds a token to the TokenStore of the current network. If the user has the token added it will show up
+ *  on the front-end GUI.
+ */
+ export async function removeTokenFromStore(network: Network, isNFT: boolean, tokenArrayIndex: number){
+
+    let res = await localforage.getItem("tokenStore").then((value) => {
+        if(value != null) {
+            let store = value as TokenStore;
+            if(isNFT) {
+                if(store.NFTList.get(network.networkUri)) {
+                    store.NFTList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    
+                }else {
+                    store.NFTList.set(network.networkUri, []);
+                    store.NFTList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                }
+            }else {
+                if(store.tokenList.get(network.networkUri)) {
+                    store.tokenList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    
+                }else {
+                    store.tokenList.set(network.networkUri, []);
+                    store.tokenList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
                 }
             }
             localforage.setItem("tokenStore", store);

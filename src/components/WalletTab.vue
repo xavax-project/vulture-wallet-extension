@@ -37,10 +37,11 @@
           class="flexBox" style="margin-top: 0px; align-items: center;">
             <div class="itemList"  v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">
               <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
-                You have: <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens.
+                You have: <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens
               </div>
               <span v-for="(token, index) in vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token">
-                <TokenModule :token="token" :tokenIndex="index"/>
+                <TokenModule :token="token" :tokenIndex="index"
+                @module-click="openToken($event, 'ERC20')"/>
               </span>
               <DefaultButton @button-click="addToken('ERC20')" buttonText="Add Token" buttonHeight="25px"  buttonWidth="100px" fontSize="16px" style="margin-bottom: 15px; margin-top: 10px;"/>
             </div>
@@ -121,9 +122,13 @@ export default {
     function setTab(tab: string) {
       currentTab.value = tab;
     }
+    function openToken(arrayIndexOfToken: number, tokenType: string) {
+      context.emit("token-view-modal", {index: arrayIndexOfToken, type: tokenType});
+    }
     return {
       currentTab,
 
+      openToken: openToken,
       addToken: addToken,
       setTab: setTab
     }

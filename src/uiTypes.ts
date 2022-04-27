@@ -6,6 +6,7 @@ export enum Modals{
   TRANSFER_ASSETS,
   MODIFY_ACCOUNT,
   RESET_WALLET,
+  TOKEN_VIEW,
   NONE,
 }
 export enum WalletStates {
