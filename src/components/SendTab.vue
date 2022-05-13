@@ -7,8 +7,19 @@
               <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
             <div>
               <div class="inputName">Asset</div>
-              <div class="assetBox">
-                <span v-if="vultureWallet.currentWallet">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
+              <div @click="selectAsset()" class="assetBox">
+
+                <!-- display info about Native asset, since that's whats selected if selectedTokenArrayIndex is -1 -->
+                <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex == -1">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
+                <!-- display info about the selected token, since that's whats selected if selectedTokenArrayIndex is >=0 -->
+                <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex >= 0 &&
+                  vultureWallet.tokenStore != null &&
+                  vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">                  
+                  {{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)[selectedTokenArrayIndex].symbol}}
+                </span>
+
+                
+
                 <span style="font-family: fonticonA; font-size: 18px;"> &#xf044;</span>
               </div>
             </div>
@@ -33,6 +44,7 @@ import { VultureWallet } from '@/vulture_backend/wallets/vultureWallet';
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import MinimalInput from "./building_parts/MinimalInput.vue";
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
+import { AbstractToken } from '@/vulture_backend/types/abstractToken';
 export default {
   name: "SendTab",
   components: {
@@ -44,7 +56,7 @@ export default {
       type: Object as PropType<VultureWallet>,
       required: true,
     },
-
+    selectedTokenArrayIndex: Number, // -1 is native, [0..n] is a non-native token.
   },
   setup(props: any, context: any) {
 
@@ -96,19 +108,22 @@ export default {
       }
       return false;
     }
+    function selectAsset() {
+      context.emit("select-new-asset");
+    }
     return {
       insufficientFunds,
       currentAddress,
       invalidAddress,
       currentAmount,
       estimatedFee,
-
       updateKey,
 
       canSend: canSend,
       amount: amount,
       address: address,
       sendButton: sendButton,
+      selectAsset: selectAsset,
     }
   }
 };

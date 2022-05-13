@@ -1,5 +1,5 @@
 <template>
-  <div @click="moduleClick()" class="module">
+  <div @click="moduleClick()" class="module" v-bind:class="selected == true ? 'selected' : ''">
     <div class="icon">
       &#xf51e;
     </div>
@@ -23,7 +23,8 @@ export default {
         type: Object as PropType<AbstractToken>,
         required: true,
     },
-    tokenIndex: Number
+    tokenIndex: Number,
+    selected: Boolean,
   },
   methods: {
     moduleClick(){
@@ -95,5 +96,9 @@ export default {
   transition-duration: 160ms;
   box-shadow: 0px 0px 8px rgb(6,6,6);
   filter: brightness(75%);
+}
+.selected {
+  border-color: var(--accent_color);
+  color: var(--accent_color);
 }
 </style>

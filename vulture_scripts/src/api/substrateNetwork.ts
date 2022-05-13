@@ -74,19 +74,29 @@ export class SubstrateNetwork implements VultureNetwork {
         
     }
     async getTokenData(tokenAddress: string, tokenType: string): Promise<void> {
-
-        
         if(this.isCryptoReady) {
-            let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
-            switch(tokenType) {
-                case 'ERC20': {
-                    await getERC20Info(tokenAddress, contract, this.currentAddress);
-                    break;
+            try {
+                let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+                switch(tokenType) {
+                    case 'ERC20': {
+                        await getERC20Info(tokenAddress, contract, this.currentAddress);
+                        break;
+                    }
+                    case 'ERC721': {
+                        console.error("NFT's are currently not supported! (ERC721)");
+                        break;
+                    }
                 }
-                case 'ERC721': {
-                    console.error("NFT's are currently not supported! (ERC721)");
-                    break;
-                }
+            }catch(error) {
+                console.log(error);
+                postMessage(new MethodResponse(
+                    VultureMessage.GET_TOKEN_DATA,
+                    {
+                        tokenData: null,
+                        error: "Contract Not Found",
+                        success: false,
+                    }
+                ));
             }
         }
     }

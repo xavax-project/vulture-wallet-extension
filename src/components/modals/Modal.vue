@@ -38,10 +38,17 @@
         :tokenTypeToAdd="tokenTypeToAdd"/>
 
         <TokenViewModal v-if="modalType == modals.TOKEN_VIEW"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal"
+        @reset-selected-token="resetSelectedToken"
         :vultureWallet="vultureWallet"
         :tokenType="tokenTypeToAdd"
         :arrayIndexOfToken="arrayIndexOfSelectedToken"/>
+
+        <SelectAssetModal v-if="modalType == modals.SELECT_NEW_ASSET"
+        @quit-modal="quitModal()"
+        @select-token="selectToken($event)"
+        :vultureWallet="vultureWallet"
+        :selectedTokenArrayIndex="selectedTokenArrayIndex"/>
         
     </div>
 </template>
@@ -55,6 +62,7 @@ import ModifyAccountModal from './ModifyAccountModal.vue';
 import SelectAccountModal from './SelectAccountModal.vue';
 import SelectNetworkModal from './SelectNetworkModal.vue';
 import TransferAssetsModal from './TransferAssetsModal.vue';
+import SelectAssetModal from './SelectAssetModal.vue';
 
 import AddTokenModal from "./AddTokenModal.vue"
 
@@ -73,6 +81,7 @@ export default {
     SelectAccountModal,
     SelectNetworkModal,
     TransferAssetsModal,
+    SelectAssetModal,
     TokenViewModal,
     AddTokenModal,
   },
@@ -92,6 +101,8 @@ export default {
 
       tokenTypeToAdd: String,
       arrayIndexOfSelectedToken: Number,
+
+      selectedTokenArrayIndex: Number,
   },
   setup(props: any, context: any) {
     let modals = Modals;
@@ -99,14 +110,22 @@ export default {
     function quitModal() {
         context.emit("quit-modal");
     }
+    function selectToken(arrayIndexOfToken: number) {
+        context.emit("select-token", arrayIndexOfToken);
+    }
     function hardWalletReset() {
         context.emit("on-wallet-reset");
+    }
+    function resetSelectedToken() {
+        context.emit("reset-selected-token");
     }
 
     return {
         modals,
         quitModal: quitModal,
-        hardWalletReset: hardWalletReset
+        hardWalletReset: hardWalletReset,
+        resetSelectedToken: resetSelectedToken,
+        selectToken: selectToken,
     }
   }
 };

@@ -12,6 +12,8 @@
 
   <SendTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'send' ? 'show' : 'hide'"
   @send-button-click="transferAssets($event)"
+  @select-new-asset="setModal(modals.SELECT_NEW_ASSET)"
+  :selectedTokenArrayIndex="selectedTokenArrayIndex"
   :vultureWallet="vultureWallet"/>
 
   <WalletTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'wallet' ? 'show' : 'hide'"
@@ -28,8 +30,7 @@
 
   <SettingsTab v-bind:class="currentTab == 'settings' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
   :vultureWallet="vultureWallet"
-  @reset-wallet="resetWallet()"
-  />
+  @reset-wallet="resetWallet()"/>
 
   <Modal v-bind:class="currentModal == modals.NONE ? 'hide' : 'show'"
   :modalType="currentModal"
@@ -39,8 +40,11 @@
   :amountToSend="amountToSend"
   :tokenTypeToAdd="tokenTypeToAdd"
   :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken"
+  :selectedTokenArrayIndex="selectedTokenArrayIndex"
   @quit-modal="quitModal()"
-  @on-wallet-reset="onWalletReset()"/>
+  @on-wallet-reset="onWalletReset()"
+  @select-token="selectToken($event)"
+  @reset-selected-token="resetSelectedToken()"/>
 
 </div>
 
@@ -93,6 +97,9 @@ export default {
     },
     setup() {
 
+      // This setup() method *is* very messy, will move things out and do cleaning
+      // Later when I decide to refactor.
+
       let vultureWallet = reactive(new VultureWallet());
       let walletState = ref(WalletStates.LOADING);
       let currentModal  = ref(Modals.NONE);
@@ -105,6 +112,9 @@ export default {
       //Token variables, a bit messy to have this here, will refactor later. 
       let tokenTypeToAdd = ref('');
       let arrayIndexOfSelectedToken = ref(0);
+
+      // The array index of the selected asset, -1 is native asset of the selected network.
+      let selectedTokenArrayIndex = ref(-1);
       
 
       /* --- Transfer Asset Variables & Functions --- */
@@ -201,6 +211,15 @@ export default {
         setModal(Modals.TOKEN_VIEW);
       }
 
+      function selectToken(arrayIndexOfToken: number) {
+        selectedTokenArrayIndex.value = arrayIndexOfToken;
+      }
+      // I Use this function whenever the token should be reset to native, usually called when the user removes a token
+      // from the list (through events).
+      function resetSelectedToken() {
+        selectedTokenArrayIndex.value = -1;
+      }
+
       return {
         vultureWallet,
         walletState,
@@ -209,7 +228,6 @@ export default {
         assetAmount,
         assetPrefix,
         address,
-        
 
         modals,
         state,
@@ -221,6 +239,8 @@ export default {
         amountToSend,
 
         selectedAccountIndex,
+
+        selectedTokenArrayIndex,
 
         currentAccentColor,
 
@@ -234,6 +254,8 @@ export default {
         modifyAccount: modifyAccount,
         onWalletReset: onWalletReset,
         addToken: addToken,
+        selectToken: selectToken,
+        resetSelectedToken: resetSelectedToken,
       }
     },
     data(){
@@ -280,6 +302,8 @@ body {
 html {
   --bg_color: rgb(22, 22, 22);
   --bg_color_2: rgb(38, 38, 38);
+
+  --incorrect_color: rgb(255, 0, 65);
   
   --fg_color: rgb(255,255,255);
   --fg_color_2: rgb(150, 150, 150);

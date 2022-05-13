@@ -29,11 +29,11 @@
                     <hr>
                 </div>
                 <div style="display: flex; flex-direction: column; width: 100%; text-align: center; margin-top: 50px; align-items: center;">
-                   <hr style="width: 100%; margin-bottom: 10px;">
+                   <hr class="red" style="width: 100%; margin-bottom: 10px;">
                 <DefaultButton buttonHeight="25px" buttonWidth="150px" fontSize="17px" buttonText="Remove From List" @button-click="removeTokenFromList()"/>
                     <i style="font-size: 13px;  color: var(--fg_color_2); margin-top: 10px; margin-bottom: 5px;" >
                         Remove this token from token list. You will have to<br> re-add it to see it again in the wallet.</i>
-                    <hr style="width: 100%;">
+                    <hr class="red" style="width: 100%;">
                 </div>
 
         </div>
@@ -80,8 +80,8 @@ export default {
         //(props.vultureWallet as VultureWallet).accountStore.allAccounts[props.selectedAccount - 1].accountName = accountName;
     }
     function removeTokenFromList() {
-
         (props.vultureWallet as VultureWallet).removeTokenFromList(props.arrayIndexOfToken, props.tokenType);
+        context.emit("reset-selected-token");
         quitModal();
     }
 
@@ -126,5 +126,9 @@ hr {
     border-style: solid;
     border-radius: 24px;
     z-index: 2;
+}
+.red {
+    background-color: var(--incorrect_color);
+    box-shadow: 0px 0px 4px var(--incorrect_color);
 }
 </style>
