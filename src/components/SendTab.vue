@@ -94,11 +94,24 @@ export default {
         }
       });
       if(invalidAddress.value == false) {
-        (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
+        // If we are sending native assets.
+        if(props.selectedTokenArrayIndex == -1) {
+          (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
+        }else{
+        // If we are sending some token, this is quite messy, will have to refactor to something easier on the eyes later.
+          let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+          if(tokenArray != undefined) {
+            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
+              (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value, (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex]);
+            }else {
+              console.error("Token not found!");
+            }
+          }
+        }
       }
     }
     function sendButton() {
-      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value});
+      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value, selectedTokenArrayIndex: props.selectedTokenArrayIndex});
       amount(0);
       updateKey.value++;
     }

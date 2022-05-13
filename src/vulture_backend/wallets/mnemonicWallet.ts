@@ -6,6 +6,7 @@ import SafeEventEmitter from "@metamask/safe-event-emitter";
 
 import { BigNumber } from "bignumber.js";
 import { VultureMessage } from "../vultureMessage";
+import { AbstractToken } from "../types/abstractToken";
 
 
 
@@ -52,19 +53,23 @@ export class MnemonicWallet implements VultureAccount {
     }
 
 
-    async transferAssets(destination: String, amountWhole: number) {
-        this.worker.onmessage = (event) => {
-            if(event.data.method == VultureMessage.TRANSFER_ASSETS) {
-                this.accountEvents.emit(VultureMessage.TRANSFER_ASSETS, event.data.params);
-            }
-        };
-        this.worker.postMessage({
-            method: VultureMessage.TRANSFER_ASSETS,
-            params: {
-                recipent: destination,
-                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
-            }
-        });
+    async transferAssets(destination: String, amountWhole: number, token?: AbstractToken) {
+        if(token) {
+            console.error("Sending and receiving tokens is not supported yet!");
+        }else {
+            this.worker.onmessage = (event) => {
+                if(event.data.method == VultureMessage.TRANSFER_ASSETS) {
+                    this.accountEvents.emit(VultureMessage.TRANSFER_ASSETS, event.data.params);
+                }
+            };
+            this.worker.postMessage({
+                method: VultureMessage.TRANSFER_ASSETS,
+                params: {
+                    recipent: destination,
+                    amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
+                }
+            });
+        }
     }
     async getTokenInformation(tokenAddress: string, tokenType: string) {
         this.worker.onmessage = (event) => {
@@ -84,26 +89,30 @@ export class MnemonicWallet implements VultureAccount {
             } 
         });
     }
-    async estimateTxFee(destination: string, amountWhole: number) {
-
-        this.worker.onmessage = (event) => {
-            if(event.data.method == VultureMessage.ESTIMATE_TX_FEE) {
-                if(event.data.params.success == true) {
-                    let fee = new BigNumber(event.data.params.result.partialFee)
-                    .div(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toNumber();
-                    this.accountEvents.emit(VultureMessage.ESTIMATE_TX_FEE, fee);
-                }else {
-                    console.error("Error: Vulture worker failed to get wallet state!");
+    async estimateTxFee(destination: string, amountWhole: number, token?: AbstractToken) {
+        if(token) {
+            console.error("Sending and receiving tokens is not supported yet!");
+            console.log("Tried to send token: ", token.name);
+        }else {
+            this.worker.onmessage = (event) => {
+                if(event.data.method == VultureMessage.ESTIMATE_TX_FEE) {
+                    if(event.data.params.success == true) {
+                        let fee = new BigNumber(event.data.params.result.partialFee)
+                        .div(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toNumber();
+                        this.accountEvents.emit(VultureMessage.ESTIMATE_TX_FEE, fee);
+                    }else {
+                        console.error("Error: Vulture worker failed to get wallet state!");
+                    }
                 }
-            }
-        };
-        this.worker.postMessage({
-            method: VultureMessage.ESTIMATE_TX_FEE,
-            params: {
-                recipent: destination,
-                amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
-            }
-        });
+            };
+            this.worker.postMessage({
+                method: VultureMessage.ESTIMATE_TX_FEE,
+                params: {
+                    recipent: destination,
+                    amount: new BigNumber(amountWhole).times(new BigNumber(10).pow(this.currentNetwork.networkAssetDecimals)).toString()
+                }
+            });
+        }
     }
     async isAddressValid(address: string) {
         this.worker.onmessage = (event) => {

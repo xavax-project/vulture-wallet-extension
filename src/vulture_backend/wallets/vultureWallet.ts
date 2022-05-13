@@ -173,11 +173,11 @@ export interface VultureAccount {
     /** ## transferAssets();
      * docs: Todo
      */
-    transferAssets(destination: string, amountWhole: number): Promise<void>;
+    transferAssets(destination: string, amountWhole: number, token?: AbstractToken): Promise<void>;
     /** ## estimateTxFee();
      * docs: Todo
      */
-    estimateTxFee(destination: string, amountWhole: number): Promise<void>;
+    estimateTxFee(destination: string, amountWhole: number, token?: AbstractToken): Promise<void>;
     /** ## updateAccountState();
      * docs: Todo
      */
