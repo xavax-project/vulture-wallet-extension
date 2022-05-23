@@ -80,7 +80,7 @@ self.addEventListener("message", (event) => {
     //Estimate tx fees
     if(event.data && event.data.method === VultureMessage.ESTIMATE_TX_FEE) {
         if(currentWallet != null){
-            currentWallet.estimateTxFee(event.data.params.recipent, event.data.params.amount);
+            currentWallet.estimateTxFee(event.data.params.recipent, event.data.params.amount, event.data.params.token == null ? null : event.data.params.token);
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }

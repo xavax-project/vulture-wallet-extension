@@ -8,7 +8,7 @@ const accountNameExamples: string[] = [
     "Spending Account",   "Income Account",
     "DAO Account",        "Experiment Account",
     "uwu Account",        "Vulture by xavax.io",
-    "Rocketry Account",
+    "Rocketry Account",   "Staking Account",
     "Revolution Savings", "Mars Account",
     "Inssurance Money",   "HODL Account",
     "Ape money",          

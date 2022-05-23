@@ -136,6 +136,7 @@ export default {
       function transferAssets(data: any) {
         recipentAddress.value = data.recipent;
         amountToSend.value = String(data.amount);
+        arrayIndexOfSelectedToken.value = data.tokenArrayIndex;
         setModal(modals.TRANSFER_ASSETS);
         //vultureWallet.currentWallet.transferAssets(recipentAddress.value, Number(amountToSend.value));
       }

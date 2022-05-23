@@ -254,6 +254,8 @@ export class SubstrateNetwork implements VultureNetwork {
                         result: info.toJSON(),
                         fee: info.partialFee.toHuman()
                     }});
+                    console.log("Fee for transfering: " + token.name + " is: ");
+                    console.log(info.toJSON());
                 });
             }else {
                 this.networkAPI!.tx.balances.transferKeepAlive(recipent, amount).paymentInfo(this.keypair!).then((info: any) => {

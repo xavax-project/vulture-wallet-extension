@@ -98,7 +98,7 @@ export default {
         if(props.selectedTokenArrayIndex == -1) {
           (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
         }else{
-        // If we are sending some token, this is quite messy, will have to refactor to something easier on the eyes later.
+        // If we are sending some token. This is quite messy, will have to refactor to something easier on the eyes later.
           let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
             if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
@@ -111,7 +111,7 @@ export default {
       }
     }
     function sendButton() {
-      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value, selectedTokenArrayIndex: props.selectedTokenArrayIndex});
+      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value, tokenArrayIndex: props.selectedTokenArrayIndex});
       amount(0);
       updateKey.value++;
     }

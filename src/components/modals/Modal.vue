@@ -24,7 +24,8 @@
         @quit-modal="quitModal" 
         :vultureWallet="vultureWallet"
         :recipentAddress="recipentAddress"
-        :amountToSend="amountToSend"/>
+        :amountToSend="amountToSend"
+        :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken"/>
 
         <ResetWalletModal v-if="modalType == modals.RESET_WALLET"
         @quit-modal="quitModal"
