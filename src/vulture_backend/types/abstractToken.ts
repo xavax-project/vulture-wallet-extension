@@ -20,7 +20,7 @@ export interface AbstractToken {
     symbol: string,
     logoURI: string,
     
-    balance?: string,
+    balance: string,
     totalSupply?: string,
 }
 

@@ -19,7 +19,7 @@
             </div>
 
             <div style="width: 100%; text-align: left; margin-bottom: 20px;margin-top: 5px;">
-                Tx Fee: <span style="color: var(--accent_color)">{{txFee.toFixed(8)}} <span style="font-size: 13px;">{{asset}} </span></span> <br>
+                Tx Fee: <span style="color: var(--accent_color)">{{txFee.toFixed(8)}} <span style="font-size: 13px;">{{nativeAsset}} </span></span> <br>
                 <hr>
             </div>
 
@@ -29,11 +29,18 @@
                 <span v-if="currentTxState == txStates.PENDING" style="color: var(--accent_color)">Pending <br></span>
                 <span v-if="currentTxState == txStates.SUCCESS" style="color: #4dff97">Success <br></span>
                 <span v-if="currentTxState == txStates.FAILED" style="color: #ff0061">Failed <br></span>
-                Completed In: <span style="color: var(--accent_color)">{{txTimer.toFixed(2)}}s <br></span>
+                Completed In: <span style="color: var(--accent_color);">{{txTimer.toFixed(2)}}s <br></span>
                 <hr>
-                <div v-bind:class="currentTxState == txStates.SUCCESS || txStates.FAILED ? 'show' : 'hide' " style="font-size: 16px;">
+                <div v-if="currentTxState == txStates.SENDING" class="flexBox" style="align-items: center;">
+                    <div class="vultureLoader showLoader"></div>
+                </div>
+                <div v-if="currentTxState == txStates.PENDING" class="flexBox" style="align-items: center;">
+                    <div class="vultureLoader showLoader"></div>
+                </div>
+                <div v-bind:class="currentTxState == txStates.SUCCESS ? 'show' : 'hide' " style="font-size: 16px; margin-top: 15px;">
                 Block ID: <span style="color: var(--accent_color); font-size: 15px;">{{blockHash}}</span> <br>
                 </div>
+
             </div>
 
         </div>
@@ -87,6 +94,8 @@ export default {
 
 
     let asset = ref('');
+    let nativeAsset = ref('');
+    nativeAsset.value = asset.value = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetPrefix;
     if(props.arrayIndexOfSelectedToken == -1) {
         asset.value = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetPrefix;
     }else {
@@ -169,6 +178,7 @@ export default {
         networks,
         txStates,
         blockHash,
+        nativeAsset,
         accountAmount,
         currentTxState,
         selectedNetwork,
@@ -197,7 +207,7 @@ hr {
     border-color: var(--bg_color_2);
     padding: 12px;
     margin: 12px;
-    height: 120px;
+    height: 138px;
     overflow: hidden;
 }
 .vultureLogo {

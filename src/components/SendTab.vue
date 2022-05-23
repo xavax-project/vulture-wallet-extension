@@ -87,11 +87,29 @@ export default {
       currentAmount.value = amount;
       (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee) => {
         estimatedFee.value = fee;
-        if((currentAmount.value + fee) < (props.vultureWallet as VultureWallet).currentWallet.accountData.freeAmountWhole) {
-          insufficientFunds.value = false;
+
+        if(props.selectedTokenArrayIndex == -1) {
+          if((currentAmount.value + fee) < (props.vultureWallet as VultureWallet).currentWallet.accountData.freeAmountWhole) {
+            insufficientFunds.value = false;
+          }else {
+            insufficientFunds.value = true;
+          }
         }else {
-          insufficientFunds.value = true;
+                    let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+          if(tokenArray != undefined) {
+            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
+              console.log((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex].balance);
+              if(currentAmount.value < Number((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex].balance)) {
+              insufficientFunds.value = false;
+              }else {
+                insufficientFunds.value = true;
+              }
+            }else {
+              console.error("Token not found!");
+            }
+          }
         }
+
       });
       if(invalidAddress.value == false) {
         // If we are sending native assets.

@@ -127,6 +127,7 @@ self.addEventListener("message", (event) => {
                 decimals: 0,
                 name: "OogaDoogoo",
                 symbol: "OOGA",
+                balance: '0',
                 logoURI: ""
             }
             currentWallet.transferAssets("5EBzqfLvB5eacCEtub6UXgGjoJYBtDtnDw4ANQeSsHbgLtC6", "1000", testingToken);

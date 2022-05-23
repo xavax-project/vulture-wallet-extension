@@ -103,6 +103,7 @@ export default {
       network: new DefaultNetworks().AlephZero,
       address: '',
       decimals: 0,
+      balance: '0',
       name: '',
       symbol: '',
       logoURI: ''
