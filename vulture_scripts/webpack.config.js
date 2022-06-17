@@ -19,7 +19,8 @@ module.exports = {
   mode: 'production',
   //devtool: false,
   entry: {
-      vulture_worker: './src/vulture_worker.ts',
+      accountActionWorker: './src/accountActionWorker.ts',
+      accountInfoWorker: './src/accountInfoWorker.ts'
   },
   output: {
     filename: '[name]-bundle.js',
@@ -63,7 +64,11 @@ module.exports = {
           test: /\.ts$/, 
           use: 'ts-loader',
           exclude: /node_modules/ 
-        }
+        },
+        {
+            test: /\.wasm$/,
+            type: "asset/inline",
+        },
     ],
  }
 };

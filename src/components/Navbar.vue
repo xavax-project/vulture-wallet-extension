@@ -3,15 +3,23 @@
       <div class=navbar>
            <div @click="onTabSwitch('send')" class="iconFont" :class="currentTab == 'send' ? 'selected' : ''">
                &#xf1d8;
+                <div class="navbarUnderline" :class="currentTab == 'send' ? 'showUnderline' : ''">
+                </div>
            </div>
             <div @click="onTabSwitch('wallet')" class="iconFont" :class="currentTab == 'wallet' ? 'selected' : ''">
                &#xf555;
+                <div class="navbarUnderline" :class="currentTab == 'wallet' ? 'showUnderline' : ''">
+                </div>
            </div>
             <div @click="onTabSwitch('accounts')" class="iconFont" :class="currentTab == 'accounts' ? 'selected' : ''">
-               &#xf2b9;
+               &#xf03a;
+                <div class="navbarUnderline" :class="currentTab == 'accounts' ? 'showUnderline' : ''">
+                </div>
            </div>
             <div @click="onTabSwitch('settings')" class="iconFont" :class="currentTab == 'settings' ? 'selected' : ''">
                &#xf013;
+                <div class="navbarUnderline" :class="currentTab == 'settings' ? 'showUnderline' : ''">
+                </div>
            </div>
       </div>
   </div>
@@ -39,9 +47,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .navbar {
-    /*
-    box-shadow: 0px 0px 4px 0px rgb(5, 5, 5) inset;
-     */
     display: flex;
     align-items: center;
     justify-content: space-evenly;
@@ -60,6 +65,7 @@ export default {
     user-select: none;
 }
 .iconFont {
+    width: 22px;
     font-size: 22px;
     font-family: fonticonA;
     color: var(--fg_color_2);
@@ -68,14 +74,30 @@ export default {
 }
 .iconFont:hover {
     color: var(--accent_color);
-    text-shadow: 0px 0px 5px var(--accent_color);
     transition-duration: 190ms;
 }
 .iconFont:active {
     filter: brightness(75%);
 }
 .selected {
-    text-shadow: 0px 0px 5px var(--accent_color);
     color: var(--accent_color);
 }
+.navbarUnderline {
+    margin-top: 5px;
+    background-color: var(--accent_color);
+    width: 100%;
+    height: 3px;
+    border-radius: 10px;
+    transition-duration: 180ms;
+    transform-origin: center;
+    transform: scale(0, 1);
+    opacity: 0;
+}
+.showUnderline {
+    width: 100%;
+    transform: scale(1, 1);
+    transition-duration: 180ms;
+    opacity: 100;
+}
+
 </style>

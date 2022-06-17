@@ -4,10 +4,12 @@
         <div class="flexBox" style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 20px; padding-right: 20px; top: 20px; align-items: center;" :key="updateKey">
             <MinimalInput @on-enter="address($event)" inputPlaceholder="Address" inputWidth="315px" inputHeight="38px" fontSize="12px" inputName="Recipent Address"/>
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
-              <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="150px" inputHeight="38px" fontSize="12px" inputName="Amount"/>
-            <div>
+              <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="147px" inputHeight="38px" fontSize="16px" inputName="Amount"/>
+            <div v-if="vultureWallet.accountStore != null && vultureWallet.accountStore.currentlySelectedNetwork != null">
               <div class="inputName">Asset</div>
-              <div @click="selectAsset()" class="assetBox">
+
+              <div @click="selectAsset()" class="assetBox clickyAssetBox" v-if=" vultureWallet.accountStore.currentlySelectedNetwork.smartContractCapable != null &&
+              vultureWallet.accountStore.currentlySelectedNetwork.smartContractCapable == true">
 
                 <!-- display info about Native asset, since that's whats selected if selectedTokenArrayIndex is -1 -->
                 <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex == -1">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
@@ -17,11 +19,14 @@
                   vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">                  
                   {{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)[selectedTokenArrayIndex].symbol}}
                 </span>
-
-                
-
                 <span style="font-family: fonticonA; font-size: 18px;"> &#xf044;</span>
               </div>
+              <div v-else>
+                <div class="assetBox">
+                  {{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}
+                </div>
+              </div>
+
             </div>
           </div>
             
@@ -168,19 +173,30 @@ export default {
 
   margin-bottom: 15px;
 
+  width: 135px;
 
-  border-radius: 0px;
-
-  width: 142px;
-
-  border-bottom-style: solid;
-  border-width: 2px;
-  border-color: var(--accent_color);
   user-select: none;
 
+  border-color: var(--bg_color_2);
+  border-width: 2px;
+  border-style: solid;
+  border-bottom-color: var(--accent_color);
+  border-bottom-width: 2px;
+  border-radius: 10px;
+}
+.clickyAssetBox {
   cursor: pointer;
-
   transition-duration: 125ms;
+  border-radius: 0px;
+
+  width: 135px;
+
+  border-color: var(--bg_color_2);
+  border-width: 2px;
+  border-style: solid;
+  border-bottom-color: var(--accent_color);
+  border-bottom-width: 2px;
+  border-radius: 10px;
 }
 .inputName {
   text-align: left;
@@ -188,13 +204,13 @@ export default {
   margin: 5px;
   color: var(--fg_color_2);
 }
-.assetBox:hover {
+.clickyAssetBox:hover {
   text-shadow: 0px 0px 5px var(--accent_color);
   color: var(--accent_color);
 
   transition-duration: 125ms;
 }
-.assetBox:active {
+.clickyAssetBox:active {
   filter: brightness(70%);
 }
 .box {

@@ -12,15 +12,13 @@
                 vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0"
                 style="align-items: center;">
                   <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
-                    You have: <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens
+                    <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens
                   </div>
                   <span v-for="(token, index) in vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token">
                     <TokenModule :token="token" :tokenIndex="index" :selected="index == selectedTokenArrayIndex ? true : false"
                     @module-click="selectToken($event, 'ERC20')"/>
                   </span>
                   <DefaultButton @button-click="selectToken(-1)" buttonText="Select Native Asset" buttonHeight="35px"  buttonWidth="200px" fontSize="18px" style="margin-bottom: 15px; margin-top: 10px;"/>
-                  
-                  
                 </div>
             </div>
         </div>

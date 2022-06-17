@@ -112,7 +112,7 @@ export default {
 
   margin: 20px;
   margin-top: 3px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 
   box-sizing: border-box;
   border-color: var(--bg_color_2);

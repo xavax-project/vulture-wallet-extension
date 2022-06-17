@@ -5,7 +5,7 @@ import { MnemonicWallet } from "./mnemonicWallet";
 import SafeEventEmitter from "@metamask/safe-event-emitter";
 import { AbstractToken, TokenStore } from "../types/abstractToken";
 
-/* --- Note # xavax # we are one @
+/* --- Note # NEXEN # we are one @
     vultureWallet.ts contains interfaces that are used by the Vulture wallet.
 
     The accounts-system that Vulture uses is as follows:
@@ -138,7 +138,8 @@ export interface Network {
  */
 export interface VultureAccount {
 
-    worker: Worker;
+    infoWorker: Worker;
+    actionWorker: Worker;
 
     /** ## accountEvents
     * Due to the fact that a lot of computations happen in service & web workers, we use events
@@ -164,6 +165,8 @@ export interface VultureAccount {
     * ```
     */
     accountEvents: SafeEventEmitter;
+
+    updateTokenBalance: any;
 
     /** ## accountData
     * The relevant Data each VultureAccount has, for example the address, derivation path, name, assetAmount, etc.
@@ -198,6 +201,8 @@ export interface VultureAccount {
      * * "NATIVE"
      */
     getTokenInformation(tokenAddress: string, tokenType: string): Promise<void>;
+
+    terminateWallet(): Promise<void>;
     updateAccountState(): Promise<void>;   
 }
 
@@ -365,20 +370,26 @@ export class VultureWallet {
                 console.error("Error: Ledger wallets not currently supported!");
             }
         }
+    
     }
 
     async initWallet(vault: Vault, accountStore: VultureAccountStore) {
 
+        // If we are switching/initializing to a new wallet, we must terminate the processes for the old one.
+        if(this.currentWallet != null) {
+            this.currentWallet.terminateWallet();
+        }
+        
         this.accountStore = accountStore;
 
         this.tokenStore = await loadTokenStore(this.accountStore.currentlySelectedNetwork);
-
+        
         this.vault = vault;
         this.nextDerivIndex = accountStore.nextAccountDerivIndex;
         this.selectedWalletIndex = accountStore.currentlySelectedAccount;
-
-        //If the currently selected account is available, if it isn't we fallback to using the first account.
-        //The reason this check is necessary is due to updates possibly resetting the currentlySelectedAccount value. 
+        
+        // If the currently selected account is available, if it isn't we fallback to using the first account.
+        // The reason this check is necessary is due to updates possibly resetting the currentlySelectedAccount value. 
         if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1]) {
             if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
                 this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
@@ -394,6 +405,11 @@ export class VultureWallet {
                 console.error("Error: Ledger wallets not currently supported!");
             }
         }
+        
+       //Set the callback for updating token balances here, it's wonky but I'll refactor the way this works eventually.
+       this.currentWallet.accountEvents.on(VultureMessage.GET_TOKEN_BALANCE, () => {
+            this.updateBalanceOfTokens();
+       });
     }
 
     async switchWallet(index: number) {
@@ -401,17 +417,36 @@ export class VultureWallet {
         this.saveAccounts();
         this.initWallet(this.vault, this.accountStore);
     }
-    test() {
-        this.currentWallet.worker.postMessage({
-            method: "TEST",
-            params: {
-                network: JSON.parse(JSON.stringify(this.accountStore.currentlySelectedNetwork))
-            }
-        })
+    async updateBalanceOfTokens() {
+       this.currentWallet.infoWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
+           if(event.data.method == VultureMessage.GET_TOKEN_BALANCE) {
+               if(event.data.params.success == true) {
+                   if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                       this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
+                       .balance = event.data.params.balance;
+                   }
+               }else {
+                   console.error("Error getting balance of token " + event.data.params.tokenAddress);
+                   if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                       this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
+                       .balance = "Error";
+                   }
+               }
+           }
+       };
+       this.tokenStore.tokenList?.get(this.accountStore.currentlySelectedNetwork.networkUri)?.forEach((token, index) => { // TODO: UPDATE TO METHOD
+           this.currentWallet.infoWorker.postMessage({
+               method: VultureMessage.GET_TOKEN_BALANCE,
+               params: {
+                   tokenAddress: token.address,
+                   arrayIndexOfToken: index,
+                   tokenType: 'ERC20'
+               },
+           });
+       });
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();
-
         //Switch the network
         if(networks.allNetworks.get(networkName)) {
             this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
@@ -474,7 +509,7 @@ export class VultureWallet {
         }
     }
     updateAccountAddresses() {
-        this.currentWallet.worker.onmessage = (event) => {
+        this.currentWallet.actionWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
             if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
                 if(event.data.params.success == true) {
                     this.accountStore.allAccounts = event.data.params.updatedAccounts;
@@ -484,7 +519,7 @@ export class VultureWallet {
                 }
             }
         };
-        this.currentWallet.worker.postMessage({
+        this.currentWallet.actionWorker.postMessage({ // TODO: UPDATE TO METHOD
             method: VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK,
             params: {
                 accounts: JSON.parse(JSON.stringify(this.accountStore.allAccounts)),
@@ -499,7 +534,7 @@ export class VultureWallet {
     }
     createAccount(accountName: string, walletType: WalletType) {
         createNewAccount(accountName, walletType).then((account) => {
-            this.currentWallet.worker.onmessage = (event) => {
+            this.currentWallet.actionWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
                 if(event.data.method == VultureMessage.GET_ADDRESS_FROM_URI && event.data.params.success == true) {
                     this.accountStore.allAccounts[event.data.params.accountIndex - 1].address = event.data.params.address;
                     this.accountStore.nextAccountDerivIndex++;
@@ -514,7 +549,7 @@ export class VultureWallet {
 
             this.accountStore.allAccounts.push(account);
 
-            this.currentWallet.worker.postMessage({
+            this.currentWallet.actionWorker.postMessage({ // TODO: UPDATE TO METHOD
                 method: VultureMessage.GET_ADDRESS_FROM_URI,
                 params: {
                     keyring: {
@@ -593,6 +628,11 @@ export async function loadTokenStore(network: Network) {
     });
     return store;
 }
+
+export async function updateBalanceOfToken(network: Network, isNFT: boolean, token: AbstractToken) {
+
+}
+
 /** # addTokenToStore()
  *  Adds a token to the TokenStore of the current network. If the user has the token added it will show up
  *  on the front-end GUI.

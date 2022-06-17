@@ -2,8 +2,8 @@
   "name": "vulture_scripts",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/vulture-wallet",
-  "author": "https://xavax.io",
+  "repository": "https://github.com/nexenlabs/vulture-wallet",
+  "author": "https://nexenlabs.io",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@metamask/safe-event-emitter": "^2.0.0",
-    "@polkadot/api": "^7.7.1",
+    "@polkadot/api": "^8.8.2",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "extensionizer": "^1.0.1",

@@ -56,31 +56,30 @@ export default {
     background-color: var(--bg_color);
     
     border-color: var(--bg_color_2);
-    border-width: 0px;
+    border-width: 2px;
     border-style: solid;
 
-    border-bottom-color: var(--accent_color);
     border-bottom-width: 2px;
 
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-radius: 10px;
 
     outline: none;
 
     color: var(--fg_color);
 
     text-align: center;
-
-    border-radius: 0px;
-
-
+    transition-duration: 200ms;
 }
 .inputCustom:hover{
-    transition-duration: 120ms;
-    filter: brightness(90%);
+  transition-duration: 170ms;
+  filter: brightness(85%);
     
 }
 .inputCustom:focus{
-    transition-duration: 120ms;
-    filter: brightness(85%);
+  transition-duration: 170ms;
+  filter: brightness(85%);
 }
 
 input::-webkit-outer-spin-button,

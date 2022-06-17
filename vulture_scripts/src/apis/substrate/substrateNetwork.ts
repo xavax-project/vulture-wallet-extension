@@ -6,13 +6,12 @@ import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { KeyringPair } from '@polkadot/keyring/types';
 
-import { VultureNetwork, MethodResponse } from './networkApi';
-import { VultureMessage } from '../../../src/vulture_backend/vultureMessage';
-import { AccountData, Network } from '../../../src/vulture_backend/wallets/vultureWallet';
-import { AbstractToken } from '../../../src/vulture_backend/types/abstractToken';
-import { erc20Abi } from '../ink_contract_abis/erc20Abi';
-import BigNumber from 'bignumber.js';
-import { getERC20Info } from './substrateFunctionality/contractFunctions';
+import { VultureNetwork, MethodResponse } from '../InetworkAPI';
+import { VultureMessage } from '../../../../src/vulture_backend/vultureMessage';
+import { AccountData, Network } from '../../../../src/vulture_backend/wallets/vultureWallet';
+import { AbstractToken } from '../../../../src/vulture_backend/types/abstractToken';
+import { erc20Abi } from './ink_contract_abis/erc20Abi';
+import { getERC20Info, getERC20Balance } from './contractFunctions';
 
 const { ContractPromise } = require('@polkadot/api-contract');
 
@@ -72,6 +71,28 @@ export class SubstrateNetwork implements VultureNetwork {
             console.error(error);
         });
         
+    }
+    async getBalanceOfToken(tokenAddress: string, tokenType: string, arrayIndexOfToken?: number): Promise<void> {
+        if(this.isCryptoReady) {
+            let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+            switch(tokenType) {
+                case 'ERC20': {
+                    await getERC20Balance(tokenAddress, contract, this.currentAddress, arrayIndexOfToken);
+                    break;
+                }
+                default: {
+                    console.error("Tried getting balance of token, but the tokenType is invalid!");
+                    postMessage({method: VultureMessage.GET_TOKEN_BALANCE, params: {
+                        success: false,
+                    }});
+                }
+            }
+        }else {
+            postMessage({method: VultureMessage.GET_TOKEN_BALANCE, params: {
+                success: false,
+            }});
+            throw new Error("Cryptography WASM hasn't been initialized yet!");
+        }
     }
     async getTokenData(tokenAddress: string, tokenType: string): Promise<void> {
         if(this.isCryptoReady) {
@@ -142,7 +163,6 @@ export class SubstrateNetwork implements VultureNetwork {
     }
     transferAssets(recipent: string, amount: string, token?: AbstractToken) {
         if(this.isCryptoReady) {
-          
           if(token != null) {
             //If the method caller specified a token, we are sending the token and not the native asset.
             //This only works on substrate networks with the Ink! smart contract pallete.
@@ -307,7 +327,7 @@ export class SubstrateNetwork implements VultureNetwork {
     subscribeToAddressUpdates() {
         if(this.isCryptoReady) {
             this.networkAPI!.query.system.account(this.currentAddress, (result: any) => {
-                postMessage({method: VultureMessage.SUB_TO_ACCOUNT_STATE, params: {
+                postMessage({method: VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, params: {
                     success: true,
                     result: result.toJSON(),
                 }});

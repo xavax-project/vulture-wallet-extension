@@ -98,7 +98,7 @@ export default {
     setup() {
 
       // This setup() method *is* very messy, will move things out and do cleaning
-      // Later when I decide to refactor.
+      // Later when I decide to refactor. It is essentially entirely temporary.
 
       let vultureWallet = reactive(new VultureWallet());
       let walletState = ref(WalletStates.LOADING);
@@ -186,6 +186,7 @@ export default {
         currentModal.value = modal;
       }
       function modifyAccount(accountIndex: number) {
+        selectedTokenArrayIndex.value = -1;
         selectedAccountIndex.value = accountIndex;
         currentModal.value = modals.MODIFY_ACCOUNT;
       }
@@ -392,7 +393,18 @@ html {
   }
 }
 
-
+a {
+  color: var(--accent_color);
+  transition-duration: 180ms;
+}
+a:hover {
+  text-shadow: 0px 0px 3px var(--accent_color);
+  transition-duration: 180ms;
+  text-decoration: none;
+}
+a:active {
+  filter: brightness(80%);
+}
 * {
   scrollbar-width: 5px;
   scrollbar-color: var(--bg_color_2);

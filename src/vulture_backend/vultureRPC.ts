@@ -1,10 +1,13 @@
 
 
+/*
+
+*/
 //Just a wrapper for requests to make things easier.
 export class VultureRequest {
     method;
     params;
-    constructor(method, params) {
+    constructor(method: any, params: any) {
         this.method = method;
         this.params = params;
     }
@@ -28,7 +31,7 @@ export class VultureRequest {
      * ____
      * @param {string} rpcURL The URL/URI the method will post the request to.
      */
-    postJsonRPC(rpcURL) {
+    postJsonRPC(rpcURL: any) {
         return fetch(rpcURL, {
             method: 'post',
             headers: {

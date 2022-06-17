@@ -97,7 +97,7 @@ export default {
 }
 .underline {
   background-color: var(--fg_color);
-  height: 2px;
+  height: 1px;
   border-radius: 10px;
   margin-top: 5px;
   width: 100%;

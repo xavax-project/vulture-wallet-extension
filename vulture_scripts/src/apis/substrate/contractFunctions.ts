@@ -6,16 +6,78 @@ import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { hexToU8a, isHex } from "@polkadot/util";
 import { KeyringPair } from '@polkadot/keyring/types';
 
-import { VultureNetwork, MethodResponse } from '.././networkApi';
+import { VultureNetwork, MethodResponse } from '../InetworkAPI';
 import { VultureMessage } from '../../../../src/vulture_backend/vultureMessage';
 import { AccountData, Network } from '../../../../src/vulture_backend/wallets/vultureWallet';
 import { AbstractToken } from '../../../../src/vulture_backend/types/abstractToken';
-import { erc20Abi } from '../../ink_contract_abis/erc20Abi';
+import { erc20Abi } from './ink_contract_abis/erc20Abi';
 import BigNumber from 'bignumber.js';
 
 const { ContractPromise } = require('@polkadot/api-contract');
 
 
+
+export async function getERC20Balance(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+    let success: boolean = true;
+    let tokenDecimals: number = -1;
+    let tokenBalance: string = "0";
+
+    let decimals = await contract.query.decimals(senderAddress, {value: 0, gasLimit: -1});
+    try{
+        if(decimals.result.isOk) {
+            tokenDecimals = decimals.output.toHuman();
+        }else {
+            console.log("Error: Failed getting token total decimals (the amount of fractions the token is divided into) \n");
+            success = false;
+        }
+    }catch {
+        tokenDecimals = -1;
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have decimals()");
+        success = false;
+    }
+
+    try{
+        let balance = await contract.query.balanceOf(senderAddress, {value: 0, gasLimit: -1}, senderAddress);
+        if(balance.result.isOk) {
+            if(decimals != -1) {
+                tokenBalance = new BigNumber((balance.output.toHuman() as string).replaceAll(',', ''))
+                .div(new BigNumber(10).pow(tokenDecimals)).toString();
+            }else {
+                tokenBalance = balance.output.toHuman();
+            }
+        }else {
+            console.log("Error: Failed getting balance!");
+            if(balance.result.asErr.toHuman().Module.error == 5) {
+                success = false;
+            }
+        }
+        
+    }catch {
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC20");
+    }
+
+    if(success) {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_BALANCE,
+            {
+                tokenAddress: tokenAddress,
+                senderAddress: senderAddress,
+                arrayIndexOfToken: arrayIndexOfToken,
+                balance: tokenBalance,
+                success: true,
+            }
+        ));
+    }else {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_BALANCE,
+            {
+                balance: "Error",
+                success: false,
+            }
+        ));
+    }
+
+}
 
 export async function getERC20Info(tokenAddress: string, contract: any, senderAddress: string) {
 

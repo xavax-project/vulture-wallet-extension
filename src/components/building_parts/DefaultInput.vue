@@ -54,10 +54,11 @@ export default {
 }
 .inputCustom {
     background-color: var(--bg_color);
-    border-color: var(--accent_color);
-    border-bottom-color: var(--accent_color);
-    border-top-color: var(--bg_color_2);
-    border-style: none;
+    border-color: var(--bg_color_2);
+    border-right-color: var(--accent_color);
+    border-left-color: var(--accent_color);
+    
+    border-style: solid;
     border-bottom-style: solid;
 
 
@@ -65,21 +66,19 @@ export default {
 
     color: var(--fg_color);
 
-    box-shadow: 0px 0px 4px rgb(10, 10, 10);
 
     text-align: center;
 
-    border-radius: 5px;
-
-
+    border-radius: 10px;
+    transition-duration: 170ms;
 }
 .inputCustom:hover{
-    transition-duration: 120ms;
-    filter: brightness(90%);    
+    transition-duration: 170ms;
+    filter: brightness(85%);    
 }
 .inputCustom:focus{
-    transition-duration: 120ms;
-    filter: brightness(90%);
+    transition-duration: 170ms;
+    filter: brightness(85%);
 }
 
 input::-webkit-outer-spin-button,

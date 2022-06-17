@@ -35,7 +35,7 @@ export default {
     align-items: center;
     width: auto;
     height: auto;
-    border-radius: 12px;
+    border-radius: 10px;
     border-color: var(--bg_color_2);
     border-width: 2px;
     border-style: solid;
@@ -58,13 +58,11 @@ export default {
 .button:hover {
     transition-duration: 100ms;
     border-color: var(--accent_color);
-    box-shadow: 0px 0px 8px 0px rgb(5, 5, 5);
     color: var(--accent_color);
     background-color: var(--bg_color);
 }
 .button:active {
     transition-duration: 100ms;
-    box-shadow: 0px 0px 3px 0px rgb(5, 5, 5);
     background-color: var(--bg_color);
     filter: brightness(70%);
 }

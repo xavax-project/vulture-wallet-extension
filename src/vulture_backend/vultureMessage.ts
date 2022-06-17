@@ -7,7 +7,7 @@ export const VultureMessage = {
     "SET_CURRENT_WALLET": "SET_CURRENT_WALLET",
     "GET_ADDRESS_FROM_URI" : "GET_ADDRESS_FROM_URI",
     "GET_ACCOUNT_STATE": "GET_ACCOUNT_STATE",
-    "SUB_TO_ACCOUNT_STATE": "SUB_TO_ACCOUNT_STATE",
+    "SUBSCRIBE_TO_ACC_EVENTS": "SUBSCRIBE_TO_ACC_EVENTS",
     "TRANSFER_ASSETS": "TRANSFER_ASSETS",
 
     //Will update the passed in key-pairs to be encoded in the correct cryptography & address format,
@@ -15,6 +15,8 @@ export const VultureMessage = {
     "UPDATE_ACCOUNTS_TO_NETWORK": "UPDATE_ACCOUNTS_TO_NETWORK",
     //Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
     "GET_TOKEN_DATA": "GET_TOKEN_DATA",
+    "GET_TOKEN_BALANCE": "GET_TOKEN_BALANCE",
+
 
     /* Utilities */
     "IS_ADDRESS_VALID": "IS_ADDRESS_VALID",

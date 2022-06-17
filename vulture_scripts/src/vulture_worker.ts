@@ -4,8 +4,8 @@ import { VultureMessage } from "../../src/vulture_backend/vultureMessage";
 import { VultureRequest } from "../../src/vulture_backend/vultureRPC";
 import { NetworkType } from "../../src/vulture_backend/wallets/vultureWallet";
 
-import { VultureNetwork } from './api/networkApi';
-import { SubstrateNetwork } from './api/substrateNetwork';
+import { VultureNetwork } from './apis/InetworkAPI';
+import { SubstrateNetwork } from './apis/substrate/substrateNetwork';
 
 var vault = {
     seed: ''
@@ -101,6 +101,14 @@ self.addEventListener("message", (event) => {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }
     }
+    //Get the balance of a token and return it.
+    if(event.data && event.data.method === VultureMessage.GET_TOKEN_BALANCE) {
+        if(currentWallet != null) {
+            //currentWallet.getBalanceOfToken(event.data.params.tokenAddress, event.data.params.tokenType, event.data.params.arrayIndexOfToken);
+        }else {
+            console.error("Wallet hasn't been setup in vulture_worker yet!");
+        }
+    }
     //Query the account state.
     if(event.data && event.data.method === VultureMessage.GET_ACCOUNT_STATE) {
         if(currentWallet != null) {
@@ -110,27 +118,9 @@ self.addEventListener("message", (event) => {
         }
     }
     //Subscribe to getting the account state.
-    if(event.data && event.data.method === VultureMessage.SUB_TO_ACCOUNT_STATE) {
-
+    if(event.data && event.data.method === VultureMessage.SUBSCRIBE_TO_ACC_EVENTS) {
         if(currentWallet != null) {
             currentWallet.subscribeToAddressUpdates();
-        }else {
-            console.error("Wallet hasn't been setup in vulture_worker yet!");
-        }
-    }
-
-    if(event.data && event.data.method === "TEST") {
-        if(currentWallet != null) {
-            let testingToken: AbstractToken = {
-                network: event.data.params.network,
-                address: "5D3qCr9DJQz6U7P8zpMSzTqHuozBibA6HyixKBAB8A9fArM2",
-                decimals: 0,
-                name: "OogaDoogoo",
-                symbol: "OOGA",
-                balance: '0',
-                logoURI: ""
-            }
-            currentWallet.transferAssets("5EBzqfLvB5eacCEtub6UXgGjoJYBtDtnDw4ANQeSsHbgLtC6", "1000", testingToken);
         }else {
             console.error("Wallet hasn't been setup in vulture_worker yet!");
         }

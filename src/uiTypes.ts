@@ -1,3 +1,4 @@
+// The current modal being displayed to the user.
 export enum Modals{
   CREATE_NEW_ACCOUNT,
   SELECT_NEW_ACCOUNT,
@@ -10,17 +11,18 @@ export enum Modals{
   TOKEN_VIEW,
   NONE,
 }
+// The login state of the wallet.
 export enum WalletStates {
-  LOADING,
-  ONBOARDING,
-  WALLET,
   PASSWORD_LOCKED,
+  ONBOARDING,
+  LOADING,
+  WALLET,
 }
-
+// The state of the current transaction the wallet is "working" on.
 export enum TxState{
-  NONE,
   SENDING,
   PENDING,
   SUCCESS,
   FAILED,
+  NONE,
 }
