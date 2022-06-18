@@ -1,16 +1,18 @@
 <template>
+
+    <!-- TODO: seperate NFTs and ERC20 to seperate components. The modal system needs a bit of refactoring clearly -->
     <div class="flexBox" style="height: 100%; width: 100%;">
         <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
-        overflow-wrap: break-word">
+        overflow-wrap: break-word" v-if="tokenTypeToAdd == 'ERC20'">
             <DefaultInput @on-enter="setAddress($event)" inputWidth="315px" inputHeight="40px" fontSize="15px" inputName="Token Address" inputPlaceholder="Enter Token Address"/>
             
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
                 <div v-if="tokenDiscoveryStatus == 'EnterAddress'">    
-                    Please enter a Token Address to add a token Manually. <br> <br>
-                    Only add tokens you 
+                    Please enter a Token Address.
+                    Only add tokens that you've
                     <span style="color: var(--accent_color); text-shadow: 0px 0px 5px var(--accent_color); ">
-                    trust.
+                    verified.
                     </span>
                 </div>
 
@@ -52,8 +54,62 @@
                 </div>
 
                 <div class="vultureLoader" v-if="showLoader == true"></div>
+            </div>
 
+        </div>
 
+        <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
+        flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
+        overflow-wrap: break-word" v-if="tokenTypeToAdd == 'ERC721'">
+            <DefaultInput @on-enter="setAddress($event)" inputWidth="315px" inputHeight="40px" fontSize="15px" inputName="NFT Address" inputPlaceholder="Enter NFT Address"/>
+            
+            <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
+                <div v-if="tokenDiscoveryStatus == 'EnterAddress'">    
+                    Please enter an NFT address.
+                    Only add tokens that you've 
+                    <span style="color: var(--accent_color); text-shadow: 0px 0px 5px var(--accent_color); ">
+                    verified.
+                    </span>
+                </div>
+
+                <div v-if="tokenDiscoveryStatus == 'InvalidAddress'">    
+                    The token address entered is Invalid! <br>
+                    <span style="color: rgb(255, 0, 65); font-size: 16px; text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
+                    Please fix (╬ Ò﹏Ó)
+                    </span>
+                </div>
+
+                <div v-if="tokenDiscoveryStatus == 'InvalidToken'">    
+                    The token address entered is faulty! <br><br>
+                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
+                    Error:
+                    </span>
+                    {{error}}
+                </div>
+
+                <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Name: <span style="color: var(--accent_color)">{{currentToken.name}}</span>
+                        [<span style="font-size: 14px; color: var(--accent_color);"> ${{currentToken.symbol}}</span> ]
+                        <hr>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Your Balance: <span style="color: var(--accent_color)">{{currentToken.balance}}</span> 
+                        <hr>
+                    </div>
+                    <div style="width: 100%; text-align: left; margin-top: 15px;">
+                        Supply: <span style="color: var(--accent_color)">{{currentToken.totalSupply}}</span> <br>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Total supply of the Token.</i>
+                        <hr>
+                    </div>
+                    <div  style="width: 100%; text-align: left; margin-top: 20px;">
+                        Address: <span style="color: var(--accent_color); font-size: 15px;">{{currentToken.address}}</span> <br>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Unique Address of the Token.</i>
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="vultureLoader" v-if="showLoader == true"></div>
             </div>
 
         </div>

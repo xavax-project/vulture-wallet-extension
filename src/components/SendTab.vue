@@ -4,12 +4,12 @@
         <div class="flexBox" style="position: absolute; width: 100%; box-sizing: border-box; padding-left: 20px; padding-right: 20px; top: 20px; align-items: center;" :key="updateKey">
             <MinimalInput @on-enter="address($event)" inputPlaceholder="Address" inputWidth="315px" inputHeight="38px" fontSize="12px" inputName="Recipent Address"/>
             <div class="flexBox" style="width: 100%; flex-direction: row; align-items: flex-end; justify-content: space-between;">
-              <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="147px" inputHeight="38px" fontSize="16px" inputName="Amount"/>
+              <MinimalInput @on-enter="amount($event)" inputPlaceholder="0" inputType="number" inputWidth="147px" inputHeight="39px" fontSize="16px" inputName="Amount"/>
             <div v-if="vultureWallet.accountStore != null && vultureWallet.accountStore.currentlySelectedNetwork != null">
               <div class="inputName">Asset</div>
 
-              <div @click="selectAsset()" class="assetBox clickyAssetBox" v-if=" vultureWallet.accountStore.currentlySelectedNetwork.smartContractCapable != null &&
-              vultureWallet.accountStore.currentlySelectedNetwork.smartContractCapable == true">
+              <div @click="selectAsset()" class="assetBox clickyAssetBox" v-if="
+              (vultureWallet.accountStore.currentlySelectedNetwork.networkFeatures & networkFeatures.SMART_CONTRACTS) === networkFeatures.SMART_CONTRACTS ? true : false">
 
                 <!-- display info about Native asset, since that's whats selected if selectedTokenArrayIndex is -1 -->
                 <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex == -1">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
@@ -18,8 +18,8 @@
                   vultureWallet.tokenStore != null &&
                   vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">                  
                   {{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)[selectedTokenArrayIndex].symbol}}
-                </span>
-                <span style="font-family: fonticonA; font-size: 18px;"> &#xf044;</span>
+                </span> <span style="font-family: fonticonA; font-size: 19px;"> &#xe3c9;</span>
+
               </div>
               <div v-else>
                 <div class="assetBox">
@@ -50,6 +50,8 @@ import DefaultButton from "./building_parts/DefaultButton.vue";
 import MinimalInput from "./building_parts/MinimalInput.vue";
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
 import { AbstractToken } from '@/vulture_backend/types/abstractToken';
+import { NetworkFeatures } from "../vulture_backend/types/networkTypes";
+
 export default {
   name: "SendTab",
   components: {
@@ -64,6 +66,8 @@ export default {
     selectedTokenArrayIndex: Number, // -1 is native, [0..n] is a non-native token.
   },
   setup(props: any, context: any) {
+
+    let networkFeatures = NetworkFeatures;
 
     let updateKey = ref(0);
 
@@ -100,7 +104,8 @@ export default {
             insufficientFunds.value = true;
           }
         }else {
-                    let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+          // Make sure we have enough of the token we are sending.
+          let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
             if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
               console.log((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex].balance);
@@ -149,6 +154,7 @@ export default {
     }
     return {
       insufficientFunds,
+      networkFeatures,
       currentAddress,
       invalidAddress,
       currentAmount,
@@ -174,6 +180,7 @@ export default {
   margin-bottom: 15px;
 
   width: 135px;
+  height: 25px;
 
   user-select: none;
 
@@ -190,6 +197,7 @@ export default {
   border-radius: 0px;
 
   width: 135px;
+  height: 25px;
 
   border-color: var(--bg_color_2);
   border-width: 2px;

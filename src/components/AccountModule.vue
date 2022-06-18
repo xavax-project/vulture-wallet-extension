@@ -1,7 +1,7 @@
 <template>
   <div @click="moduleClick()" class="module" v-bind:class="selected == true ? 'selectedAccount' : ''">
     <div class="icon">
-      &#xf2bd;
+      &#xe853;
     </div>
       <div class="left">
         "{{accountName}}"
@@ -70,7 +70,7 @@ export default {
 
   margin: 20px;
   margin-top: 3px;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 
   box-sizing: border-box;
   border-color: var(--bg_color_2);

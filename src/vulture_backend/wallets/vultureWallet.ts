@@ -4,6 +4,7 @@ import { encrypt } from "@metamask/browser-passworder";
 import { MnemonicWallet } from "./mnemonicWallet";
 import SafeEventEmitter from "@metamask/safe-event-emitter";
 import { AbstractToken, TokenStore } from "../types/abstractToken";
+import { NetworkFeatures } from "../types/networkTypes";
 
 /* --- Note # NEXEN # we are one @
     vultureWallet.ts contains interfaces that are used by the Vulture wallet.
@@ -124,11 +125,11 @@ export interface Network {
     addressFormat?: string
     isTestnet: boolean,
 
-    /** ## smartContractCapable
-     * If the network is smart-contract capable or not. This boolean is quite temporary as I'd like to abstract
-     * network features further later on. 
+    /** ## networkFeatures
+     * An enum bitfield representing the features a network has. Interact with this enum as a **bitfield**!
      */
-    smartContractCapable: boolean,
+    networkFeatures: NetworkFeatures
+
 }
 
 /** ## VultureAccount
@@ -226,10 +227,10 @@ export class DefaultNetworks {
         networkAssetPrefix: 'AZERO',
         networkName: 'Aleph Zero',
         networkAssetDecimals: 12,
-        networkColor: '#4dff97',
+        networkColor: '#00EAC7',
         networkType: NetworkType.Substrate,
         isTestnet: false,
-        smartContractCapable: false
+        networkFeatures: (NetworkFeatures.STAKING),
     }
     public Kusama: Network = {
         networkUri: 'wss://kusama-rpc.polkadot.io',
@@ -238,9 +239,9 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#e8026d',
         networkType: NetworkType.Substrate,
+        networkFeatures: (NetworkFeatures.NONE),
         addressFormat: '2',
         isTestnet: false,
-        smartContractCapable: false,
     }
     public Polkadot: Network = {
         networkUri: 'wss://kusama-rpc.polkadot.io',
@@ -249,9 +250,9 @@ export class DefaultNetworks {
         networkAssetDecimals: 10,
         networkColor: '#e6007a',
         networkType: NetworkType.Substrate,
+        networkFeatures: (NetworkFeatures.NONE),
         addressFormat: '0',
         isTestnet: false,
-        smartContractCapable: false,
     }
     /* 
     public AvalancheCChain: Network = {
@@ -272,8 +273,8 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
+        networkFeatures: (NetworkFeatures.STAKING),
         isTestnet: true,
-        smartContractCapable: false,
     }
     public AlephZeroSmartnet: Network = {
         networkUri: 'wss://ws-smartnet.test.azero.dev',
@@ -282,8 +283,8 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
+        networkFeatures: (NetworkFeatures.SMART_CONTRACTS),
         isTestnet: true,
-        smartContractCapable: true
     }
     public allNetworks: Map<string, Network> = new Map([
         [
@@ -337,7 +338,6 @@ export class DefaultNetworks {
             this.AlephZeroSmartnet
         ],
     ]);
-    constructor() {}
 }
 
 export class VultureWallet {

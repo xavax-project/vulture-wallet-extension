@@ -10,7 +10,8 @@
             <hr>
             </div>
             <div style="width: 100%; text-align: left; margin-top: 20px;">
-                Address: <span style="color: var(--accent_color); font-size: 15px;">{{vultureWallet.accountStore.allAccounts[selectedAccount - 1].address}}</span> <br>
+                Deposit Address ({{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}):
+                <span style="color: var(--accent_color); font-size: 15px;">{{vultureWallet.accountStore.allAccounts[selectedAccount - 1].address}}</span> <br>
                 <i style="font-size: 13px;  color: var(--fg_color_2)">Address may vary depending on the selected network.</i>
                 <hr>
             </div>

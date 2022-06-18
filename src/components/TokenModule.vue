@@ -1,7 +1,7 @@
 <template>
   <div @click="moduleClick()" class="module" v-bind:class="selected == true ? 'selected' : ''">
     <div class="icon">
-      &#xf51e;
+      &#xe062;
     </div>
       <div class="left">
         "{{token.name}}"

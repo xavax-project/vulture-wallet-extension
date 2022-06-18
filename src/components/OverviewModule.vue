@@ -8,10 +8,10 @@
         </div>
         <div class="flexBox" style="">
           <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 20px;" @click="selectAccount()">
-            &#xf0c9;
+            &#xf02e;
           </div>
           <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 8px;" @click="selectNetwork()">
-            &#xf0ac;
+            &#xe9f4;
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@ export default {
 }
 .selectAccountButton {
   font-family: fonticonA;
-  font-size: 22px;
+  font-size: 24px;
   cursor: pointer;
   transition-duration: 120ms;
   color: var(--fg_color_2)

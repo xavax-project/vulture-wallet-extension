@@ -8,7 +8,7 @@
                 <hr>
             </div>
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
-                <div class="flexBox itemList"  v-if="vultureWallet.tokenStore != null &&
+                <div class="flexBox"  v-if="vultureWallet.tokenStore != null &&
                 vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0"
                 style="align-items: center;">
                   <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
@@ -18,13 +18,14 @@
                     <TokenModule :token="token" :tokenIndex="index" :selected="index == selectedTokenArrayIndex ? true : false"
                     @module-click="selectToken($event, 'ERC20')"/>
                   </span>
-                  <DefaultButton @button-click="selectToken(-1)" buttonText="Select Native Asset" buttonHeight="35px"  buttonWidth="200px" fontSize="18px" style="margin-bottom: 15px; margin-top: 10px;"/>
+                    <DefaultButton @button-click="selectToken(-1)" :buttonText="'Select \'' + vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix + '\''"
+                    buttonHeight="35px"  buttonWidth="154px" fontSize="18px" style="margin-bottom: 15px; margin-top: 10px;"/>
                 </div>
             </div>
         </div>
 
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
-            <DefaultButton buttonHeight="40px" buttonWidth="150px" buttonText="Return" @button-click="quitModal()"/>
+            <DefaultButton buttonHeight="40px" buttonWidth="154px" buttonText="Return" @button-click="quitModal()"/>
         </div>
             
     </div>
@@ -102,7 +103,9 @@ hr {
     max-height: 380px;
     
     overflow: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
+
+    border-radius: 4px;
 }
 
 .vultureLogo {

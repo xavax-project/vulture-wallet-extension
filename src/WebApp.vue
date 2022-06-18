@@ -27,7 +27,7 @@ export default {
 }
 @font-face {
     font-family: GardensC;
-    src: url("./assets/fonts/GlacialIndifference-Regular.otf");
+    src: url("./assets/fonts/Assistant/Assistant-VariableFont_wght.ttf");
 }
 @font-face {
     font-family: ButtonFont;

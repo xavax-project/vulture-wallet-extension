@@ -280,11 +280,11 @@ export default {
 <style>
 @font-face {
     font-family: fonticonA;
-    src: url("./assets/fonts/fa-solid-900.ttf");
+    src: url("./assets/fonts/MaterialIconsRound-Regular.otf");
 }
 @font-face {
     font-family: GardensC;
-    src: url("./assets/fonts/GlacialIndifference-Regular.otf");
+    src: url("./assets/fonts/Assistant/Assistant-VariableFont_wght.ttf");
 }
 @font-face {
     font-family: ButtonFont;
@@ -405,25 +405,18 @@ a:hover {
 a:active {
   filter: brightness(80%);
 }
-* {
-  scrollbar-width: 5px;
-  scrollbar-color: var(--bg_color_2);
-}
+
 *::-webkit-scrollbar {
   width: 5px;         
 }
-
 *::-webkit-scrollbar-track {
-  background: var(--bg_color_2);
+  box-shadow: 0px 0px 0px rgba(0,0,0,1);
+  background: rgb(16,16,16);
   border-radius: 5px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--bg_color);
-
+  background-color: var(--bg_color_2);
   border-radius: 5px;
-  border-width: 1px;
-  border: 1px solid var(--bg_color);
-
 }
 </style>

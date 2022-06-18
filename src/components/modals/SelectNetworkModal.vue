@@ -138,6 +138,7 @@ hr {
   justify-content: flex-start;
   overflow: hidden;
   overflow-y: scroll;
+  border-radius: 4px;
 }
 .vultureLogo {
     fill: var(--bg_color);
@@ -154,24 +155,8 @@ hr {
     border-color: var(--bg_color_2);
     border-style: solid;
     border-radius: 24px;
+
     z-index: 2;
 }
-* {
-  scrollbar-width: 0px;
-  scrollbar-color: rgba(34, 34, 34, 0) rgba(34, 34, 34, 0);
-}
-*::-webkit-scrollbar {
-  width: 0px;         
-}
 
-*::-webkit-scrollbar-track {
-  background: rgba(34, 34, 34, 0);
-  border-radius: 0px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: rgba(34, 34, 34, 0);
-  border-radius: 0px;
-  border: 0px solid rgba(34, 34, 34, 0);
-}
 </style>

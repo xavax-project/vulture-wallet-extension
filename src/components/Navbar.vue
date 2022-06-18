@@ -2,22 +2,22 @@
   <div class="flexBox" style="align-items: center;">
       <div class=navbar>
            <div @click="onTabSwitch('send')" class="iconFont" :class="currentTab == 'send' ? 'selected' : ''">
-               &#xf1d8;
+               &#xe163;
                 <div class="navbarUnderline" :class="currentTab == 'send' ? 'showUnderline' : ''">
                 </div>
            </div>
             <div @click="onTabSwitch('wallet')" class="iconFont" :class="currentTab == 'wallet' ? 'selected' : ''">
-               &#xf555;
+               &#xe850;
                 <div class="navbarUnderline" :class="currentTab == 'wallet' ? 'showUnderline' : ''">
                 </div>
            </div>
             <div @click="onTabSwitch('accounts')" class="iconFont" :class="currentTab == 'accounts' ? 'selected' : ''">
-               &#xf03a;
+               &#xe03f;
                 <div class="navbarUnderline" :class="currentTab == 'accounts' ? 'showUnderline' : ''">
                 </div>
            </div>
             <div @click="onTabSwitch('settings')" class="iconFont" :class="currentTab == 'settings' ? 'selected' : ''">
-               &#xf013;
+               &#xe8b8;
                 <div class="navbarUnderline" :class="currentTab == 'settings' ? 'showUnderline' : ''">
                 </div>
            </div>
@@ -65,8 +65,8 @@ export default {
     user-select: none;
 }
 .iconFont {
-    width: 22px;
-    font-size: 22px;
+    width: 24px;
+    font-size: 24px;
     font-family: fonticonA;
     color: var(--fg_color_2);
     transition-duration: 190ms;

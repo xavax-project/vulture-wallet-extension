@@ -103,7 +103,7 @@ hr {
   display: flex;
   box-sizing: border-box;
   flex-direction: column;
-  border-radius: 12px;
+  border-radius: 4px;
 
   border-width: 0px;
   height: 100%;
@@ -136,23 +136,5 @@ hr {
     border-style: solid;
     border-radius: 24px;
     z-index: 2;
-}
-* {
-  scrollbar-width: 0px;
-  scrollbar-color: rgba(34, 34, 34, 0) rgba(34, 34, 34, 0);
-}
-*::-webkit-scrollbar {
-  width: 0px;         
-}
-
-*::-webkit-scrollbar-track {
-  background: rgba(34, 34, 34, 0);
-  border-radius: 0px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: rgba(34, 34, 34, 0);
-  border-radius: 0px;
-  border: 0px solid rgba(34, 34, 34, 0);
 }
 </style>
