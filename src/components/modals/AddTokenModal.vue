@@ -1,6 +1,8 @@
 <template>
 
     <!-- TODO: seperate NFTs and ERC20 to seperate components. The modal system needs a bit of refactoring clearly -->
+
+    <!---------------------------------- TOKEN BOX ---------------------------------->
     <div class="flexBox" style="height: 100%; width: 100%;">
         <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
@@ -23,12 +25,17 @@
                     </span>
                 </div>
 
-                <div v-if="tokenDiscoveryStatus == 'InvalidToken'">    
-                    The token address entered is faulty! <br><br>
-                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
-                    Error:
+                <div v-if="tokenDiscoveryStatus == 'InvalidToken'" class="flexBox" style="width: 100%; flex-direction: column; width: 100%; align-items: center;">    
+                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); margin-bottom: 5px;">
+                    Error: <span style="color: var(--fg_color); text-shadow: 0px 0px 0px;"> {{error}} </span>
                     </span>
-                    {{error}}
+                    <hr>
+                    <div style="display: flex; flex-direction: column; width: 100%; margin-top: 5px; margin-bottom: 5px;">
+                    Maybe try a different one?
+                        <div style="color: rgb(0, 180, 255); text-shadow: 0px 0px 7px rgb(0, 180, 255); font-size: 15px;">
+                            (╥﹏╥)
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
@@ -55,9 +62,9 @@
 
                 <div class="vultureLoader" v-if="showLoader == true"></div>
             </div>
-
         </div>
 
+        <!---------------------------------- NFT BOX ---------------------------------->
         <div class="flexBox" style="flex-grow: 1; padding-left: 8px; padding-right: 8px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
         overflow-wrap: break-word" v-if="tokenTypeToAdd == 'ERC721'">
@@ -79,12 +86,17 @@
                     </span>
                 </div>
 
-                <div v-if="tokenDiscoveryStatus == 'InvalidToken'">    
-                    The token address entered is faulty! <br><br>
-                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); ">
-                    Error:
+                <div v-if="tokenDiscoveryStatus == 'InvalidToken'" class="flexBox" style="width: 100%; flex-direction: column; width: 100%; align-items: center;">    
+                    <span style="color: rgb(255, 0, 65); text-shadow: 0px 0px 5px rgb(255, 0, 65); margin-bottom: 5px;">
+                    Error: <span style="color: var(--fg_color); text-shadow: 0px 0px 0px;"> {{error}} </span>
                     </span>
-                    {{error}}
+                    <hr>
+                    <div style="display: flex; flex-direction: column; width: 100%; margin-top: 5px; margin-bottom: 5px;">
+                    Maybe try a different one?
+                        <div style="color: rgb(0, 180, 255); text-shadow: 0px 0px 7px rgb(0, 180, 255); font-size: 15px;">
+                            (╥﹏╥)
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flexBox" style="width: 100%;" v-if="tokenDiscoveryStatus == 'TokenFound'">
@@ -94,12 +106,13 @@
                         <hr>
                     </div>
                     <div style="width: 100%; text-align: left; margin-top: 15px;">
-                        Your Balance: <span style="color: var(--accent_color)">{{currentToken.balance}}</span> 
+                        This account has: <span style="color: var(--accent_color)">{{currentToken.balance}}</span>
+                        <span style="font-size: 14px; color: var(--accent_color);"> ${{currentToken.symbol}}</span> NFTs
                         <hr>
                     </div>
                     <div style="width: 100%; text-align: left; margin-top: 15px;">
-                        Supply: <span style="color: var(--accent_color)">{{currentToken.totalSupply}}</span> <br>
-                        <i style="font-size: 13px;  color: var(--fg_color_2)">Total supply of the Token.</i>
+                        Total Supply: <span style="color: var(--accent_color)">{{currentToken.totalSupply}}</span> <br>
+                        <i style="font-size: 13px;  color: var(--fg_color_2)">Total supply of the NFT collection.</i>
                         <hr>
                     </div>
                     <div  style="width: 100%; text-align: left; margin-top: 20px;">
@@ -187,7 +200,7 @@ export default {
                     if(data.params.success == true) {
                         tokenDiscoveryStatus.value = "TokenFound";
                         showLoader.value = false;
-
+                        console.log("We've got a token bois!");
                         let selectedToken: AbstractToken = {
                           network: (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork,
                           address: address,
@@ -240,6 +253,7 @@ export default {
 hr {
     margin-top: 5px;
     margin-bottom: 5px;
+    width: 100%;
     border: none;
     height: 1px;
     background-color: var(--fg_color_2);

@@ -273,7 +273,7 @@ export class DefaultNetworks {
         networkAssetDecimals: 12,
         networkColor: '#4dff97',
         networkType: NetworkType.Substrate,
-        networkFeatures: (NetworkFeatures.STAKING),
+        networkFeatures: (NetworkFeatures.STAKING | NetworkFeatures.SMART_CONTRACTS),
         isTestnet: true,
     }
     public AlephZeroSmartnet: Network = {
@@ -393,6 +393,7 @@ export class VultureWallet {
         if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1]) {
             if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
                 this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
+                
             }else {
                 console.error("Error: Ledger wallets not currently supported!");
             }
@@ -449,16 +450,15 @@ export class VultureWallet {
         const networks = new DefaultNetworks();
         //Switch the network
         if(networks.allNetworks.get(networkName)) {
+            this.currentWallet.accountData.freeAmountWhole = Number.NaN;
+            this.currentWallet.accountData.freeAmountSmallestFraction = "NaN";
             this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
             this.saveAccounts();
-            this.updateAccountAddresses();
+            this.updateAccountAddresses(true);
         }else {
             console.error("Network: " + networkName + " Doesn't exist!");
             return;
         }
-
-        //initialize the wallet again but with the new network.
-        this.initWallet(this.vault, this.accountStore);
     }    
     addTokenToList(token: AbstractToken, tokenType: string) {
         switch(tokenType) {
@@ -508,15 +508,20 @@ export class VultureWallet {
             }
         }
     }
-    updateAccountAddresses() {
+    updateAccountAddresses(reInitializeWallet: boolean) {
         this.currentWallet.actionWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
             if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
+                console.log(event.data.params);
                 if(event.data.params.success == true) {
                     this.accountStore.allAccounts = event.data.params.updatedAccounts;
                     this.saveAccounts();
                 }else {
                     console.log("Failed updating accounts to use new network format!");
                 }
+            }
+            if(reInitializeWallet) {
+                //initialize the wallet again but with the new network.
+                this.initWallet(this.vault, this.accountStore);
             }
         };
         this.currentWallet.actionWorker.postMessage({ // TODO: UPDATE TO METHOD

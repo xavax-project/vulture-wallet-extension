@@ -47,8 +47,8 @@ export async function getERC20Balance(tokenAddress: string, contract: any, sende
             }
         }else {
             console.log("Error: Failed getting balance!");
+            success = false;
             if(balance.result.asErr.toHuman().Module.error == 5) {
-                success = false;
             }
         }
         
@@ -98,8 +98,12 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
             token.decimals = decimals.output.toHuman();
         }else {
             console.log("Error: Failed getting token total decimals (the amount of fractions the token is divided into) \n");
+            success = false;
+            error = "Invalid Contract";
         }
     }catch {
+        success = false;
+        error = "Invalid Contract";
         token.decimals = -1;
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have decimals()");
     }
@@ -115,8 +119,9 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
             }
         }else {
             console.log("Error: Failed getting balance!");
+            success = false;
+            error = "Invalid Contract.";
             if(balance.result.asErr.toHuman().Module.error == 5) {
-                success = false;
                 error = "Contract Not Found";
             }
         }
@@ -132,12 +137,11 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
         }else {
             console.log("Error: Failed getting token name");
             if(nameData.result.asErr.toHuman().Module.error == 5) {
-                success = false;
                 error = "Contract Not Found";
             }
         }
     }catch {
-        token.name = "Token Has None";
+        token.name = "No Name";
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have name()");
     }
 
@@ -149,7 +153,7 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
             console.log("Error: Failed getting token symbol \n");
         }
     }catch {
-        token.symbol = "Token Has None";
+        token.symbol = "No Symbol";
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have symbol()");
     }
      
@@ -190,6 +194,110 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
     }
 }
 
-export async function getERC721Info(tokenAddress: string) {
+export async function getERC721Info(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+    
+    let success: boolean = true;
+    let error: string = "";
+    let token: AbstractToken = {
+        address: tokenAddress,
+        decimals: -1,
+        name: '',
+        symbol: '',
+        logoURI: '',
+        balance: '0',
+    }
+
+    // Get token name.
+    try {
+        let nameData = await contract.query.name(senderAddress, {value: 0, gasLimit: -1});
+        if(nameData.result.isOk) {
+            token.name = nameData.output.toHuman();
+        }else {
+            console.log("Error: Failed getting token name");
+            if(nameData.result.asErr.toHuman().Module.error == 5) {
+                error = "Contract Not Found";
+            }
+        }
+    }catch {
+        token.name = "No Name";
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have name()");
+    }
+
+    // Get token symbol.
+    try {
+        let nameData = await contract.query.symbol(senderAddress, {value: 0, gasLimit: -1});
+        if(nameData.result.isOk) {
+            token.symbol = nameData.output.toHuman();
+        }else {
+            console.log("Error: Failed getting token name");
+            if(nameData.result.asErr.toHuman().Module.error == 5) {
+                error = "Contract Not Found";
+            }
+        }
+    }catch {
+        token.symbol = "No Symbol";
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have symbol()");
+    }
+
+    // Get balance the current account has.
+    try{
+        let balance = await contract.query.balanceOf(senderAddress, {value: 0, gasLimit: -1}, senderAddress);
+        if(balance.result.isOk) {
+            if(token.decimals != -1) {
+                token.balance = new BigNumber((balance.output.toHuman() as string).replaceAll(',', ''))
+                .div(new BigNumber(10).pow(token.decimals)).toString();
+            }else {
+                token.balance = balance.output.toHuman();
+            }
+        }else {
+            console.log("Error: Failed getting balance!");
+            success = false;
+            error = "Invalid Contract.";
+            if(balance.result.asErr.toHuman().Module.error == 5) {
+                error = "Contract Not Found";
+            }
+        }
+    }catch {
+        success = false;
+        error = "Invalid Contract.";
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC721");
+    }
+
+    // Get total supply.
+    try {
+        let totalSupplyData = await contract.query.totalSupply(senderAddress, {value: 0, gasLimit: -1});
+        if(totalSupplyData.result.isOk) {
+            token.totalSupply = totalSupplyData.output.toHuman();
+        }else {
+            console.log("Error: Failed getting token total supply! \n");
+        }
+    }catch {
+        success = false;
+        error = "Invalid Contract.";
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have totalSupply()");
+    }
+
+    console.log("Attempting to get ERC721 info!");
+    console.log(token);
+
+    if(success) {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_DATA,
+            {
+                tokenData: token,
+                success: true,
+            }
+        ));
+    }else {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_DATA,
+            {
+                tokenData: token,
+                error: error,
+                success: false,
+            }
+        ));
+    }
+
 
 }

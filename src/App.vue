@@ -370,9 +370,9 @@ html {
 .vultureLoader:after {
   content: " ";
   display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
+  width: 62px;
+  height: 62px;
+  margin: 10px;
   border-radius: 50%;
   border: 3px solid;
 

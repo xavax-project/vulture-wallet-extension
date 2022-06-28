@@ -10,7 +10,8 @@ import { VultureMessage } from '../../../../src/vulture_backend/vultureMessage';
 import { AccountData, Network } from '../../../../src/vulture_backend/wallets/vultureWallet';
 import { AbstractToken } from '../../../../src/vulture_backend/types/abstractToken';
 import { erc20Abi } from './ink_contract_abis/erc20Abi';
-import { getERC20Info, getERC20Balance } from './contractFunctions';
+import { erc721Abi } from './ink_contract_abis/erc721Abi';
+import { getERC20Info, getERC20Balance, getERC721Info } from './contractFunctions';
 
 const { ContractPromise } = require('@polkadot/api-contract');
 import { AccountInfoHandler } from "../InetworkAPI";
@@ -130,14 +131,16 @@ export class SubstrateInfo implements AccountInfoHandler {
     async getTokenData(tokenAddress: string, tokenType: string) {
         if(this.isCryptoReady) {
             try {
-                let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
                 switch(tokenType) {
                     case 'ERC20': {
-                        await getERC20Info(tokenAddress, contract, this.address);
+                        let erc20Contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+                        await getERC20Info(tokenAddress, erc20Contract, this.address);
                         break;
                     }
                     case 'ERC721': {
-                        console.error("NFT's are currently not supported! (ERC721)");
+                        let erc721Contract = new ContractPromise(this.networkAPI!, erc721Abi, tokenAddress);
+                        await getERC721Info(tokenAddress, erc721Contract, this.address);
+                        //console.error("NFT's are currently not supported! (ERC721)");
                         break;
                     }
                 }

@@ -123,8 +123,6 @@ export class SubstrateActions implements AccountActionHandler {
                         result: info.toJSON(),
                         fee: info.partialFee.toHuman()
                     }});
-                    console.log("Fee for transfering: " + token.name + " is: ");
-                    console.log(info.toJSON());
                 });
             }else {
                 this.networkAPI!.tx.balances.transferKeepAlive(recipent, amount).paymentInfo(this.keypair!).then((info: any) => {
@@ -169,7 +167,6 @@ export class SubstrateActions implements AccountActionHandler {
               //This only works on substrate networks with the Ink! smart contract pallete.
   
               let contract = new ContractPromise(this.networkAPI!, erc20Abi, token.address);
-              console.log("_________________________________ \nAttempting to transfer: '" + token.name + "' Token to: " + recipent);
               
               contract.tx.transfer({value: 0, gasLimit: -1}, recipent, amount).signAndSend(this.keypair!, ({events = [], status = {}}) => {
                 if((status as any).isInBlock) {
@@ -177,10 +174,7 @@ export class SubstrateActions implements AccountActionHandler {
                     events.forEach(({event: {data, method, section}, phase}) => {
                         if(method == 'ExtrinsicSuccess') {
   
-                        console.log("==== EVENT START ===");
-                        console.log(method);
-                        console.log("Block Hash Of Tx: " + (status as any).asInBlock.toHex());
-                        console.log("==== EVENT END ===");
+
                           postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
                               success: true,
                               status: (status as any).type,
@@ -196,8 +190,6 @@ export class SubstrateActions implements AccountActionHandler {
                           }});
                         }
                     });
-                    console.log("_________________________________");
-  
                 }else if((status as any).isDropped) {
                     postMessage({method: VultureMessage.TRANSFER_ASSETS, params: {
                         success: false,

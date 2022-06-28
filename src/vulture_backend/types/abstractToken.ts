@@ -1,7 +1,6 @@
 import { Network } from "../wallets/vultureWallet";
 
 
-
 /** ## AbstractToken
  * An abstract representation of ERC20/Native tokens/assets which can be used to represent tokens on
  * any smart-contract blockchain, ex `Avalanche C-Chain`, or `Aleph Zero`, or native assets that reside

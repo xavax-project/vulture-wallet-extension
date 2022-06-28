@@ -2,10 +2,15 @@
   <div class="overviewModule">
     <div class="flexBox" style="width: 100%;">
       <div class="flexBox" style="width: 100%; flex-direction: row;">
-        <div class="amountText">
+
+        <div class="amountText" v-if="Number(assetAmount).toFixed(4) != 'NaN'">
           {{ Number(assetAmount).toFixed(4) }}<span class="assetName">{{ assetPrefix }}</span>
             <div class="underline"/>
         </div>
+        <div v-else class="flexBox" style="">
+            <div class="vultureLoader" style="margin-left: 10px; margin-bottom: 3px;"></div>
+        </div>
+
         <div class="flexBox" style="">
           <div class="selectAccountButton" style="margin-left: auto; margin-right: 20px; margin-top: 20px;" @click="selectAccount()">
             &#xf02e;
@@ -104,6 +109,7 @@ export default {
   align-self: left;
 }
 .overviewModule {
+  z-index: 1;
   box-sizing: border-box;
   border-width: 2px;
   border-color: var(--bg_color_2);

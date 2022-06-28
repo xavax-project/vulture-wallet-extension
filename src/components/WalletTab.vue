@@ -65,6 +65,9 @@
             <div class="navbarButton" v-bind:class="currentTab == 'NFTs' ? 'active' : ''" @click="setTab('NFTs')">
               &#xe871;
             </div>
+            <div class="navbarButton" v-bind:class="currentTab == 'Staking' ? 'active' : ''" @click="setTab('Staking')">
+              &#xf092; 
+            </div>
             <div class="navbarButton" v-bind:class="currentTab == 'History' ? 'active' : ''" @click="setTab('History')">
               &#xe889; 
             </div>
