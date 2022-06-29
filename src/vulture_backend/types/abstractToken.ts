@@ -12,6 +12,8 @@ export interface AbstractToken {
     chainId?: number
     chainName?: string
     network?: Network
+
+    metadataURI?: string
     
     address: string,
     decimals: number,

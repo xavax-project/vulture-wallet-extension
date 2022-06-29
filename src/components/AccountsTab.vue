@@ -32,10 +32,10 @@ import DefaultInput from "./building_parts/DefaultInput.vue";
 import AccountModule from "../components/AccountModule.vue"
 
 import { AccountData, VultureWallet } from '../vulture_backend/wallets/vultureWallet'
-import { PropType } from '@vue/runtime-core';
+import { defineComponent, PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "AccountsTab",
   components: {
     DefaultButton,
@@ -56,14 +56,14 @@ export default {
         this.$emit('create-new-account');
     }
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     function modifyAccount(index: number) {
       context.emit('modify-account', index);
     }
 
     function removeAccount() {
-      (props.vultureWallet as VultureWallet).popAccount();
+      props.vultureWallet.popAccount();
     }
 
     return {
@@ -71,7 +71,7 @@ export default {
       modifyAccount: modifyAccount,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -24,9 +24,9 @@ import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/vultureWallet";
 import { getRandomAccountName} from "../../randomNames";
 
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "CreateAccountModal",
   components: {
     DropdownSelection,
@@ -40,11 +40,10 @@ export default {
     },
     nextAccountIndex: Number
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     let accountName: string;
     const networks = new DefaultNetworks();
-
 
     function quitModal() {
         context.emit("quit-modal");
@@ -68,7 +67,7 @@ export default {
         getRandomAccountName: getRandomAccountName
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

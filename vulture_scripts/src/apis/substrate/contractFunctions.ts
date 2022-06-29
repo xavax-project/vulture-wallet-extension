@@ -61,6 +61,7 @@ export async function getERC20Balance(tokenAddress: string, contract: any, sende
             VultureMessage.GET_TOKEN_BALANCE,
             {
                 tokenAddress: tokenAddress,
+                tokenType: 'ERC20',
                 senderAddress: senderAddress,
                 arrayIndexOfToken: arrayIndexOfToken,
                 balance: tokenBalance,
@@ -77,6 +78,47 @@ export async function getERC20Balance(tokenAddress: string, contract: any, sende
         ));
     }
 
+}
+
+export async function getERC721Balance(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+    let success: boolean = true;
+    let tokenBalance: string = "0";
+
+    try{
+        let balance = await contract.query.balanceOf(senderAddress, {value: 0, gasLimit: -1}, senderAddress);
+        if(balance.result.isOk) {
+            tokenBalance = balance.output.toHuman();
+        }else {
+            console.log("Error: Failed getting balance for NFT!");
+            success = false;
+            tokenBalance = "NULL";
+        }
+        
+    }catch {
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC20");
+    }
+
+    if(success) {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_BALANCE,
+            {
+                tokenAddress: tokenAddress,
+                tokenType: 'ERC721',
+                senderAddress: senderAddress,
+                arrayIndexOfToken: arrayIndexOfToken,
+                balance: tokenBalance,
+                success: true,
+            }
+        ));
+    }else {
+        postMessage(new MethodResponse(
+            VultureMessage.GET_TOKEN_BALANCE,
+            {
+                balance: "Error",
+                success: false,
+            }
+        ));
+    }
 }
 
 export async function getERC20Info(tokenAddress: string, contract: any, senderAddress: string) {
@@ -194,6 +236,10 @@ export async function getERC20Info(tokenAddress: string, contract: any, senderAd
     }
 }
 
+export async function getERC721Metadata(tokenAddress: string, contract: any, senderAddress: string, tokenId: number) {
+
+}
+
 export async function getERC721Info(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
     
     let success: boolean = true;
@@ -205,6 +251,7 @@ export async function getERC721Info(tokenAddress: string, contract: any, senderA
         symbol: '',
         logoURI: '',
         balance: '0',
+        metadataURI: '',
     }
 
     // Get token name.
@@ -222,6 +269,8 @@ export async function getERC721Info(tokenAddress: string, contract: any, senderA
         token.name = "No Name";
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have name()");
     }
+
+
 
     // Get token symbol.
     try {
@@ -263,6 +312,40 @@ export async function getERC721Info(tokenAddress: string, contract: any, senderA
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC721");
     }
 
+    // Get the metadata of the first token the account has, this isn't necessary but is used for UI purposes in the front-end.
+    if(Number(token.balance) > 0) {
+        let firstTokenId: number = Number.NaN;
+        try {
+            let firstTokenIdResponse = await contract.query.tokenByIndex(senderAddress, {value: 0, gasLimit: -1}, 0);
+            if(firstTokenIdResponse.result.isOk) {
+                firstTokenId = firstTokenIdResponse.output.toHuman();
+            }else {
+                console.log("Error: Failed getting token ID by index!");
+                if(firstTokenIdResponse.result.asErr.toHuman().Module.error == 5) {
+                    error = "Contract Not Found";
+                }
+            }
+        }catch {
+            console.log("Contract '" + tokenAddress + "'" + " Doesn't have tokenByIndex()");
+        }
+        if(firstTokenId != Number.NaN) {
+            try {
+                let tokenUri = await contract.query.tokenUri(senderAddress, {value: 0, gasLimit: -1}, firstTokenId);
+                if(tokenUri.result.isOk) {
+                    token.metadataURI = tokenUri.output.toHuman();
+                }else {
+                    console.log("Error: Failed getting token URI");
+                    if(tokenUri.result.asErr.toHuman().Module.error == 5) {
+                        error = "Contract Not Found";
+                    }
+                }
+            }catch {
+                console.log("Contract '" + tokenAddress + "'" + " Doesn't have tokenURI()");
+            }
+        }
+
+    }
+
     // Get total supply.
     try {
         let totalSupplyData = await contract.query.totalSupply(senderAddress, {value: 0, gasLimit: -1});
@@ -276,9 +359,6 @@ export async function getERC721Info(tokenAddress: string, contract: any, senderA
         error = "Invalid Contract.";
         console.log("Contract '" + tokenAddress + "'" + " Doesn't have totalSupply()");
     }
-
-    console.log("Attempting to get ERC721 info!");
-    console.log(token);
 
     if(success) {
         postMessage(new MethodResponse(

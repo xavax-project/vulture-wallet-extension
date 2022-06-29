@@ -8,7 +8,7 @@
             <div class="underline"/>
         </div>
         <div v-else class="flexBox" style="">
-            <div class="vultureLoader" style="margin-left: 10px; margin-bottom: 3px;"></div>
+            <div class="vultureLoader" style="margin-left: 15px; margin-bottom: 3px;"></div>
         </div>
 
         <div class="flexBox" style="">
@@ -34,7 +34,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "@vue/runtime-core"
+
+export default defineComponent({
   name: "OverviewModule",
   props: {
     address: String,
@@ -42,7 +44,7 @@ export default {
     assetPrefix: String,
     assetAmount: String
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
     function selectAccount() {
       context.emit("select-account");
     }
@@ -54,7 +56,7 @@ export default {
       selectNetwork: selectNetwork
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -87,6 +89,8 @@ export default {
   color: var(--accent_color);
 
   font-weight: bold;
+
+  width: 86%;
 
   border-width: 2px;
   border-color: var(--bg_color_2);

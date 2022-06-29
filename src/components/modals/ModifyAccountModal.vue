@@ -28,9 +28,9 @@ import DefaultButton from "../building_parts/DefaultButton.vue";
 import DefaultInput from "../building_parts/DefaultInput.vue"
 import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks} from "../../vulture_backend/wallets/vultureWallet";
-import { PropType, reactive } from 'vue';
+import { defineComponent, PropType, reactive } from 'vue';
 
-export default {
+export default defineComponent({
   name: "ModifyAccount",
   components: {
     DropdownSelection,
@@ -44,23 +44,23 @@ export default {
     },
     selectedAccount: Number
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
 
-    let accountName: string = (props.vultureWallet as VultureWallet).accountStore.allAccounts[props.selectedAccount - 1].accountName;
+    let accountName: string = props.vultureWallet.accountStore.allAccounts[props.selectedAccount! - 1].accountName;
     const networks = new DefaultNetworks();
-    let initialNetwork = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork;
+    let initialNetwork = props.vultureWallet.accountStore.currentlySelectedNetwork;
 
     function quitModal() {
         context.emit("quit-modal");
     }
     function setName(name: string) {
         accountName = name;
-        (props.vultureWallet as VultureWallet).accountStore.allAccounts[props.selectedAccount - 1].accountName = accountName;
+        props.vultureWallet.accountStore.allAccounts[props.selectedAccount! - 1].accountName = accountName;
     }
     function saveAccount() {
 
-        (props.vultureWallet as VultureWallet).saveAccounts();
+        props.vultureWallet.saveAccounts();
         quitModal();
     }
 
@@ -75,7 +75,7 @@ export default {
         saveAccount: saveAccount,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

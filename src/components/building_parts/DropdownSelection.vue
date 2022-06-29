@@ -13,9 +13,9 @@
 
 <script lang="ts">
 import { Network } from "../../vulture_backend/wallets/vultureWallet";
-import { PropType, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "DropdownSelection",
   props: {
     selectionText: String,
@@ -28,7 +28,7 @@ export default {
         type: Array as PropType<string[]>,
     },
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     let displaySelection = ref(false);
 
@@ -50,7 +50,7 @@ export default {
       toggleDropdown: toggleDropdown
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

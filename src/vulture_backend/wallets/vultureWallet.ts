@@ -351,8 +351,10 @@ export class VultureWallet {
 
     public tokenStore!: TokenStore;
 
-    constructor(vault?: Vault, accountStore?: VultureAccountStore) {
+    public walletEvents: SafeEventEmitter = new SafeEventEmitter();
 
+    constructor(vault?: Vault, accountStore?: VultureAccountStore) {
+        this.walletEvents.setMaxListeners(50);
         if(vault && accountStore)
         {
             this.accountStore = accountStore;
@@ -393,7 +395,6 @@ export class VultureWallet {
         if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1]) {
             if(accountStore.allAccounts[accountStore.currentlySelectedAccount - 1].walletType == WalletType.MnemonicPhrase) {
                 this.currentWallet = new MnemonicWallet(vault.seed, accountStore.allAccounts[accountStore.currentlySelectedAccount - 1], accountStore.currentlySelectedNetwork);
-                
             }else {
                 console.error("Error: Ledger wallets not currently supported!");
             }
@@ -411,9 +412,17 @@ export class VultureWallet {
        this.currentWallet.accountEvents.on(VultureMessage.GET_TOKEN_BALANCE, () => {
             this.updateBalanceOfTokens();
        });
+       this.currentWallet.accountEvents.on(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, (data) => {
+           this.walletEvents.emit(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, data);
+       });
     }
 
     async switchWallet(index: number) {
+        // Reset the account balance to nothing which updates the UI, will change the way this works later.
+        this.walletEvents.emit(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, {
+            amount: Number.NaN,
+            address: "LOADING",
+        });
         this.accountStore.currentlySelectedAccount = index;
         this.saveAccounts();
         this.initWallet(this.vault, this.accountStore);
@@ -422,10 +431,27 @@ export class VultureWallet {
        this.currentWallet.infoWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
            if(event.data.method == VultureMessage.GET_TOKEN_BALANCE) {
                if(event.data.params.success == true) {
-                   if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
-                       this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
-                       .balance = event.data.params.balance;
+                   switch(event.data.params.tokenType) {
+                       case 'ERC20': {
+                            if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                                this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
+                                .balance = event.data.params.balance;
+                            }
+                           break;
+                       }
+                       case 'ERC721': {
+                            if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                                this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
+                                .balance = event.data.params.balance;
+                            }
+                           break;
+                       }
+                       default: {
+                           console.warn("Token Type: " + event.data.params.tokenType + " is Invalid!");
+                           break;
+                       }
                    }
+
                }else {
                    console.error("Error getting balance of token " + event.data.params.tokenAddress);
                    if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
@@ -435,6 +461,7 @@ export class VultureWallet {
                }
            }
        };
+       // Get balance of every ERC20 token. We have to manually call since subscriptions don't work for this *yet*.
        this.tokenStore.tokenList?.get(this.accountStore.currentlySelectedNetwork.networkUri)?.forEach((token, index) => { // TODO: UPDATE TO METHOD
            this.currentWallet.infoWorker.postMessage({
                method: VultureMessage.GET_TOKEN_BALANCE,
@@ -445,14 +472,31 @@ export class VultureWallet {
                },
            });
        });
+
+        // Get balance of every ERC721 token. We have to manually call since subscriptions don't work for this *yet*.
+       this.tokenStore.NFTList?.get(this.accountStore.currentlySelectedNetwork.networkUri)?.forEach((token, index) => { // TODO: UPDATE TO METHOD
+            this.currentWallet.infoWorker.postMessage({
+                method: VultureMessage.GET_TOKEN_BALANCE,
+                params: {
+                    tokenAddress: token.address,
+                    arrayIndexOfToken: index,
+                    tokenType: 'ERC721'
+                },
+            });
+        });
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();
         //Switch the network
         if(networks.allNetworks.get(networkName)) {
-            this.currentWallet.accountData.freeAmountWhole = Number.NaN;
-            this.currentWallet.accountData.freeAmountSmallestFraction = "NaN";
             this.accountStore.currentlySelectedNetwork = networks.allNetworks.get(networkName) as Network;
+
+            // Emit empty values which will set the UI frontend to loading mode, will introduce seperate system for this later.
+            this.walletEvents.emit(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, {
+                amount: Number.NaN,
+                address: "LOADING",
+            });
+
             this.saveAccounts();
             this.updateAccountAddresses(true);
         }else {

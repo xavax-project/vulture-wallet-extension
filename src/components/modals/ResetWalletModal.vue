@@ -37,11 +37,11 @@ import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import AccountModule from "../AccountModule.vue"
 
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType, hardWalletReset} from "../../vulture_backend/wallets/vultureWallet";
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
 import { TxState } from '@/uiTypes';
 
-export default {
+export default defineComponent({
   name: "ResetWalletModal",
   components: {
     DropdownSelection,
@@ -55,7 +55,7 @@ export default {
         required: true,
     },
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     function quitModal() {
         context.emit("quit-modal");
@@ -70,7 +70,7 @@ export default {
         resetWallet: resetWallet
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

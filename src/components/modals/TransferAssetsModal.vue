@@ -58,12 +58,12 @@ import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import AccountModule from "../AccountModule.vue"
 
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/vultureWallet";
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
 import { TxState } from '@/uiTypes';
 import { AbstractToken } from '@/vulture_backend/types/abstractToken';
 
-export default {
+export default defineComponent({
   name: "TransferAssetsModal",
   components: {
     DropdownSelection,
@@ -80,7 +80,7 @@ export default {
     amountToSend: String,
     arrayIndexOfSelectedToken: Number,
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     let currentTxState = ref(TxState.NONE);
     let blockHash = ref('');
@@ -95,16 +95,16 @@ export default {
 
     let asset = ref('');
     let nativeAsset = ref('');
-    nativeAsset.value = asset.value = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetPrefix;
+    nativeAsset.value = asset.value = props.vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
     if(props.arrayIndexOfSelectedToken == -1) {
-        asset.value = (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetPrefix;
+        asset.value = props.vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
     }else {
-        let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+        let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
         if(tokenArray != undefined) {
-          if((tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken] != null) {
+          if((tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!] != null) {
               //re.token = (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex];
-              asset.value = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken].symbol;
-              token = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken];
+              asset.value = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!].symbol;
+              token = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!];
           }else {
             console.error("Token not found!");
             token = null;
@@ -113,7 +113,7 @@ export default {
     }
 
     let accountAmount = ref(0);
-    accountAmount.value = (props.vultureWallet as VultureWallet).accountStore.allAccounts.length;
+    accountAmount.value = props.vultureWallet.accountStore.allAccounts.length;
     let selectedNetwork = reactive({network: networks.AlephZero});
 
     let txFee = ref(0);
@@ -128,26 +128,26 @@ export default {
         let timer = setInterval(async () => {
             txTimer.value += 0.01;
         }, 10);
-        (props.vultureWallet as VultureWallet).currentWallet.accountEvents.removeAllListeners(VultureMessage.TRANSFER_ASSETS);
-        (props.vultureWallet as VultureWallet).currentWallet.accountEvents.on(VultureMessage.TRANSFER_ASSETS, (params) => {
+        props.vultureWallet.currentWallet.accountEvents.removeAllListeners(VultureMessage.TRANSFER_ASSETS);
+        props.vultureWallet.currentWallet.accountEvents.on(VultureMessage.TRANSFER_ASSETS, (params) => {
             if(params.status == false) {
-                (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
+                props.vultureWallet.currentWallet.updateAccountState();
                 currentTxState.value = TxState.FAILED;
                 blockHash.value = params.blockHash;
                 clearInterval(timer);
             } else if(params.status == 'InBlock') {
                 if(params.method == 'ExtrinsicSuccess') {
-                    (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
+                    props.vultureWallet.currentWallet.updateAccountState();
                     currentTxState.value = TxState.SUCCESS;
                     blockHash.value = params.blockHash;
                     clearInterval(timer);
                 }else if(params.method == 'ExtrinsicFailed'){
-                    (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
+                    props.vultureWallet.currentWallet.updateAccountState();
                     currentTxState.value = TxState.FAILED;
                     blockHash.value = params.blockHash;
                     clearInterval(timer);
                 }else {
-                    (props.vultureWallet as VultureWallet).currentWallet.updateAccountState();
+                    props.vultureWallet.currentWallet.updateAccountState();
                     currentTxState.value = TxState.FAILED;
                     blockHash.value = "Not included in block.";
                     clearInterval(timer);
@@ -161,13 +161,13 @@ export default {
             }
         });
 
-        (props.vultureWallet as VultureWallet).currentWallet.transferAssets(props.recipentAddress, Number(props.amountToSend), token == null ? undefined : token);
+        props.vultureWallet.currentWallet.transferAssets(props.recipentAddress!, Number(props.amountToSend), token == null ? undefined : token);
     }
     let estimateFee = () => {
-        (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee) => {
+        props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee) => {
             txFee.value = fee;
         });
-        (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(props.recipentAddress, Number(props.amountToSend), token == null ? undefined : token);
+        props.vultureWallet.currentWallet.estimateTxFee(props.recipentAddress!, Number(props.amountToSend), token == null ? undefined : token);
     }
     estimateFee();
 
@@ -187,7 +187,7 @@ export default {
         send: send
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

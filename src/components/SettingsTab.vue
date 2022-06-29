@@ -26,10 +26,10 @@ import DefaultInput from "./building_parts/DefaultInput.vue";
 import AccountModule from "../components/AccountModule.vue"
 
 import { AccountData, VultureWallet } from '../vulture_backend/wallets/vultureWallet'
-import { PropType } from '@vue/runtime-core';
+import { defineComponent, PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "SettingsTab",
   components: {
     DefaultButton,
@@ -50,7 +50,7 @@ export default {
         this.$emit('create-new-account');
     }
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     function resetWallet() {
         context.emit('reset-wallet');
@@ -60,7 +60,7 @@ export default {
         resetWallet: resetWallet,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

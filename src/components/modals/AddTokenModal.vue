@@ -146,9 +146,9 @@ import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks} from "../../vulture_backend/wallets/vultureWallet";
 import { AbstractToken } from "../../vulture_backend/types/abstractToken";
 import { VultureMessage } from "../../vulture_backend/vultureMessage";
-import { PropType, reactive, ref, Ref } from 'vue';
+import { defineComponent, PropType, reactive, ref, Ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "AddTokenModal",
   components: {
     DropdownSelection,
@@ -162,7 +162,7 @@ export default {
     },
     tokenTypeToAdd: String,
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
     let currentAddress = ref("");
     let tokenDiscoveryStatus = ref("EnterAddress");
     
@@ -175,7 +175,8 @@ export default {
       balance: '0',
       name: '',
       symbol: '',
-      logoURI: ''
+      logoURI: '',
+      metadataURI: undefined
     };
     let error = ref("");
     let currentToken = ref(token);
@@ -190,26 +191,26 @@ export default {
             showLoader.value = false;
             return;
         }
-        (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid) => {
+        props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid) => {
             if(isValid == true) {
                 tokenDiscoveryStatus.value = "Loading";
                 showLoader.value = true;
                 
                 //Get the token information and display it if the address matches a token.
-                (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (data) => {
+                props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.GET_TOKEN_DATA, (data) => {
                     if(data.params.success == true) {
                         tokenDiscoveryStatus.value = "TokenFound";
                         showLoader.value = false;
-                        console.log("We've got a token bois!");
                         let selectedToken: AbstractToken = {
-                          network: (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork,
+                          network: props.vultureWallet.accountStore.currentlySelectedNetwork,
                           address: address,
-                          decimals: (props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkAssetDecimals, //this is temporary for now...
+                          decimals: props.vultureWallet.accountStore.currentlySelectedNetwork.networkAssetDecimals, //this is temporary for now...
                           name: data.params.tokenData.name,
                           totalSupply: data.params.tokenData.totalSupply,
                           symbol: data.params.tokenData.symbol,
                           logoURI: data.params.tokenData.logoURI,
                           balance: data.params.tokenData.balance,
+                          metadataURI: data.params.tokenData.metadataURI,
                         }
                         currentToken.value = selectedToken;
                         // set currentToken.token to the token, 
@@ -219,18 +220,18 @@ export default {
                         error.value = data.params.error;
                     }
                 });
-                (props.vultureWallet as VultureWallet).currentWallet.getTokenInformation(address, props.tokenTypeToAdd);
+                props.vultureWallet.currentWallet.getTokenInformation(address, props.tokenTypeToAdd!);
                 
             }else {
                 tokenDiscoveryStatus.value = "InvalidAddress";
                 showLoader.value = false;
             }
         });
-        (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
+        props.vultureWallet.currentWallet.isAddressValid(currentAddress.value);
     }
     function addToken() {
         if(tokenDiscoveryStatus.value == "TokenFound") {
-            (props.vultureWallet as VultureWallet).addTokenToList(currentToken.value, props.tokenTypeToAdd);
+            props.vultureWallet.addTokenToList(currentToken.value, props.tokenTypeToAdd!);
         }
         quitModal();
     }
@@ -245,7 +246,7 @@ export default {
         addToken: addToken,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

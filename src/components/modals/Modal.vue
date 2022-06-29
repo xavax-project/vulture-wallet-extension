@@ -1,46 +1,46 @@
 <template>
     <div class="flexBox box" style="position: absolute; height: 550px; width: 350px; top: 5px; left: 5px;">
         <CreateAccountModal v-if="modalType == modals.CREATE_NEW_ACCOUNT"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :nextAccountIndex="vultureWallet.nextDerivIndex"/>
 
         <ModifyAccountModal v-if="modalType == modals.MODIFY_ACCOUNT"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :selectedAccount="selectedAccountIndex"/>
 
         <SelectAccountModal v-if="modalType == modals.SELECT_NEW_ACCOUNT"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :nextAccountIndex="vultureWallet.nextDerivIndex"/>
 
         <SelectNetworkModal v-if="modalType == modals.SELECT_NEW_NETWORK"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :nextAccountIndex="vultureWallet.nextDerivIndex"/>
 
         <TransferAssetsModal v-if="modalType == modals.TRANSFER_ASSETS"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :recipentAddress="recipentAddress"
         :amountToSend="amountToSend"
         :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken"/>
 
         <ResetWalletModal v-if="modalType == modals.RESET_WALLET"
-        @quit-modal="quitModal"
+        @quit-modal="quitModal()"
         @on-wallet-reset="hardWalletReset()"
         :vultureWallet="vultureWallet"/>
 
 
         <AddTokenModal v-if="modalType == modals.ADD_CUSTOM_TOKEN"
-        @quit-modal="quitModal" 
+        @quit-modal="quitModal()" 
         :vultureWallet="vultureWallet"
         :tokenTypeToAdd="tokenTypeToAdd"/>
 
         <TokenViewModal v-if="modalType == modals.TOKEN_VIEW"
-        @quit-modal="quitModal"
-        @reset-selected-token="resetSelectedToken"
+        @quit-modal="quitModal()"
+        @reset-selected-token="resetSelectedToken()"
         :vultureWallet="vultureWallet"
         :tokenType="tokenTypeToAdd"
         :arrayIndexOfToken="arrayIndexOfSelectedToken"/>
@@ -68,11 +68,11 @@ import SelectAssetModal from './SelectAssetModal.vue';
 import AddTokenModal from "./AddTokenModal.vue"
 
 import { Modals } from "../../uiTypes";
-import { PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "@vue/runtime-core";
 import { VultureWallet } from "../../vulture_backend/wallets/vultureWallet";
 
 
-export default {
+export default defineComponent({
   name: "Modal",
   components: {
     DefaultButton,
@@ -105,7 +105,7 @@ export default {
 
       selectedTokenArrayIndex: Number,
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
     let modals = Modals;
 
     function quitModal() {
@@ -129,7 +129,7 @@ export default {
         selectToken: selectToken,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

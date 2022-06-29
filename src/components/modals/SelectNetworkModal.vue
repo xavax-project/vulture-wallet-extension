@@ -53,9 +53,9 @@ import DropdownSelection from "../building_parts/DropdownSelection.vue";
 import NetworkModule from "../NetworkModule.vue"
 
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks, Network, NetworkType} from "../../vulture_backend/wallets/vultureWallet";
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "SelectNetworkModal",
   components: {
     DropdownSelection,
@@ -70,13 +70,13 @@ export default {
     },
     nextAccountIndex: Number
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     let accountName: string;
     const networks = new DefaultNetworks();
 
     let accountAmount = ref(0);
-    accountAmount.value = (props.vultureWallet as VultureWallet).accountStore.allAccounts.length;
+    accountAmount.value = props.vultureWallet.accountStore.allAccounts.length;
     let selectedNetwork = reactive({network: networks.AlephZero});
 
     function quitModal() {
@@ -86,12 +86,12 @@ export default {
         accountName = name;
     }
     function selectAccount(index: number) {
-        (props.vultureWallet as VultureWallet).switchWallet(index);
+        props.vultureWallet.switchWallet(index);
         quitModal();
     }
     function selectNetwork(name: string) {
       console.log("Switch to " + name);
-      (props.vultureWallet as VultureWallet).switchNetwork(name);
+      props.vultureWallet.switchNetwork(name);
       quitModal();
     }
 
@@ -106,7 +106,7 @@ export default {
         setName: setName,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

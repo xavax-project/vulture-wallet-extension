@@ -32,6 +32,9 @@
   :vultureWallet="vultureWallet"
   @reset-wallet="resetWallet()"/>
 
+  <!-- I know, this is pretty fking stupid because it's so confusing, but until the new modal-system is added this will
+  have to do (v0.1.7 - v0.1.8 era will introduce a new modal system.) -->
+
   <Modal v-bind:class="currentModal == modals.NONE ? 'hide' : 'show'"
   :modalType="currentModal"
   :vultureWallet="vultureWallet"
@@ -39,7 +42,7 @@
   :recipentAddress="recipentAddress"
   :amountToSend="amountToSend"
   :tokenTypeToAdd="tokenTypeToAdd"
-  :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken"
+  :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken" 
   :selectedTokenArrayIndex="selectedTokenArrayIndex"
   @quit-modal="quitModal()"
   @on-wallet-reset="onWalletReset()"
@@ -78,6 +81,7 @@ import { doesWalletExist, VultureWallet, loadVault, Vault, loadAccounts,
          deleteWallet, VultureAccountStore, AccountData} from "./vulture_backend/wallets/vultureWallet";
 import { Modals, WalletStates } from "./uiTypes";
 import { reactive, ref } from '@vue/reactivity';
+import { useWalletInfo } from "./store/useWalletInfo";
 import { VultureMessage } from './vulture_backend/vultureMessage';
 
 //openWebApp();
@@ -97,6 +101,7 @@ export default {
     },
     setup() {
 
+      
       // This setup() method *is* very messy, will move things out and do cleaning
       // Later when I decide to refactor. It is essentially entirely temporary.
 
@@ -145,7 +150,7 @@ export default {
 
       let assetAmount = ref('Loading');
       let assetPrefix = ref('...');
-      let address = ref(' ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~');
+      let address = ref("LOADING");
       doesWalletExist().then((value) => {
         if(value == true) {
           walletState.value = WalletStates.WALLET;
@@ -167,17 +172,28 @@ export default {
           //vultureWallet = new VultureWallet(vault, accounts as VultureAccountStore);
           await vultureWallet.initWallet(vaultE, accounts as VultureAccountStore);
           walletState.value = WalletStates.WALLET;
+          
           currentAccentColor.value = vultureWallet.accountStore.currentlySelectedNetwork.networkColor;
+
+          vultureWallet.walletEvents.on(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, (data) => {
+            assetAmount.value = data.amount;
+            assetPrefix.value = vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
+            
+            address.value = data.address;
+          });
           
           //Not extremely happy that I'm doing this, but vue seems to really like being a bitch about updating these set of values manually,
           //just a temporary work-around until I improve the state management & reactivity (the values should be reactive, kinda weird...)
-          setInterval(()=> {
-          if(vultureWallet.currentWallet != null) {
-            assetAmount.value = String(vultureWallet.currentWallet.accountData.freeAmountWhole);
-            assetPrefix.value = vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
-            address.value = vultureWallet.currentWallet.accountData.address;
-          }
-        }, 1000);
+
+          /*
+            setInterval(()=> {
+            if(vultureWallet.currentWallet != null) {
+              assetAmount.value = String(vultureWallet.currentWallet.accountData.freeAmountWhole);
+              assetPrefix.value = vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
+              address.address = vultureWallet.currentWallet.accountData.address;
+            }
+          }, 1000);
+           */
         });
       }
 

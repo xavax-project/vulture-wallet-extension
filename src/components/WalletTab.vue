@@ -11,10 +11,20 @@
           <div v-if="currentTab == 'NFTs'"
           class="flexBox" style="margin-top: 0px; align-items: center;">
             <div class="itemList" v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">
-              <div style="margin-bottom: 15px;"> </div>
+              <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
+                <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span>
+                NFT/Collection
+              </div>
 
-              <span v-for="(token) in vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token">                
-              </span>
+              <div class="flexBox" v-for="(token, index) in vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token"
+              style="width: 100%; flex-wrap: wrap; flex-direction: row; justify-content: space-between; box-sizing: border-box;"> 
+              <!--
+
+                {{token.name}} {{index}} Balance: {{token.balance}}
+              -->   
+                <NFTModule :token="token" :tokenIndex="index"
+                @module-click="openToken($event, 'ERC721')"/>
+              </div>
               <DefaultButton @button-click="addToken('ERC721')" buttonText="Add NFT" buttonHeight="25px"  buttonWidth="100px" fontSize="16px" style="margin-bottom: 15px; margin-top: 10px"/>
             </div>
             <div class="flexBox" v-else style="margin-bottom: 10px; margin-top: 30px; align-items: center;">
@@ -24,7 +34,7 @@
             </div>
           </div>
   
-          <!-- Tokens -->
+          <!-- Fungible Tokens -->
           <div v-if="currentTab == 'Assets'"
           class="flexBox" style="margin-top: 0px; align-items: center;">
             <div class="itemList"  v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">
@@ -79,22 +89,25 @@
 </template>
 
 <script lang="ts">
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 import { VultureWallet } from '@/vulture_backend/wallets/vultureWallet';
 
 import DefaultButton from "./building_parts/DefaultButton.vue";
 import MinimalInput from "./building_parts/MinimalInput.vue";
 import TokenModule from "./TokenModule.vue";
+import NFTModule from "./NFTModule.vue";
+
 import { VultureMessage } from '@/vulture_backend/vultureMessage';
 
 import { NetworkFeatures } from "../vulture_backend/types/networkTypes"
 
-export default {
+export default defineComponent({
   name: "WalletTab",
   components: {
     DefaultButton,
     MinimalInput,
-    TokenModule
+    TokenModule,
+    NFTModule,
   },
   props: {
       vultureWallet: {
@@ -103,7 +116,7 @@ export default {
     },
 
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
     let networkFeatures = NetworkFeatures;
     let currentTab = ref("Assets");
 
@@ -125,7 +138,7 @@ export default {
       setTab: setTab
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -199,7 +212,7 @@ hr {
   justify-content: flex-start;
   align-items: center;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   width: 300px;
 
@@ -216,22 +229,17 @@ hr {
   justify-content: center;
   flex-direction: row;
 }
-* {
-  scrollbar-width: 0px;
-  scrollbar-color: rgba(34, 34, 34, 0) rgba(34, 34, 34, 0);
-}
+
 *::-webkit-scrollbar {
-  width: 0px;         
+  border-radius: 10px;
 }
 
 *::-webkit-scrollbar-track {
-  background: rgba(34, 34, 34, 0);
   border-radius: 0px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(34, 34, 34, 0);
   border-radius: 0px;
-  border: 0px solid rgba(34, 34, 34, 0);
+    border-radius: 10px;
 }
 </style>

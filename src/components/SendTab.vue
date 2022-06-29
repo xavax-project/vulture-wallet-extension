@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, reactive, ref } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 import { VultureWallet } from '@/vulture_backend/wallets/vultureWallet';
 
 import DefaultButton from "./building_parts/DefaultButton.vue";
@@ -52,7 +52,7 @@ import { VultureMessage } from '@/vulture_backend/vultureMessage';
 import { AbstractToken } from '@/vulture_backend/types/abstractToken';
 import { NetworkFeatures } from "../vulture_backend/types/networkTypes";
 
-export default {
+export default defineComponent({
   name: "SendTab",
   components: {
     DefaultButton,
@@ -65,7 +65,7 @@ export default {
     },
     selectedTokenArrayIndex: Number, // -1 is native, [0..n] is a non-native token.
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     let networkFeatures = NetworkFeatures;
 
@@ -82,34 +82,33 @@ export default {
 
     function address(address: string) {
       currentAddress.value = address;
-      (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid) => {
+      props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.IS_ADDRESS_VALID, (isValid: any) => {
           if(isValid) {
             invalidAddress.value = false;
           } else {
             invalidAddress.value = true;
           }
       });
-      (props.vultureWallet as VultureWallet).currentWallet.isAddressValid(currentAddress.value);
+      props.vultureWallet.currentWallet.isAddressValid(currentAddress.value);
     }
     
     function amount(amount: number) {
       currentAmount.value = amount;
-      (props.vultureWallet as VultureWallet).currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee) => {
+      props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee: number) => {
         estimatedFee.value = fee;
 
         if(props.selectedTokenArrayIndex == -1) {
-          if((currentAmount.value + fee) < (props.vultureWallet as VultureWallet).currentWallet.accountData.freeAmountWhole) {
+          if((currentAmount.value + fee) < props.vultureWallet.currentWallet.accountData.freeAmountWhole) {
             insufficientFunds.value = false;
           }else {
             insufficientFunds.value = true;
           }
         }else {
           // Make sure we have enough of the token we are sending.
-          let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+          let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
-            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
-              console.log((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex].balance);
-              if(currentAmount.value < Number((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex].balance)) {
+            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!] != null) {
+              if(currentAmount.value < Number((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!].balance)) {
               insufficientFunds.value = false;
               }else {
                 insufficientFunds.value = true;
@@ -124,13 +123,13 @@ export default {
       if(invalidAddress.value == false) {
         // If we are sending native assets.
         if(props.selectedTokenArrayIndex == -1) {
-          (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
+          props.vultureWallet.currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
         }else{
         // If we are sending some token. This is quite messy, will have to refactor to something easier on the eyes later.
-          let tokenArray = (props.vultureWallet as VultureWallet).tokenStore.tokenList.get((props.vultureWallet as VultureWallet).accountStore.currentlySelectedNetwork.networkUri);
+          let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
-            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex] != null) {
-              (props.vultureWallet as VultureWallet).currentWallet.estimateTxFee(currentAddress.value, currentAmount.value, (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex]);
+            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!] != null) {
+              props.vultureWallet.currentWallet.estimateTxFee(currentAddress.value, currentAmount.value, (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!]);
             }else {
               console.error("Token not found!");
             }
@@ -168,7 +167,7 @@ export default {
       selectAsset: selectAsset,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

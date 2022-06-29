@@ -39,9 +39,9 @@ import TokenModule from "../TokenModule.vue";
 import { VultureWallet, createNewAccount, WalletType, DefaultNetworks} from "../../vulture_backend/wallets/vultureWallet";
 import { AbstractToken } from "../../vulture_backend/types/abstractToken";
 import { VultureMessage } from "../../vulture_backend/vultureMessage";
-import { PropType, reactive, ref, Ref } from 'vue';
+import { defineComponent, PropType, reactive, ref, Ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: "SelectTokenModal",
   components: {
     DropdownSelection,
@@ -56,7 +56,7 @@ export default {
     },
     selectedTokenArrayIndex: Number
   },
-  setup(props: any, context: any) {
+  setup(props, context) {
 
     function quitModal() {
         context.emit("quit-modal");
@@ -70,7 +70,7 @@ export default {
         selectToken: selectToken,
     }
   }
-};
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -11,7 +11,7 @@ import { AccountData, Network } from '../../../../src/vulture_backend/wallets/vu
 import { AbstractToken } from '../../../../src/vulture_backend/types/abstractToken';
 import { erc20Abi } from './ink_contract_abis/erc20Abi';
 import { erc721Abi } from './ink_contract_abis/erc721Abi';
-import { getERC20Info, getERC20Balance, getERC721Info } from './contractFunctions';
+import { getERC20Info, getERC20Balance, getERC721Info, getERC721Balance } from './contractFunctions';
 
 const { ContractPromise } = require('@polkadot/api-contract');
 import { AccountInfoHandler } from "../InetworkAPI";
@@ -108,10 +108,15 @@ export class SubstrateInfo implements AccountInfoHandler {
     }
     async getBalanceOfToken(tokenAddress: string, tokenType: string, arrayIndexOfToken?: number) {
         if(this.isCryptoReady) {
-            let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
             switch(tokenType) {
                 case 'ERC20': {
-                    await getERC20Balance(tokenAddress, contract, this.address, arrayIndexOfToken);
+                    let erc20contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+                    await getERC20Balance(tokenAddress, erc20contract, this.address, arrayIndexOfToken);
+                    break;
+                }
+                case 'ERC721': {
+                    let erc721contract = new ContractPromise(this.networkAPI!, erc721Abi, tokenAddress);
+                    await getERC721Balance(tokenAddress, erc721contract, this.address, arrayIndexOfToken);
                     break;
                 }
                 default: {

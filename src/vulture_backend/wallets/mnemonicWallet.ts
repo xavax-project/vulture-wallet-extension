@@ -218,6 +218,11 @@ export class MnemonicWallet implements VultureAccount {
                     this.accountData.freeAmountSmallestFraction = amount.toString();
                     this.accountData.accountNonce = event.data.params.result.nonce;
 
+                    this.accountEvents.emit(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, {
+                        amount: wholeAmount.toString(),
+                        address: this.accountData.address,
+                    });
+
                     //Update tokens as well.
                     this.accountEvents.emit(VultureMessage.GET_TOKEN_BALANCE);
                 }else {
