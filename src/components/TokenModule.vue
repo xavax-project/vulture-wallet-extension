@@ -23,12 +23,11 @@ export default {
         type: Object as PropType<AbstractToken>,
         required: true,
     },
-    tokenIndex: Number,
     selected: Boolean,
   },
   methods: {
     moduleClick(){
-       this.$emit('module-click', this.tokenIndex);
+       this.$emit('module-click', (this.token as AbstractToken).address);
     }
   }
 };

@@ -8,13 +8,15 @@ export const VultureMessage = {
     "GET_ADDRESS_FROM_URI" : "GET_ADDRESS_FROM_URI",
     "GET_ACCOUNT_STATE": "GET_ACCOUNT_STATE",
     "SUBSCRIBE_TO_ACC_EVENTS": "SUBSCRIBE_TO_ACC_EVENTS",
+    // This is necessary due to subscription to raw storage of contracts still being on-track.
+    "ADD_TOKEN_TO_SUBSCRIPTION": "ADD_TOKEN_TO_SUBSCRIPTION",
     "TRANSFER_ASSETS": "TRANSFER_ASSETS",
 
-    //Will update the passed in key-pairs to be encoded in the correct cryptography & address format,
-    //This method is used primarily when the user switches network (all accounts will need to be updated accordingally).
+    // Will update the passed in key-pairs to be encoded in the correct cryptography & address format,
+    // This method is used primarily when the user switches network (all accounts will need to be updated accordingally).
     "UPDATE_ACCOUNTS_TO_NETWORK": "UPDATE_ACCOUNTS_TO_NETWORK",
 
-    //Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
+    // Will return information about any arbitrary asset such as ERC20/ERC721, or any asset depending on the network.
     "GET_TOKEN_DATA": "GET_TOKEN_DATA",
     "GET_TOKEN_BALANCE": "GET_TOKEN_BALANCE",
     "GET_TOKEN_METADATA": "GET_TOKEN_METADATA",

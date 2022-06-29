@@ -15,6 +15,7 @@ import { SubstrateInfo } from './apis/substrate/substrateInfo';
 
 var keylessWallet: AccountInfoHandler | null;
 
+
 self.addEventListener("message", async (event) => {
     if(event.data && event.data.method) {
         switch(event.data.method as string) {
@@ -48,7 +49,13 @@ self.addEventListener("message", async (event) => {
             }
             // Calls necessary method to get balance of a given token (smart contract methods).
             case VultureMessage.GET_TOKEN_BALANCE: {
-                await keylessWallet?.getBalanceOfToken(event.data.params.tokenAddress, event.data.params.tokenType, event.data.params.arrayIndexOfToken);
+                await keylessWallet?.getBalanceOfToken(event.data.params.tokenAddress, event.data.params.tokenType);
+                break;
+            }
+            // Subscribes token address to changes, used to know when we should attempt to update balance. Quite inefficient since
+            // it doesn't support raw storage subscriptions, but when that is supported it will be added.
+            case VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION: {
+                await keylessWallet?.addTokenToSubscription(event.data.params.tokenAddress, event.data.params.tokenType);
                 break;
             }
             // Checks if the address is valid/correct.
@@ -62,4 +69,8 @@ self.addEventListener("message", async (event) => {
             }
         }
     }
+});
+
+postMessage({
+    isReady: true
 });

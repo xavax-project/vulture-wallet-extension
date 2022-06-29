@@ -28,6 +28,9 @@ export class SubstrateInfo implements AccountInfoHandler {
     wsProvider?: WsProvider;
     networkAPI?: ApiPromise;
 
+    addedTokens: AbstractToken[] = [];
+    addedNFTs: AbstractToken[] = [];
+
     constructor(address: string, derivationPath: string, networkURI: string) {
         this.networkURI = networkURI;
         this.address = address;
@@ -106,22 +109,61 @@ export class SubstrateInfo implements AccountInfoHandler {
             throw new Error("Cryptography WASM hasn't been initialized yet!");
         }
     }
-    async getBalanceOfToken(tokenAddress: string, tokenType: string, arrayIndexOfToken?: number) {
+    async getBalanceOfToken(tokenAddress: string, tokenType: string) {
         if(this.isCryptoReady) {
             switch(tokenType) {
                 case 'ERC20': {
                     let erc20contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
-                    await getERC20Balance(tokenAddress, erc20contract, this.address, arrayIndexOfToken);
+                    await getERC20Balance(tokenAddress, erc20contract, this.address);
                     break;
                 }
                 case 'ERC721': {
                     let erc721contract = new ContractPromise(this.networkAPI!, erc721Abi, tokenAddress);
-                    await getERC721Balance(tokenAddress, erc721contract, this.address, arrayIndexOfToken);
+                    await getERC721Balance(tokenAddress, erc721contract, this.address);
                     break;
                 }
                 default: {
                     console.error("Tried getting balance of token, but the tokenType is invalid!");
                     postMessage({method: VultureMessage.GET_TOKEN_BALANCE, params: {
+                        success: false,
+                    }});
+                }
+            }
+        }else {
+            postMessage({method: VultureMessage.GET_TOKEN_BALANCE, params: {
+                success: false,
+            }});
+            throw new Error("Cryptography WASM hasn't been initialized yet!");
+        }
+    }
+    async addTokenToSubscription(tokenAddress: string, tokenType: string) {
+        if(this.isCryptoReady) {
+            switch(tokenType) {
+                case 'ERC20': {
+
+                    // This doesn't work for some reason... Fix!
+                    //const unsub = await this.networkAPI?.query.contracts.contractInfoOf(tokenAddress, async (result: any) => {
+                    //    await getERC20Balance(tokenAddress, erc20contract, this.address);
+                    //});
+
+                    // Due to the fact that contract subscriptions aren't available yet, this is a temporary work-around.
+                    // Will poll the balance ever 2.5 seconds.
+                    setInterval(async () => {
+                        let erc20contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
+                        await getERC20Balance(tokenAddress, erc20contract, this.address);
+                    }, 2500);
+                    break;
+                }
+                case 'ERC721': {
+                    setInterval(async () => {
+                        let erc721contract = new ContractPromise(this.networkAPI!, erc721Abi, tokenAddress);
+                        await getERC721Balance(tokenAddress, erc721contract, this.address);
+                    }, 2500);
+                    break;
+                }
+                default: {
+                    console.error("Tried getting balance of token, but the tokenType is invalid!");
+                    postMessage({method: VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, params: {
                         success: false,
                     }});
                 }

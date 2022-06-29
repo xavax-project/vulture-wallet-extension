@@ -1,0 +1,16 @@
+{
+
+    "name": "Curse Of Anubis",
+    "description": "This is a test NFT, the main purpose of which is to see how well NFT wallet-integration works in Vulture Wallet.",
+    "image": "https://ms.yugipedia.com/6/69/CurseofAnubis-LDK2-EN-C-1E.png",
+    "external_url": "https://vulturewallet.net",
+    "attributes": [
+        {
+            "trait_type" : "Kind",
+            "value": "Trap Card"
+        },
+        {
+            "rarity": "0.1%"
+        }
+    ]
+}

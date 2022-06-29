@@ -10,19 +10,19 @@
           <!-- NFTs -->
           <div v-if="currentTab == 'NFTs'"
           class="flexBox" style="margin-top: 0px; align-items: center;">
-            <div class="itemList" v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">
+            <div class="itemList" v-if="vultureWallet.tokenStore != null && Array.from(vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length > 0">
               <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
-                <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span>
+                <span style="color: var(--accent_color);">{{Array.from(vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length}}</span>
                 NFT/Collection
               </div>
 
-              <div class="flexBox" v-for="(token, index) in vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token"
+              <div class="flexBox" v-for="(token) in Array.from(vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri).values())" v-bind:key="token"
               style="width: 100%; flex-wrap: wrap; flex-direction: row; justify-content: space-between; box-sizing: border-box;"> 
               <!--
 
                 {{token.name}} {{index}} Balance: {{token.balance}}
               -->   
-                <NFTModule :token="token" :tokenIndex="index"
+                <NFTModule :token="token"
                 @module-click="openToken($event, 'ERC721')"/>
               </div>
               <DefaultButton @button-click="addToken('ERC721')" buttonText="Add NFT" buttonHeight="25px"  buttonWidth="100px" fontSize="16px" style="margin-bottom: 15px; margin-top: 10px"/>
@@ -37,12 +37,12 @@
           <!-- Fungible Tokens -->
           <div v-if="currentTab == 'Assets'"
           class="flexBox" style="margin-top: 0px; align-items: center;">
-            <div class="itemList"  v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">
+            <div class="itemList"  v-if="vultureWallet.tokenStore != null && Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length > 0">
               <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
-                <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens
+                <span style="color: var(--accent_color);">{{Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length}}</span> tokens
               </div>
-              <span v-for="(token, index) in vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token">
-                <TokenModule :token="token" :tokenIndex="index"
+              <span v-for="(token) in Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri).values())" v-bind:key="token">
+                <TokenModule :token="token"
                 @module-click="openToken($event, 'ERC20')"/>
               </span>
               <DefaultButton @button-click="addToken('ERC20')" buttonText="Add Token" buttonHeight="25px"  buttonWidth="100px" fontSize="16px" style="margin-bottom: 15px; margin-top: 10px;"/>
@@ -78,9 +78,11 @@
             <div class="navbarButton" v-bind:class="currentTab == 'Staking' ? 'active' : ''" @click="setTab('Staking')">
               &#xf092; 
             </div>
-            <div class="navbarButton" v-bind:class="currentTab == 'History' ? 'active' : ''" @click="setTab('History')">
-              &#xe889; 
-            </div>
+            <!-- Historical txs coming later...
+              <div class="navbarButton" v-bind:class="currentTab == 'History' ? 'active' : ''" @click="setTab('History')">
+                &#xe889; 
+              </div>
+            -->
           </div>
         </div>
       </div>
@@ -120,14 +122,15 @@ export default defineComponent({
     let networkFeatures = NetworkFeatures;
     let currentTab = ref("Assets");
 
+
     function addToken(tokenType: string) {
       context.emit("add-custom-token", tokenType);
     }
     function setTab(tab: string) {
       currentTab.value = tab;
     }
-    function openToken(arrayIndexOfToken: number, tokenType: string) {
-      context.emit("token-view-modal", {index: arrayIndexOfToken, type: tokenType});
+    function openToken(addressOfToken: string, tokenType: string) {
+      context.emit("token-view-modal", {address: addressOfToken, type: tokenType});
     }
     return {
       currentTab,

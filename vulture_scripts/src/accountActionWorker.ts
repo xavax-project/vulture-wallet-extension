@@ -66,3 +66,7 @@ self.addEventListener("message", async (event) => {
         }
     }
 });
+
+postMessage({
+    isReady: true
+});

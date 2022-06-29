@@ -13,13 +13,13 @@
   <SendTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'send' ? 'show' : 'hide'"
   @send-button-click="transferAssets($event)"
   @select-new-asset="setModal(modals.SELECT_NEW_ASSET)"
-  :selectedTokenArrayIndex="selectedTokenArrayIndex"
+  :addressOfTokenToTransfer="addressOfTokenToTransfer"
   :vultureWallet="vultureWallet"/>
 
   <WalletTab style="position: absolute; width: 360px;" v-bind:class="currentTab == 'wallet' ? 'show' : 'hide'"
   :vultureWallet="vultureWallet"
   @add-custom-token="addToken($event)"
-  @token-view-modal="tokenViewModal($event.index, $event.type)"/>
+  @token-view-modal="tokenViewModal($event.address, $event.type)"/>
 
   <AccountsTab v-if="vultureWallet.accountStore != null" v-bind:class="currentTab == 'accounts' ? 'show' : 'hide'" style="position: absolute; width: 360px; height: 345px;"
   :allAccounts="vultureWallet.accountStore.allAccounts"
@@ -42,8 +42,8 @@
   :recipentAddress="recipentAddress"
   :amountToSend="amountToSend"
   :tokenTypeToAdd="tokenTypeToAdd"
-  :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken" 
-  :selectedTokenArrayIndex="selectedTokenArrayIndex"
+  :addressOfTokenToView="addressOfTokenToView"
+  :addressOfTokenToTransfer="addressOfTokenToTransfer"
   @quit-modal="quitModal()"
   @on-wallet-reset="onWalletReset()"
   @select-token="selectToken($event)"
@@ -116,10 +116,10 @@ export default {
 
       //Token variables, a bit messy to have this here, will refactor later. 
       let tokenTypeToAdd = ref('');
-      let arrayIndexOfSelectedToken = ref(0);
+      let addressOfTokenToView = ref('');
 
-      // The array index of the selected asset, -1 is native asset of the selected network.
-      let selectedTokenArrayIndex = ref(-1);
+      // Address of token to transfer, empty is the native asset of the selected network.
+      let addressOfTokenToTransfer = ref('');
       
 
       /* --- Transfer Asset Variables & Functions --- */
@@ -141,7 +141,7 @@ export default {
       function transferAssets(data: any) {
         recipentAddress.value = data.recipent;
         amountToSend.value = String(data.amount);
-        arrayIndexOfSelectedToken.value = data.tokenArrayIndex;
+        addressOfTokenToView.value = data.tokenAddress;
         setModal(modals.TRANSFER_ASSETS);
         //vultureWallet.currentWallet.transferAssets(recipentAddress.value, Number(amountToSend.value));
       }
@@ -181,19 +181,6 @@ export default {
             
             address.value = data.address;
           });
-          
-          //Not extremely happy that I'm doing this, but vue seems to really like being a bitch about updating these set of values manually,
-          //just a temporary work-around until I improve the state management & reactivity (the values should be reactive, kinda weird...)
-
-          /*
-            setInterval(()=> {
-            if(vultureWallet.currentWallet != null) {
-              assetAmount.value = String(vultureWallet.currentWallet.accountData.freeAmountWhole);
-              assetPrefix.value = vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
-              address.address = vultureWallet.currentWallet.accountData.address;
-            }
-          }, 1000);
-           */
         });
       }
 
@@ -202,7 +189,7 @@ export default {
         currentModal.value = modal;
       }
       function modifyAccount(accountIndex: number) {
-        selectedTokenArrayIndex.value = -1;
+        addressOfTokenToTransfer.value = ""
         selectedAccountIndex.value = accountIndex;
         currentModal.value = modals.MODIFY_ACCOUNT;
       }
@@ -223,19 +210,19 @@ export default {
         setModal(Modals.ADD_CUSTOM_TOKEN);
         tokenTypeToAdd.value = tokenType;
       }
-      function tokenViewModal(arrayIndexOfToken: number, tokenType: string) {
-        arrayIndexOfSelectedToken.value = arrayIndexOfToken;
+      function tokenViewModal(tokenAddress: string, tokenType: string) {
+        addressOfTokenToView.value = tokenAddress;
         tokenTypeToAdd.value = tokenType;
         setModal(Modals.TOKEN_VIEW);
       }
 
-      function selectToken(arrayIndexOfToken: number) {
-        selectedTokenArrayIndex.value = arrayIndexOfToken;
+      function selectToken(tokenAddress: string) {
+        addressOfTokenToTransfer.value = tokenAddress;
       }
       // I Use this function whenever the token should be reset to native, usually called when the user removes a token
       // from the list (through events).
       function resetSelectedToken() {
-        selectedTokenArrayIndex.value = -1;
+        addressOfTokenToTransfer.value = '';
       }
 
       return {
@@ -250,7 +237,7 @@ export default {
         modals,
         state,
   
-        arrayIndexOfSelectedToken,
+        addressOfTokenToView,
         tokenTypeToAdd,
 
         recipentAddress,
@@ -258,7 +245,7 @@ export default {
 
         selectedAccountIndex,
 
-        selectedTokenArrayIndex,
+        addressOfTokenToTransfer,
 
         currentAccentColor,
 

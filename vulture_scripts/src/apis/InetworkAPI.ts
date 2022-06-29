@@ -43,7 +43,8 @@ export interface AccountInfoHandler {
     networkURI: string,
 
     subscribeToAddressEvents(): Promise<void>;
-    getBalanceOfToken(tokenAddress: string, tokenType: string, arrayIndexOfToken?: number): Promise<void>;
+    addTokenToSubscription(tokenAddress: string, tokenType: string): Promise<void>;
+    getBalanceOfToken(tokenAddress: string, tokenType: string): Promise<void>;
     validateAddress(address: string): Promise<void>;
     getTokenData(tokenAddress: string, tokenType: string): Promise<void>;
     setAddress(address: string): Promise<void>;

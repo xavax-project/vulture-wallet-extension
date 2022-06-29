@@ -79,6 +79,7 @@ export default defineComponent({
     recipentAddress: String,
     amountToSend: String,
     arrayIndexOfSelectedToken: Number,
+    addressOfTokenToTransfer: String,
   },
   setup(props, context) {
 
@@ -96,18 +97,19 @@ export default defineComponent({
     let asset = ref('');
     let nativeAsset = ref('');
     nativeAsset.value = asset.value = props.vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
-    if(props.arrayIndexOfSelectedToken == -1) {
+    // If we are sending a token, or native asset.
+    if(props.addressOfTokenToTransfer == "") {
         asset.value = props.vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix;
     }else {
         let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
         if(tokenArray != undefined) {
-          if((tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!] != null) {
-              //re.token = (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex];
-              asset.value = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!].symbol;
-              token = (tokenArray as AbstractToken[])[props.arrayIndexOfSelectedToken!];
+          if(tokenArray!.get(props.addressOfTokenToTransfer!) != null) {
+              asset.value = tokenArray!.get(props.addressOfTokenToTransfer!)!.symbol;
+              token = tokenArray!.get(props.addressOfTokenToTransfer!)!;
           }else {
-            console.error("Token not found!");
+            console.error("Token not width address: " + props.addressOfTokenToTransfer + "found!");
             token = null;
+            quitModal();
           }
         }
     }

@@ -39,10 +39,14 @@ export class MnemonicWallet implements VultureAccount {
 
         // Callback for SET_CURRENT_WALLET from the action worker.
         this.actionWorker.onmessage = async (event) => {
+
             if(event.data.method == VultureMessage.SET_CURRENT_WALLET) {
                 if(event.data.params.success == true) {
                     this.isWalletActive = true;
                     this.accountData.address = event.data.params.address;
+
+                    // Emit ready events when the worker is ready.
+                    this.accountEvents.emit('actionWorkerReady');
 
                     // Initialize the AccountInfoWorker, which is a query/info focused keyless worker.
                     this.infoWorker.postMessage({
@@ -63,13 +67,18 @@ export class MnemonicWallet implements VultureAccount {
                 if(event.data.params.success == true) {
                     console.info("Information worker initialized.");
 
+                    // Emit ready events when the worker is ready.
+                    this.accountEvents.emit('infoWorkerReady');
+
                     // Subscribe to account events after our info worker is initialized.
                     await this.subscribeToAccountEvents();
 
                     // This is quite temporary.
+                    /*
                     this.updateTokenBalance = setInterval(async () => {
                         this.accountEvents.emit(VultureMessage.GET_TOKEN_BALANCE);
                     }, 3000);
+                    */
                 }else {
                     console.error("Failed to initialize infoWorker: " + event.data.params.error);
                 }

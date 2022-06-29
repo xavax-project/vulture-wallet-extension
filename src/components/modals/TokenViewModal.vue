@@ -7,8 +7,7 @@
         <div class="flexBox" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
         overflow-wrap: break-word;"
-         v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0
-         && tokenType == 'ERC20'">
+         v-if="vultureWallet.tokenStore != null && tokenType == 'ERC20'">
 
             <div style="width: 100%; margin-bottom: 5px;">
                 <div style="font-size: 26px;">Token: 
@@ -61,8 +60,7 @@
         <div class="flexBox" style="flex-grow: 1; padding-left: 15px; padding-right: 15px; width: 100%;
         flex-direction: column; align-items: center; margin-top: 30px; box-sizing: border-box; font-size: 18px;
         overflow-wrap: break-word;"
-         v-if="vultureWallet.tokenStore != null && vultureWallet.tokenStore.NFTList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0
-         && tokenType == 'ERC721'">
+         v-if="vultureWallet.tokenStore != null && tokenType == 'ERC721'">
 
             <div style="width: 100%; margin-bottom: 5px;">
                 <div style="font-size: 26px;">
@@ -141,7 +139,7 @@ export default defineComponent({
         type: Object as PropType<VultureWallet>,
         required: true,
     },
-    arrayIndexOfToken: Number,
+    tokenAddress: String,
     tokenType: String,
   },
   setup(props, context) {
@@ -155,13 +153,14 @@ export default defineComponent({
       balance: '0'
     });
 
+    // Lots of ! here, too many, I know.
     switch(props.tokenType) {
         case "ERC20": {
-            token = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri)![props.arrayIndexOfToken!]
+            token = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri)!.get(props.tokenAddress!)!;
             break;
         }
         case "ERC721": {
-            token = props.vultureWallet.tokenStore.NFTList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri)![props.arrayIndexOfToken!];
+            token = props.vultureWallet.tokenStore.NFTList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri)!.get(props.tokenAddress!)!;
             break;
         }
         default: {
@@ -173,7 +172,7 @@ export default defineComponent({
         context.emit("quit-modal");
     }
     function removeTokenFromList() {
-        (props.vultureWallet as VultureWallet).removeTokenFromList(props.arrayIndexOfToken!, props.tokenType!);
+        (props.vultureWallet as VultureWallet).removeTokenFromList(props.tokenAddress!, props.tokenType!);
         context.emit("reset-selected-token");
         quitModal();
     }

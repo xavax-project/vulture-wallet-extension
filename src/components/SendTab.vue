@@ -12,12 +12,12 @@
               (vultureWallet.accountStore.currentlySelectedNetwork.networkFeatures & networkFeatures.SMART_CONTRACTS) === networkFeatures.SMART_CONTRACTS ? true : false">
 
                 <!-- display info about Native asset, since that's whats selected if selectedTokenArrayIndex is -1 -->
-                <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex == -1">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
+                <span v-if="vultureWallet.currentWallet && addressOfTokenToTransfer == ''">{{vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix}}</span>
                 <!-- display info about the selected token, since that's whats selected if selectedTokenArrayIndex is >=0 -->
-                <span v-if="vultureWallet.currentWallet && selectedTokenArrayIndex >= 0 &&
+                <span v-if="vultureWallet.currentWallet && addressOfTokenToTransfer != 0 &&
                   vultureWallet.tokenStore != null &&
-                  vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0">                  
-                  {{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)[selectedTokenArrayIndex].symbol}}
+                  vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri) != null">                  
+                  {{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.get(addressOfTokenToTransfer).name}}
                 </span> <span style="font-family: fonticonA; font-size: 19px;"> &#xe3c9;</span>
 
               </div>
@@ -63,7 +63,7 @@ export default defineComponent({
       type: Object as PropType<VultureWallet>,
       required: true,
     },
-    selectedTokenArrayIndex: Number, // -1 is native, [0..n] is a non-native token.
+    addressOfTokenToTransfer: String, // Empty is native, anything else hints that we are transferring a token with the given address. 
   },
   setup(props, context) {
 
@@ -97,7 +97,8 @@ export default defineComponent({
       props.vultureWallet.currentWallet.accountEvents.once(VultureMessage.ESTIMATE_TX_FEE, (fee: number) => {
         estimatedFee.value = fee;
 
-        if(props.selectedTokenArrayIndex == -1) {
+        // Check if we are transfering a token or the native asset by props.addressOfTokenToTransfer
+        if(props.addressOfTokenToTransfer == "") {
           if((currentAmount.value + fee) < props.vultureWallet.currentWallet.accountData.freeAmountWhole) {
             insufficientFunds.value = false;
           }else {
@@ -107,8 +108,8 @@ export default defineComponent({
           // Make sure we have enough of the token we are sending.
           let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
-            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!] != null) {
-              if(currentAmount.value < Number((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!].balance)) {
+            if(tokenArray!.get(props.addressOfTokenToTransfer!) != null) {
+              if(currentAmount.value < Number(tokenArray!.get(props.addressOfTokenToTransfer!)!.balance)) {
               insufficientFunds.value = false;
               }else {
                 insufficientFunds.value = true;
@@ -122,14 +123,14 @@ export default defineComponent({
       });
       if(invalidAddress.value == false) {
         // If we are sending native assets.
-        if(props.selectedTokenArrayIndex == -1) {
+        if(props.addressOfTokenToTransfer == "") {
           props.vultureWallet.currentWallet.estimateTxFee(currentAddress.value, currentAmount.value);
-        }else{
+        }else {
         // If we are sending some token. This is quite messy, will have to refactor to something easier on the eyes later.
           let tokenArray = props.vultureWallet.tokenStore.tokenList.get(props.vultureWallet.accountStore.currentlySelectedNetwork.networkUri);
           if(tokenArray != undefined) {
-            if((tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!] != null) {
-              props.vultureWallet.currentWallet.estimateTxFee(currentAddress.value, currentAmount.value, (tokenArray as AbstractToken[])[props.selectedTokenArrayIndex!]);
+            if(tokenArray!.get(props.addressOfTokenToTransfer!) != null) {
+              props.vultureWallet.currentWallet.estimateTxFee(currentAddress.value, currentAmount.value, tokenArray!.get(props.addressOfTokenToTransfer!)!);
             }else {
               console.error("Token not found!");
             }
@@ -138,7 +139,7 @@ export default defineComponent({
       }
     }
     function sendButton() {
-      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value, tokenArrayIndex: props.selectedTokenArrayIndex});
+      context.emit('send-button-click', {amount: currentAmount.value, recipent: currentAddress.value, addressOfTokenToTransfer: props.addressOfTokenToTransfer});
       amount(0);
       updateKey.value++;
     }

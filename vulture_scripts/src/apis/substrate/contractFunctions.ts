@@ -17,7 +17,7 @@ const { ContractPromise } = require('@polkadot/api-contract');
 
 
 
-export async function getERC20Balance(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+export async function getERC20Balance(tokenAddress: string, contract: any, senderAddress: string) {
     let success: boolean = true;
     let tokenDecimals: number = -1;
     let tokenBalance: string = "0";
@@ -61,11 +61,10 @@ export async function getERC20Balance(tokenAddress: string, contract: any, sende
             VultureMessage.GET_TOKEN_BALANCE,
             {
                 tokenAddress: tokenAddress,
-                tokenType: 'ERC20',
                 senderAddress: senderAddress,
-                arrayIndexOfToken: arrayIndexOfToken,
-                balance: tokenBalance,
+                tokenType: 'ERC20',
                 success: true,
+                balance: tokenBalance,
             }
         ));
     }else {
@@ -80,7 +79,7 @@ export async function getERC20Balance(tokenAddress: string, contract: any, sende
 
 }
 
-export async function getERC721Balance(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+export async function getERC721Balance(tokenAddress: string, contract: any, senderAddress: string) {
     let success: boolean = true;
     let tokenBalance: string = "0";
 
@@ -95,7 +94,7 @@ export async function getERC721Balance(tokenAddress: string, contract: any, send
         }
         
     }catch {
-        console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC20");
+        console.log("Contract '" + tokenAddress + "'" + " Doesn't have balanceOf() - this is catastrophic for ERC721");
     }
 
     if(success) {
@@ -105,7 +104,6 @@ export async function getERC721Balance(tokenAddress: string, contract: any, send
                 tokenAddress: tokenAddress,
                 tokenType: 'ERC721',
                 senderAddress: senderAddress,
-                arrayIndexOfToken: arrayIndexOfToken,
                 balance: tokenBalance,
                 success: true,
             }
@@ -240,7 +238,7 @@ export async function getERC721Metadata(tokenAddress: string, contract: any, sen
 
 }
 
-export async function getERC721Info(tokenAddress: string, contract: any, senderAddress: string, arrayIndexOfToken?: number) {
+export async function getERC721Info(tokenAddress: string, contract: any, senderAddress: string) {
     
     let success: boolean = true;
     let error: string = "";

@@ -25,7 +25,7 @@
         :vultureWallet="vultureWallet"
         :recipentAddress="recipentAddress"
         :amountToSend="amountToSend"
-        :arrayIndexOfSelectedToken="arrayIndexOfSelectedToken"/>
+        :addressOfTokenToTransfer="addressOfTokenToTransfer"/>
 
         <ResetWalletModal v-if="modalType == modals.RESET_WALLET"
         @quit-modal="quitModal()"
@@ -43,13 +43,13 @@
         @reset-selected-token="resetSelectedToken()"
         :vultureWallet="vultureWallet"
         :tokenType="tokenTypeToAdd"
-        :arrayIndexOfToken="arrayIndexOfSelectedToken"/>
+        :tokenAddress="addressOfTokenToView"/>
 
         <SelectAssetModal v-if="modalType == modals.SELECT_NEW_ASSET"
         @quit-modal="quitModal()"
         @select-token="selectToken($event)"
         :vultureWallet="vultureWallet"
-        :selectedTokenArrayIndex="selectedTokenArrayIndex"/>
+        :selectedTokenAddress="addressOfTokenToTransfer"/>
         
     </div>
 </template>
@@ -101,9 +101,8 @@ export default defineComponent({
       amountToSend: String,
 
       tokenTypeToAdd: String,
-      arrayIndexOfSelectedToken: Number,
-
-      selectedTokenArrayIndex: Number,
+      addressOfTokenToView: String,
+      addressOfTokenToTransfer: String
   },
   setup(props, context) {
     let modals = Modals;
@@ -111,8 +110,8 @@ export default defineComponent({
     function quitModal() {
         context.emit("quit-modal");
     }
-    function selectToken(arrayIndexOfToken: number) {
-        context.emit("select-token", arrayIndexOfToken);
+    function selectToken(tokenAddress: string) {
+        context.emit("select-token", tokenAddress);
     }
     function hardWalletReset() {
         context.emit("on-wallet-reset");

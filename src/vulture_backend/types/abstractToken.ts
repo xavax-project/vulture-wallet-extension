@@ -37,8 +37,12 @@ export interface AbstractToken {
  * The `TokenStore` is useful when dealing with many a multi-account system. Every network added will have
  * its own `TokenStore`.
  * 
+ * The key-value pair is as follows:
+ * `Map<string, Map<string, AbstractToken>>`
+ * First key is the identifier of the store (i.e which network the tokens are added to).
+ * Second key is the hash/address of each token, which gets a corresponding token.
  */
 export interface TokenStore {
-    tokenList: Map<string, AbstractToken[]>;
-    NFTList: Map<string, AbstractToken[]>;
+    tokenList: Map<string, Map<string, AbstractToken>>;
+    NFTList: Map<string, Map<string, AbstractToken>>;
 }

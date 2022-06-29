@@ -407,14 +407,57 @@ export class VultureWallet {
                 console.error("Error: Ledger wallets not currently supported!");
             }
         }
-        
-       //Set the callback for updating token balances here, it's wonky but I'll refactor the way this works eventually.
-       this.currentWallet.accountEvents.on(VultureMessage.GET_TOKEN_BALANCE, () => {
-            this.updateBalanceOfTokens();
-       });
+        // Start polling token balances instantly when the info worker is ready.s
+        this.currentWallet.accountEvents.on("infoWorkerReady", async () => {
+            await this.startTokenBalancePolling();
+        })
+
+       //TODO: REMOVE 
+       ////Set the callback for updating token balances here, it's wonky but I'll refactor the way this works eventually.
        this.currentWallet.accountEvents.on(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, (data) => {
            this.walletEvents.emit(VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, data);
        });
+
+       this.currentWallet.infoWorker.addEventListener("message", async(event) => {
+            if(event.data.method == VultureMessage.GET_TOKEN_BALANCE) {
+                if(event.data.params.success == true) {
+                    switch(event.data.params.tokenType) {
+                        case 'ERC20': {
+                             if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                                 this.tokenStore.tokenList
+                                 .get(this.accountStore.currentlySelectedNetwork.networkUri)!
+                                 .get(event.data.params.tokenAddress)!
+                                 .balance = event.data.params.balance;
+                             }
+                            break;
+                        }
+                        case 'ERC721': {
+                             if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                                 this.tokenStore.NFTList
+                                 .get(this.accountStore.currentlySelectedNetwork.networkUri)!
+                                 .get(event.data.params.tokenAddress)!
+                                 .balance = event.data.params.balance;
+                             }
+                            break;
+                        }
+                        default: {
+                            console.warn("Token Type: " + event.data.params.tokenType + " is Invalid!");
+                            break;
+                        }
+                    }
+
+                }else {
+                    console.error("Error getting balance of token " + event.data.params.tokenAddress);
+                    if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+                        this.tokenStore.tokenList
+                        .get(this.accountStore.currentlySelectedNetwork.networkUri)!
+                        .get(event.data.params.tokenAddress)!
+                        .balance = "Error";
+                    }
+                }
+            }
+       });
+
     }
 
     async switchWallet(index: number) {
@@ -427,63 +470,49 @@ export class VultureWallet {
         this.saveAccounts();
         this.initWallet(this.vault, this.accountStore);
     }
-    async updateBalanceOfTokens() {
-       this.currentWallet.infoWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
-           if(event.data.method == VultureMessage.GET_TOKEN_BALANCE) {
-               if(event.data.params.success == true) {
-                   switch(event.data.params.tokenType) {
-                       case 'ERC20': {
-                            if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
-                                this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
-                                .balance = event.data.params.balance;
-                            }
-                           break;
-                       }
-                       case 'ERC721': {
-                            if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
-                                this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
-                                .balance = event.data.params.balance;
-                            }
-                           break;
-                       }
-                       default: {
-                           console.warn("Token Type: " + event.data.params.tokenType + " is Invalid!");
-                           break;
-                       }
-                   }
-
-               }else {
-                   console.error("Error getting balance of token " + event.data.params.tokenAddress);
-                   if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
-                       this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri)![event.data.params.arrayIndexOfToken]
-                       .balance = "Error";
-                   }
-               }
-           }
-       };
-       // Get balance of every ERC20 token. We have to manually call since subscriptions don't work for this *yet*.
-       this.tokenStore.tokenList?.get(this.accountStore.currentlySelectedNetwork.networkUri)?.forEach((token, index) => { // TODO: UPDATE TO METHOD
-           this.currentWallet.infoWorker.postMessage({
-               method: VultureMessage.GET_TOKEN_BALANCE,
-               params: {
-                   tokenAddress: token.address,
-                   arrayIndexOfToken: index,
-                   tokenType: 'ERC20'
-               },
-           });
-       });
-
-        // Get balance of every ERC721 token. We have to manually call since subscriptions don't work for this *yet*.
-       this.tokenStore.NFTList?.get(this.accountStore.currentlySelectedNetwork.networkUri)?.forEach((token, index) => { // TODO: UPDATE TO METHOD
-            this.currentWallet.infoWorker.postMessage({
-                method: VultureMessage.GET_TOKEN_BALANCE,
-                params: {
-                    tokenAddress: token.address,
-                    arrayIndexOfToken: index,
-                    tokenType: 'ERC721'
-                },
+    async startTokenBalancePolling() {
+         console.log("This is redundant.");
+        
+        if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+            // Get balance of every ERC20 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
+            Array.from(this.tokenStore.tokenList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
+                console.log("Adding to subscription: " + token.name);
+                this.currentWallet.infoWorker.postMessage({
+                    method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
+                    params: {
+                        tokenAddress: token.address,
+                        tokenType: 'ERC20'
+                    },
+                });
             });
-        });
+            // Get balance of every ERC721 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
+            Array.from(this.tokenStore.NFTList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
+                console.log("Adding to subscription: " + token.name);
+                this.currentWallet.infoWorker.postMessage({
+                    method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
+                    params: {
+                        tokenAddress: token.address,
+                        tokenType: 'ERC721'
+                    },
+                });
+            });
+        }
+
+        if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
+            // Get balance of every ERC721 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
+           Array.from(this.tokenStore.NFTList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
+                this.currentWallet.infoWorker.postMessage({
+                    method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
+                    params: {
+                        tokenAddress: token.address,
+                        tokenType: 'ERC721'
+                    },
+                });
+           });
+        }
+
+        
+
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();
@@ -510,6 +539,13 @@ export class VultureWallet {
                 addTokenToStore(this.accountStore.currentlySelectedNetwork, false, token).then((store) => {
                     if(store != null) {
                         this.tokenStore = store;
+                        this.currentWallet.infoWorker.postMessage({
+                            method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
+                            params: {
+                                tokenAddress: token.address,
+                                tokenType: 'ERC20'
+                            },
+                        });
                     }else {
                         console.error("Failed adding token, store not found!");
                     }
@@ -520,6 +556,13 @@ export class VultureWallet {
                 addTokenToStore(this.accountStore.currentlySelectedNetwork, true, token).then((store) => {
                     if(store != null) {
                         this.tokenStore = store;
+                        this.currentWallet.infoWorker.postMessage({
+                            method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
+                            params: {
+                                tokenAddress: token.address,
+                                tokenType: 'ERC721'
+                            },
+                        });
                     }else {
                         console.error("Failed adding token, store not found!");
                     }
@@ -528,10 +571,10 @@ export class VultureWallet {
             }
         }
     }
-    removeTokenFromList(arrayIndexOfToken: number, tokenType: string) {
+    removeTokenFromList(tokenAddress: string, tokenType: string) {
         switch(tokenType) {
             case 'ERC20': {
-                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, false, arrayIndexOfToken).then((store) => {
+                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, false, tokenAddress).then((store) => {
                     if(store != null) {
                         this.tokenStore = store;
                     }else {
@@ -541,7 +584,7 @@ export class VultureWallet {
                 break;
             }
             case 'ERC721': {
-                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, true, arrayIndexOfToken).then((store) => {
+                removeTokenFromStore(this.accountStore.currentlySelectedNetwork, true, tokenAddress).then((store) => {
                     if(store != null) {
                         this.tokenStore = store;
                     }else {
@@ -555,7 +598,6 @@ export class VultureWallet {
     updateAccountAddresses(reInitializeWallet: boolean) {
         this.currentWallet.actionWorker.onmessage = (event) => { // TODO: UPDATE TO METHOD
             if(event.data.method == VultureMessage.UPDATE_ACCOUNTS_TO_NETWORK) {
-                console.log(event.data.params);
                 if(event.data.params.success == true) {
                     this.accountStore.allAccounts = event.data.params.updatedAccounts;
                     this.saveAccounts();
@@ -668,8 +710,8 @@ export async function loadTokenStore(network: Network) {
             return value as TokenStore;
         }else {
             let tokenStore: TokenStore = {
-                tokenList: new Map<string, AbstractToken[]>(),
-                NFTList: new Map<string, AbstractToken[]>(),
+                tokenList: new Map<string, Map<string, AbstractToken>>(),
+                NFTList: new Map<string, Map<string, AbstractToken>>(),
             }
             localforage.setItem("tokenStore", tokenStore);
             return tokenStore;
@@ -693,19 +735,19 @@ export async function addTokenToStore(network: Network, isNFT: boolean, token: A
             let store = value as TokenStore;
             if(isNFT) {
                 if(store.NFTList.get(network.networkUri)) {
-                    store.NFTList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    store.NFTList.get(network.networkUri)?.set(token.address, JSON.parse(JSON.stringify(token)));
                     
                 }else {
-                    store.NFTList.set(network.networkUri, []);
-                    store.NFTList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    store.NFTList.set(network.networkUri, new Map<string, AbstractToken>());
+                    store.NFTList.get(network.networkUri)?.set(token.address, JSON.parse(JSON.stringify(token)));
                 }
             }else {
                 if(store.tokenList.get(network.networkUri)) {
-                    store.tokenList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    store.tokenList.get(network.networkUri)?.set(token.address, JSON.parse(JSON.stringify(token)));
                     
                 }else {
-                    store.tokenList.set(network.networkUri, []);
-                    store.tokenList.get(network.networkUri)?.push(JSON.parse(JSON.stringify(token)));
+                    store.tokenList.set(network.networkUri, new Map<string, AbstractToken>());
+                    store.tokenList.get(network.networkUri)?.set(token.address, JSON.parse(JSON.stringify(token)));
                 }
             }
             localforage.setItem("tokenStore", store);
@@ -721,26 +763,26 @@ export async function addTokenToStore(network: Network, isNFT: boolean, token: A
  *  Adds a token to the TokenStore of the current network. If the user has the token added it will show up
  *  on the front-end GUI.
  */
- export async function removeTokenFromStore(network: Network, isNFT: boolean, tokenArrayIndex: number){
+ export async function removeTokenFromStore(network: Network, isNFT: boolean, tokenAddress: string){
 
     let res = await localforage.getItem("tokenStore").then((value) => {
         if(value != null) {
             let store = value as TokenStore;
             if(isNFT) {
                 if(store.NFTList.get(network.networkUri)) {
-                    store.NFTList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    store.NFTList.get(network.networkUri)?.delete(tokenAddress);
                     
                 }else {
-                    store.NFTList.set(network.networkUri, []);
-                    store.NFTList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    store.NFTList.set(network.networkUri, new Map<string, AbstractToken>());
+                    console.log("Token doesn't exist in store because store doesn't exist! (creating store...)");
                 }
             }else {
                 if(store.tokenList.get(network.networkUri)) {
-                    store.tokenList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    store.tokenList.get(network.networkUri)?.delete(tokenAddress);
                     
                 }else {
-                    store.tokenList.set(network.networkUri, []);
-                    store.tokenList.get(network.networkUri)?.splice(tokenArrayIndex, 1);
+                    store.tokenList.set(network.networkUri, new Map<string, AbstractToken>());
+                    console.log("Token doesn't exist in store because store doesn't exist! (creating store...)");
                 }
             }
             localforage.setItem("tokenStore", store);

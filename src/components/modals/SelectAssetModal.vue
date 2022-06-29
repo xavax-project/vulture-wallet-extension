@@ -9,22 +9,23 @@
             </div>
             <div class="outline" style=" text-align: left; font-size: 18px; height: auto; text-align: center; width: 90%;">
                 <div class="flexBox"  v-if="vultureWallet.tokenStore != null &&
-                vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length > 0"
+                Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length > 0"
                 style="align-items: center;">
                   <div style="margin-top: 10px; margin-bottom: 5px; font-size: 15px;">
-                    <span style="color: var(--accent_color);">{{vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.length}}</span> tokens
+                    <span style="color: var(--accent_color);">
+                        {{Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)?.values()).length}}
+                        </span> tokens
                   </div>
-                  <span v-for="(token, index) in vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri)" v-bind:key="token">
-                    <TokenModule :token="token" :tokenIndex="index" :selected="index == selectedTokenArrayIndex ? true : false"
+                  <span v-for="(token) in Array.from(vultureWallet.tokenStore.tokenList.get(vultureWallet.accountStore.currentlySelectedNetwork.networkUri).values())" v-bind:key="token">
+                    <TokenModule :token="token" :selected="token.address == selectedTokenAddress ? true : false"
                     @module-click="selectToken($event, 'ERC20')"/>
                   </span>
-                    <DefaultButton @button-click="selectToken(-1)" :buttonText="'Select \'' + vultureWallet.accountStore.currentlySelectedNetwork.networkAssetPrefix + '\''"
-                    buttonHeight="35px"  buttonWidth="154px" fontSize="18px" style="margin-bottom: 15px; margin-top: 10px;"/>
                 </div>
             </div>
         </div>
 
         <div class="flexBox" style="flex-grow: 0; margin-bottom: 15px; width: 100%; flex-direction: row; align-self: center; justify-content: space-evenly;">
+            <DefaultButton buttonHeight="40px" buttonWidth="154px" buttonText="Default" @button-click="selectToken('')"/>
             <DefaultButton buttonHeight="40px" buttonWidth="154px" buttonText="Return" @button-click="quitModal()"/>
         </div>
             
@@ -54,15 +55,15 @@ export default defineComponent({
         type: Object as PropType<VultureWallet>,
         required: true,
     },
-    selectedTokenArrayIndex: Number
+    selectedTokenAddress: String
   },
   setup(props, context) {
 
     function quitModal() {
         context.emit("quit-modal");
     }
-    function selectToken(arrayIndexOfToken: number) {
-        context.emit("select-token", arrayIndexOfToken);
+    function selectToken(tokenAddress: string) {
+        context.emit("select-token", tokenAddress);
         quitModal();
     }
     return {

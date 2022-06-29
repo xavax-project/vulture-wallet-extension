@@ -72,17 +72,17 @@ export class SubstrateNetwork implements VultureNetwork {
         });
         
     }
-    async getBalanceOfToken(tokenAddress: string, tokenType: string, arrayIndexOfToken?: number): Promise<void> {
+    async getBalanceOfToken(tokenAddress: string, tokenType: string): Promise<void> {
         if(this.isCryptoReady) {
             let contract = new ContractPromise(this.networkAPI!, erc20Abi, tokenAddress);
             switch(tokenType) {
                 case 'ERC20': {
-                    await getERC20Balance(tokenAddress, contract, this.currentAddress, arrayIndexOfToken);
+                    await getERC20Balance(tokenAddress, contract, this.currentAddress);
                     break;
                 }
                 default: {
                     console.error("Tried getting balance of token, but the tokenType is invalid!");
-                    postMessage({method: VultureMessage.GET_TOKEN_BALANCE, params: {
+                    postMessage({method: VultureMessage.SUBSCRIBE_TO_ACC_EVENTS, params: {
                         success: false,
                     }});
                 }
