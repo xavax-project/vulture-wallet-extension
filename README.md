@@ -1,3 +1,10 @@
+# ATTENTION: REPOSITORY MOVED!
+This repo has been permanently moved to: https://github.com/psycoders-club/vulture-wallet-browser.
+This one wont be updated any longer.
+
+
+____
+
 <h1 align="center">Vulture Wallet | Extension</h1>
 <p align='center'>
 <img src="./public/icons/VultureIcon2.png" alt="Example 1" width="8%"> 
