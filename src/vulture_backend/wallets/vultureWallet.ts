@@ -470,13 +470,10 @@ export class VultureWallet {
         this.saveAccounts();
         this.initWallet(this.vault, this.accountStore);
     }
-    async startTokenBalancePolling() {
-         console.log("This is redundant.");
-        
+    async startTokenBalancePolling() {        
         if(this.tokenStore.tokenList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
             // Get balance of every ERC20 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
             Array.from(this.tokenStore.tokenList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
-                console.log("Adding to subscription: " + token.name);
                 this.currentWallet.infoWorker.postMessage({
                     method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
                     params: {
@@ -485,9 +482,10 @@ export class VultureWallet {
                     },
                 });
             });
+        }
+        if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
             // Get balance of every ERC721 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
             Array.from(this.tokenStore.NFTList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
-                console.log("Adding to subscription: " + token.name);
                 this.currentWallet.infoWorker.postMessage({
                     method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
                     params: {
@@ -497,22 +495,6 @@ export class VultureWallet {
                 });
             });
         }
-
-        if(this.tokenStore.NFTList.get(this.accountStore.currentlySelectedNetwork.networkUri) != null) {
-            // Get balance of every ERC721 token. We have to manually poll in the worker since subscriptions don't work for this *yet*.
-           Array.from(this.tokenStore.NFTList!.get(this.accountStore.currentlySelectedNetwork.networkUri)!.values()).forEach((token) => {
-                this.currentWallet.infoWorker.postMessage({
-                    method: VultureMessage.ADD_TOKEN_TO_SUBSCRIPTION,
-                    params: {
-                        tokenAddress: token.address,
-                        tokenType: 'ERC721'
-                    },
-                });
-           });
-        }
-
-        
-
     }
     switchNetwork(networkName: string) {
         const networks = new DefaultNetworks();
